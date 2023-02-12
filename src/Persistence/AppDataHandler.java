@@ -30,19 +30,19 @@ public class AppDataHandler {
         return false;
     }
 
-    public Map<String, Iterable<Word>> getPhoneNumbers( int companyId ) {
-        return new TreeMap<String, Iterable<Word>>();
+    public Map<String, LinkedList<Word>> getPhoneNumbers( int companyId ) {
+        return new TreeMap<String, LinkedList<Word>>();
     }
 
-    public Iterable<Integer> storePhoneNumbers( Map<String, Iterable<Word>> phoneNumbers, int companyId ) {
+    public LinkedList<Integer> storePhoneNumbers( Map<String, LinkedList<Word>> phoneNumbers, int companyId ) {
         return new LinkedList<Integer>();
     }
 
-    public Iterable<Word> getWords( String phoneNumber ) {
+    public LinkedList<Word> getWords( String phoneNumber ) {
         return new LinkedList<Word>();
     }
 
-    public Iterable<Integer> storeWords( Iterable<Word> words, String phoneNumber ) {
+    public LinkedList<Integer> storeWords( LinkedList<Word> words, String phoneNumber ) {
         return new LinkedList<Integer>();
     }
 }

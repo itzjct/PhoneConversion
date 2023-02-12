@@ -5,7 +5,7 @@ import java.util.*;
 public class Company {
     private int id;
     private String name;
-    private Map<String, Iterable<String>> phoneNumbersToWords = new TreeMap<String, Iterable<String>>();
+    private Map<String, LinkedList<Word>> phoneNumbersToWords = new TreeMap<String, LinkedList<Word>>();
 
     public int getId() {
         return this.id;
@@ -23,11 +23,11 @@ public class Company {
         this.name = name;
     }
 
-    public Map<String, Iterable<String>> getPhoneNumbersToWords() {
+    public Map<String, LinkedList<Word>> getPhoneNumbersToWords() {
         return this.phoneNumbersToWords;
     }
 
-    public void setPhoneNumbersToWords( Map<String, Iterable<String>> phoneNumbersToWords ) {
+    public void setPhoneNumbersToWords( Map<String, LinkedList<Word>> phoneNumbersToWords ) {
         this.phoneNumbersToWords = phoneNumbersToWords;
     }
 }
