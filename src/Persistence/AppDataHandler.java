@@ -4,11 +4,7 @@ import Application.Domain.*;
 import java.util.*;
 
 public class AppDataHandler {
-    private String connectionString;
-
-    public AppDataHandler( String connectionString ) {
-        this.connectionString = connectionString;
-    }
+    private final String connectionString = "";
 
     public User getUser( String email ) {
         return new User();

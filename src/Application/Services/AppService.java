@@ -7,8 +7,8 @@ import java.util.*;
 public class AppService {
     private AppDataHandler dataHandler;
 
-    public AppService( String connectionString ) {
-        dataHandler = new AppDataHandler( connectionString );
+    public AppService() {
+        dataHandler = new AppDataHandler();
     }
 
     public boolean validatePhoneNumber( String phoneNumber ) {
