@@ -9,6 +9,7 @@ public class App {
     private AppService appService;
     private User currentUser;
     private String selectedPhoneNumber;
+    private Scanner input;
 
     public static void main( String[] args ) {
 
@@ -19,6 +20,7 @@ public class App {
 
     public App() {
         appService = new AppService();
+        input = new Scanner( System.in );
     }
 
     /*
@@ -27,9 +29,6 @@ public class App {
      */
     public void start() {
 
-        // Scanner used to read input from user
-        Scanner input = new Scanner( System.in );
-
         // Flag used to stop execution
         boolean isRunning = true;
 
@@ -37,12 +36,17 @@ public class App {
         while ( isRunning ) {
 
             // Select a start option
-            int selectedOption = selectStartOption( input );
+            int selectedOption = selectStartOption();
 
             // Execute the selected option
             isRunning = execStartOption( selectedOption );
+            if ( !isRunning ) {
+                System.out.println( "Exiting..." );
+                continue;
+            }
         }
 
+        // Close scanner
         input.close();
     }
 
@@ -50,7 +54,7 @@ public class App {
      * This method handles logic to allow the selection
      * of a start option
      */
-    private int selectStartOption( Scanner input ) {
+    private int selectStartOption() {
 
         // Initial message
         String message = "Welcome!:";
@@ -124,20 +128,18 @@ public class App {
         switch ( option ) {
         case 1:
             System.out.println( "Login chosen" );
-            // perform login()
-            break;
+            currentUser = login();
+            return currentUser != null;
         case 2:
             System.out.println( "Register chosen" );
-            // perform register()
-            break;
+            currentUser = register();
+            return currentUser != null;
         case 3:
-            System.out.println( "Exiting..." );
             return false;
         default:
-            System.out.println( "Invalid option parsed! \nExiting..." );
+            System.out.println( "Invalid option parsed!" );
             return false;
         }
-        return true;
     }
 
     // This method ensures a value is within given a range
@@ -146,5 +148,89 @@ public class App {
             return n >= hi && n <= lo;
         }
         return n >= lo && n <= hi;
+    }
+
+    private User login() {
+        return null;
+    }
+
+    /*
+     * This method handles register user logic
+     */
+    private User register() {
+
+        boolean isError = false;
+        User user = new User();
+        do {
+            // Temporary objects to store input
+            user = new User();
+
+            // Capture registration information
+            System.out.print( "Enter first name: " );
+            user.setFirstName( input.nextLine().trim() );
+            System.out.print( "Enter last name: " );
+            user.setLastName( input.nextLine().trim() );
+            System.out.print( "Enter email: " );
+            user.setEmail( input.nextLine().trim() );
+            System.out.print( "Enter password: " );
+            user.setPasswordString( input.nextLine().trim() );
+            System.out.print( "Enter company name: " );
+            user.getCompany().setName( input.nextLine().trim() );
+            System.out.print( "Are you an admin?(y/n): " );
+            String isAdmin = input.nextLine().trim();
+            user.setIsAdmin( isAdmin.equals( "y" ) );
+
+            // Validate user information
+            LinkedList<String> errors = appService.validateUser( user );
+            if ( errors.size() > 0 ) {
+                isError = true;
+                continue;
+            }
+
+            // Validate company information
+            errors = appService.validateCompany( user.getCompany() );
+            if ( errors.size() > 0 ) {
+                isError = true;
+                continue;
+            }
+
+            // User info is valid
+            isError = false;
+        }
+        while ( isError );
+
+        // Generate password salt and hash password
+        user.setPasswordSalt( appService.getSalt() );
+        user.setPassword( appService.hashPassword( user.getPasswordString(), user.getPasswordSalt() ) );
+
+        // If password hashing failed then return null
+        if ( user.getPassword().length == 0 ) {
+            return null;
+        }
+
+        // Clear user's text password (for security)
+        user.setPasswordString( null );
+
+        // Submit user to db
+        try {
+            user.setId( appService.storeUser( user ) );
+        }
+        catch ( Exception ex ) {
+            System.out.println( "Error submitting user to database" );
+
+            // If db submission failed then return null
+            return null;
+        }
+
+        return user;
+    }
+
+    /*
+     * This method prints a list of error messages to console
+     */
+    private void printErrorMsgs( LinkedList<String> errors ) {
+        for ( String msg : errors ) {
+            System.out.println( msg );
+        }
     }
 }

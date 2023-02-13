@@ -2,13 +2,21 @@ package Application.Services;
 
 import Application.Domain.*;
 import Persistence.*;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.*;
 
 public class AppService {
+    public final int SALT_LEN = 32;
+    public final String HASH_ALGORITHM = "SHA-512";
+    public SecureRandom rng;
     private AppDataHandler dataHandler;
 
     public AppService() {
         dataHandler = new AppDataHandler();
+        rng = new SecureRandom();
     }
 
     public boolean validatePhoneNumber( String phoneNumber ) {
@@ -17,6 +25,34 @@ public class AppService {
 
     public LinkedList<Word> generateWords( String phoneNumber ) {
         return new LinkedList<Word>();
+    }
+
+    public LinkedList<String> validateUser( User user ) {
+        LinkedList<String> errors = new LinkedList<String>();
+        return errors;
+    }
+
+    public LinkedList<String> validateCompany( Company company ) {
+        LinkedList<String> errors = new LinkedList<String>();
+        return errors;
+    }
+
+    public byte[] getSalt() {
+        byte[] salt = new byte[SALT_LEN];
+        rng.nextBytes( salt );
+        return salt;
+    }
+
+    public byte[] hashPassword( String password, byte[] salt ) {
+        try {
+            MessageDigest md = MessageDigest.getInstance( HASH_ALGORITHM );
+            md.update( salt );
+            return md.digest( password.getBytes( StandardCharsets.UTF_8 ) );
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return new byte[0];
+        }
     }
 
     public User getUser( String email ) {

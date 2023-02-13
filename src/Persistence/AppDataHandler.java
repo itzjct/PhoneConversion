@@ -14,6 +14,10 @@ public class AppDataHandler {
         return 0;
     }
 
+    public boolean existsCompany( String name ) {
+        return false;
+    }
+
     public Company getCompany( int userId ) {
         return new Company();
     }

@@ -5,8 +5,10 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
-    private String password;
-    private Company company;
+    private String passwordString;
+    private byte[] password;
+    private byte[] passwordSalt;
+    private Company company = new Company();
     private boolean isAdmin;
 
     public int getId() {
@@ -41,12 +43,28 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
+    public String getPasswordString() {
+        return this.passwordString;
+    }
+
+    public void setPasswordString( String passwordString ) {
+        this.passwordString = passwordString;
+    }
+
+    public byte[] getPassword() {
         return this.password;
     }
 
-    public void setPassword( String password ) {
+    public void setPassword( byte[] password ) {
         this.password = password;
+    }
+
+    public byte[] getPasswordSalt() {
+        return this.passwordSalt;
+    }
+
+    public void setPasswordSalt( byte[] passwordSalt ) {
+        this.passwordSalt = passwordSalt;
     }
 
     public Company getCompany() {
