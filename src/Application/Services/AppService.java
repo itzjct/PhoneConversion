@@ -122,10 +122,8 @@ public class AppService {
         return dataHandler.existsPhoneNumber( phoneNumber );
     }
 
-    public int addPhoneNumber( String phoneNumber, int companyId ) {
-        Map<String, LinkedList<Word>> tempMap = new TreeMap<String, LinkedList<Word>>();
-        tempMap.put( phoneNumber, null );
-        return ( dataHandler.storePhoneNumbers( tempMap, companyId ) ).getFirst();
+    public int storePhoneNumber( String phoneNumber, int companyId ) {
+        return dataHandler.storePhoneNumber( phoneNumber, companyId );
     }
 
     public LinkedList<Word> getWords( String phoneNumber ) {

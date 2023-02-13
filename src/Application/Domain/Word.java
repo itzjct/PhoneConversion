@@ -5,6 +5,18 @@ public class Word {
     private String word;
     private boolean isApproved;
 
+    public Word() {
+    }
+
+    public Word( String word ) {
+        this.word = word;
+    }
+
+    public Word( String word, boolean isApproved ) {
+        this.word = word;
+        this.isApproved = isApproved;
+    }
+
     public int getId() {
         return this.id;
     }

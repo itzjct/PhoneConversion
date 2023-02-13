@@ -1,48 +1,270 @@
 package Persistence;
 
 import Application.Domain.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 
 public class AppDataHandler {
-    private final String connectionString = "";
+    private final String connectionString = "jdbc:sqlite:C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\word_conversion.db";
+
+    private Connection getConnection() {
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection( connectionString );
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+        }
+        return conn;
+    }
 
     public User getUser( String email ) {
-        return new User();
+        String query = "SELECT user_id, first_name, last_name, email, password, password_salt, is_admin, company_id " +
+                "FROM users WHERE email = ?;";
+
+        User user = new User();
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query );) {
+            stmt.setString( 1, email );
+            ResultSet result = stmt.executeQuery();
+            int count = 0;
+            while ( result.next() ) {
+                count++;
+                user.setId( result.getInt( "user_id" ) );
+                user.setFirstName( result.getString( "first_name" ) );
+                user.setLastName( result.getString( "last_name" ) );
+                user.setEmail( result.getString( "email" ) );
+                user.setPassword( result.getBytes( "password" ) );
+                user.setPasswordSalt( result.getBytes( "password_salt" ) );
+                user.setIsAdmin( result.getBoolean( "is_admin" ) );
+                user.getCompany().setId( result.getInt( "company_id" ) );
+            }
+            result.close();
+
+            // No user found
+            if ( count == 0 ) {
+                return null;
+            }
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return null;
+        }
+
+        // Retrieve company object for given user
+        user.setCompany( getCompany( user.getCompany().getId() ) );
+
+        return user;
     }
 
     public int storeUser( User user ) {
-        return 0;
+        String query = "INSERT INTO users " +
+                "( first_name, last_name, email, password, password_salt, is_admin, company_id ) " +
+                "VALUES ( ?, ?, ?, ?, ?, ?, ? );";
+        int id = 0;
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            int index = 1;
+            stmt.setString( index++, user.getFirstName() );
+            stmt.setString( index++, user.getLastName() );
+            stmt.setString( index++, user.getEmail() );
+            stmt.setBytes( index++, user.getPassword() );
+            stmt.setBytes( index++, user.getPasswordSalt() );
+            stmt.setBoolean( index++, user.getIsAdmin() );
+            stmt.setInt( index++, user.getCompany().getId() );
+
+            stmt.executeUpdate();
+            ResultSet keys = stmt.getGeneratedKeys();
+            while ( keys.next() ) {
+                id = keys.getInt( 1 );
+            }
+            stmt.close();
+            return id;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return id;
+        }
     }
 
     public boolean existsCompany( String name ) {
-        return false;
+        String query = "SELECT company_id FROM companies WHERE company_name = ?;";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setString( 1, name );
+
+            ResultSet result = stmt.executeQuery();
+            while ( result.next() ) {
+                return true;
+            }
+            return false;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return false;
+        }
     }
 
-    public Company getCompany( int userId ) {
-        return new Company();
+    public Company getCompany( int companyId ) {
+        String query = "SELECT company_id, company_name FROM companies WHERE company_id = ?;";
+        Company company = new Company();
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setInt( 1, companyId );
+            ResultSet result = stmt.executeQuery();
+            int count = 0;
+            while ( result.next() ) {
+                count++;
+                company.setId( result.getInt( "company_id" ) );
+                company.setName( result.getString( "company_name" ) );
+            }
+            result.close();
+
+            // No company found
+            if ( count == 0 ) {
+                return null;
+            }
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return null;
+        }
+
+        // Retrieve phone numbers to words map
+        company.setPhoneNumbersToWords( getPhoneNumbers( companyId ) );
+
+        return company;
     }
 
     public int storeCompany( Company company ) {
-        return 0;
+        String query = "INSERT INTO companies ( company_name ) VALUES ( ? );";
+        int id = 0;
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setString( 1, company.getName() );
+
+            stmt.executeUpdate();
+            ResultSet keys = stmt.getGeneratedKeys();
+            while ( keys.next() ) {
+                id = keys.getInt( 1 );
+            }
+            keys.close();
+            return id;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return id;
+        }
     }
 
     public boolean existsPhoneNumber( String phoneNumber ) {
-        return false;
+        String query = "SELECT phone_number FROM phone_numbers WHERE phone_number = ?;";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setString( 1, phoneNumber );
+
+            ResultSet result = stmt.executeQuery();
+            while ( result.next() ) {
+                return true;
+            }
+            return false;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return false;
+        }
     }
 
     public Map<String, LinkedList<Word>> getPhoneNumbers( int companyId ) {
-        return new TreeMap<String, LinkedList<Word>>();
+        String query = "SELECT phone_numbers.phone_number, words.word_id, words.word, words.is_approved " +
+                "FROM phone_numbers " +
+                "INNER JOIN words ON phone_numbers.phone_number = words.phone_number " +
+                "WHERE company_id = ?;";
+        TreeMap<String, LinkedList<Word>> phoneToWords = new TreeMap<String, LinkedList<Word>>();
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setInt( 1, companyId );
+            ResultSet result = stmt.executeQuery();
+            while ( result.next() ) {
+                Word word = new Word();
+                word.setId( result.getInt( "word_id" ) );
+                word.setWord( result.getString( "word" ) );
+                word.setIsApproved( result.getBoolean( "is_approved" ) );
+
+                String phoneNumber = result.getString( "phone_number" );
+                if ( phoneToWords.containsKey( phoneNumber ) ) {
+                    phoneToWords.get( phoneNumber ).addLast( word );
+                }
+                else {
+                    LinkedList<Word> words = new LinkedList<Word>();
+                    words.add( word );
+                    phoneToWords.put( phoneNumber, words );
+                }
+            }
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return phoneToWords;
+        }
+        return phoneToWords;
     }
 
-    public LinkedList<Integer> storePhoneNumbers( Map<String, LinkedList<Word>> phoneNumbers, int companyId ) {
-        return new LinkedList<Integer>();
+    public int storePhoneNumber( String phoneNumber, int companyId ) {
+        String query = "INSERT INTO phone_numbers ( phone_number, company_id ) VALUES ( ?, ? );";
+        int id = 0;
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            int index = 1;
+            stmt.setString( index++, phoneNumber );
+            stmt.setInt( index++, companyId );
+
+            stmt.executeUpdate();
+            ResultSet keys = stmt.getGeneratedKeys();
+            while ( keys.next() ) {
+                id = keys.getInt( 1 );
+            }
+            keys.close();
+            return id;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return id;
+        }
     }
 
+    // May not be needed
     public LinkedList<Word> getWords( String phoneNumber ) {
         return new LinkedList<Word>();
     }
 
     public LinkedList<Integer> storeWords( LinkedList<Word> words, String phoneNumber ) {
-        return new LinkedList<Integer>();
+        String query = "INSERT INTO words ( word, is_approved, phone_number ) VALUES ( ?, ?, ? );";
+        LinkedList<Integer> ids = new LinkedList<Integer>();
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            for ( Word word : words ) {
+                int index = 1;
+                stmt.setString( index++, word.getWord() );
+                stmt.setBoolean( index++, word.getIsApproved() );
+                stmt.setString( index++, phoneNumber );
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+
+            ResultSet keys = stmt.getGeneratedKeys();
+            while ( keys.next() ) {
+                ids.addLast( keys.getInt( 1 ) );
+            }
+            keys.close();
+            return ids;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return ids;
+        }
     }
 }
