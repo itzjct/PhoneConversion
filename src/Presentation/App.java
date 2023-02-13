@@ -183,6 +183,7 @@ public class App {
             // Validate user information
             LinkedList<String> errors = appService.validateUser( user );
             if ( errors.size() > 0 ) {
+                printErrorMsgs( errors );
                 isError = true;
                 continue;
             }
@@ -190,6 +191,7 @@ public class App {
             // Validate company information
             errors = appService.validateCompany( user.getCompany() );
             if ( errors.size() > 0 ) {
+                printErrorMsgs( errors );
                 isError = true;
                 continue;
             }
