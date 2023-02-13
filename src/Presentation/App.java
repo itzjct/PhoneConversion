@@ -167,15 +167,15 @@ public class App {
 
             // Capture registration information
             System.out.print( "Enter first name: " );
-            user.setFirstName( input.nextLine().trim() );
+            user.setFirstName( input.nextLine().trim().toUpperCase() );
             System.out.print( "Enter last name: " );
-            user.setLastName( input.nextLine().trim() );
+            user.setLastName( input.nextLine().trim().toUpperCase() );
             System.out.print( "Enter email: " );
-            user.setEmail( input.nextLine().trim() );
+            user.setEmail( input.nextLine().trim().toUpperCase() );
             System.out.print( "Enter password: " );
             user.setPasswordString( input.nextLine().trim() );
             System.out.print( "Enter company name: " );
-            user.getCompany().setName( input.nextLine().trim() );
+            user.getCompany().setName( input.nextLine().trim().toUpperCase() );
             System.out.print( "Are you an admin?(y/n): " );
             String isAdmin = input.nextLine().trim();
             user.setIsAdmin( isAdmin.equals( "y" ) );
