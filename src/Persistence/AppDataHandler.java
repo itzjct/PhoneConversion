@@ -39,6 +39,9 @@ public class AppDataHandler {
         return conn;
     }
 
+    /*
+     * This method retrieves user from db with given email
+     */
     public User getUser( String email ) {
         String query = "SELECT user_id, first_name, last_name, email, password, password_salt, is_admin, company_id " +
                 "FROM users WHERE email = ?;";
@@ -78,6 +81,9 @@ public class AppDataHandler {
         return user;
     }
 
+    /*
+     * This method stores given user into db
+     */
     public int storeUser( User user ) {
         String query = "INSERT INTO users " +
                 "( first_name, last_name, email, password, password_salt, is_admin, company_id ) " +
@@ -108,6 +114,9 @@ public class AppDataHandler {
         }
     }
 
+    /*
+     * This methods deletes given user from db
+     */
     public int deleteUser( User user ) {
         String query = "DELETE FROM users WHERE email = ?;";
         int id = 0;
@@ -124,6 +133,9 @@ public class AppDataHandler {
         }
     }
 
+    /*
+     * This method checks if a given company exists in db
+     */
     public int existsCompany( String name ) {
         String query = "SELECT company_id FROM companies WHERE company_name = ?;";
         int id = 0;
@@ -144,6 +156,9 @@ public class AppDataHandler {
         }
     }
 
+    /*
+     * This method retrieves company from db with given id
+     */
     public Company getCompany( int companyId ) {
         String query = "SELECT company_id, company_name FROM companies WHERE company_id = ?;";
         Company company = new Company();
@@ -175,6 +190,9 @@ public class AppDataHandler {
         return company;
     }
 
+    /*
+     * This method stores given company into db
+     */
     public int storeCompany( Company company ) {
         String query = "INSERT INTO companies ( company_name ) VALUES ( ? );";
         int id = 0;
@@ -196,6 +214,9 @@ public class AppDataHandler {
         }
     }
 
+    /*
+     * This method deletes given company from db
+     */
     public int deleteCompany( Company company ) {
         String query = "DELETE FROM companies WHERE company_name = ?;";
         int id = 0;
@@ -212,6 +233,9 @@ public class AppDataHandler {
         }
     }
 
+    /*
+     * This method checks if given phone number exists in db
+     */
     public boolean existsPhoneNumber( String phoneNumber ) {
         String query = "SELECT phone_number FROM phone_numbers WHERE phone_number = ?;";
         try (Connection conn = getConnection();
@@ -230,6 +254,9 @@ public class AppDataHandler {
         }
     }
 
+    /*
+     * This method retrieves the map from phone numbers to words for a given company id
+     */
     public Map<String, List<Word>> getPhoneNumbers( int companyId ) {
         String query = "SELECT phone_numbers.phone_number, words.word_id, words.word, words.is_approved " +
                 "FROM phone_numbers " +
@@ -264,6 +291,9 @@ public class AppDataHandler {
         return phoneToWords;
     }
 
+    /*
+     * This method stores the phone number to given company into db
+     */
     public boolean storePhoneNumber( String phoneNumber, int companyId ) {
         String query = "INSERT INTO phone_numbers ( phone_number, company_id ) VALUES ( ?, ? );";
         try (Connection conn = getConnection();
@@ -281,6 +311,9 @@ public class AppDataHandler {
         }
     }
 
+    /*
+     * This method deletes given phone number from db
+     */
     public boolean deletePhoneNumber( String phoneNumber ) {
         String query = "DELETE FROM phone_numbers WHERE phone_number = ?;";
         try (Connection conn = getConnection();
@@ -296,11 +329,17 @@ public class AppDataHandler {
         }
     }
 
-    // May not be needed
+    /*
+     * Not implemented
+     * May not be needed
+     */
     public List<Word> getWords( String phoneNumber ) {
         return new LinkedList<Word>();
     }
 
+    /*
+     * This method stores words to given phone number into db
+     */
     public List<Integer> storeWords( List<Word> words, String phoneNumber ) {
         String query = "INSERT INTO words ( word, is_approved, phone_number ) VALUES ( ?, ?, ? );";
         List<Integer> ids = new LinkedList<Integer>();
@@ -330,6 +369,9 @@ public class AppDataHandler {
         }
     }
 
+    /*
+     * This method deletes the given words from db
+     */
     public boolean deleteWords( List<Word> words ) {
         String query = "DELETE FROM words WHERE word = ?;";
         try (Connection conn = getConnection();

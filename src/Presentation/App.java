@@ -129,16 +129,24 @@ public class App {
      */
     private void execStartOption( int option ) {
         switch ( option ) {
+
+        // Login option
         case 1:
             while ( login() ) {
             }
             break;
+
+        // Register option
         case 2:
             while ( register() ) {
             }
             break;
+
+        // Exit option
         case 3:
             exit();
+
+        // Unknown option
         default:
             System.out.println( "Invalid option parsed!" );
             exit();
@@ -294,6 +302,10 @@ public class App {
         return false;
     }
 
+    /*
+     * This method handles logic to allow the selection
+     * of a user option
+     */
     public int selectUserOptions() {
 
         // Print greetings
@@ -370,23 +382,35 @@ public class App {
      */
     private void execUserOption( int option ) {
         switch ( option ) {
+        
+        // Exit option
         case 1:
             exit();
+        
+        // Logout option
         case 2:
             logout();
             break;
+
+        // Generate words option
         case 3:
             while ( generateWords() ) {
             }
             break;
+
+        // View phone numbers option
         case 4:
             while ( viewPhoneNumbers() ) {
             }
             break;
+
+        // Approve words option
         case 5:
             while ( approveWords() ) {
             }
             break;
+
+        // Unknown option
         default:
             System.out.println( "Invalid option parsed!" );
             exit();
@@ -401,18 +425,30 @@ public class App {
         isUserLoopRunning = false;
     }
 
+    /*
+     * Not implemented
+     */
     private boolean generateWords() {
         printHeader( "Generate Words" );
+        System.out.println( "NOT IMPLEMENTED" );
         return false;
     }
 
+    /*
+     * Not implemented
+     */
     private boolean viewPhoneNumbers() {
         printHeader( "View Phone Numbers" );
+        System.out.println( "NOT IMPLEMENTED" );
         return false;
     }
 
+    /*
+     * Not implemented
+     */
     private boolean approveWords() {
         printHeader( "Approve Words" );
+        System.out.println( "NOT IMPLEMENTED" );
         return false;
     }
 

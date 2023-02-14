@@ -21,8 +21,15 @@ public class AppService {
     private Pattern emailPattern;
 
     public AppService() {
+
+        // Initialize data handler
         dataHandler = new AppDataHandler();
+
+        // Create random number generator
+        // Used to generate password salts
         rng = new SecureRandom();
+
+        // Regex and pattern to check validity of email
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
                 "[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
@@ -30,16 +37,27 @@ public class AppService {
         emailPattern = Pattern.compile( emailRegex );
     }
 
+    /*
+     * Not implemented
+     */
     public boolean validatePhoneNumber( String phoneNumber ) {
         return true;
     }
 
+    /*
+     * Not implemented
+     */
     public List<Word> generateWords( String phoneNumber ) {
         return new LinkedList<Word>();
     }
 
+    /*
+     * This method authenticates user
+     */
     public List<String> authenticateUser( User user ) {
         List<String> errors = new LinkedList<String>();
+
+        // Retrieve requested user from db
         User userFromDb = new User();
         try {
             userFromDb = dataHandler.getUser( user.getEmail() );
@@ -48,21 +66,29 @@ public class AppService {
             errors.add( ex.getMessage() );
             return errors;
         }
+
+        // Given email does not correspond to user in db
         if ( userFromDb == null ) {
             errors.add( "Email not found" );
             return errors;
         }
 
+        // Hash password and validate
         byte[] hashedPassword = hashPassword( user.getPasswordString(), userFromDb.getPasswordSalt() );
         if ( !Arrays.equals( hashedPassword, userFromDb.getPassword() ) ) {
             errors.add( "Invalid password" );
             return errors;
         }
+
+        // User authenticated, retrieve all data
         User.copy( user, userFromDb );
 
         return errors;
     }
 
+    /*
+     * This method validates login user data
+     */
     public List<String> validateLogin( User user ) {
         List<String> errors = new LinkedList<String>();
 
@@ -82,6 +108,9 @@ public class AppService {
         return errors;
     }
 
+    /*
+     * This method validates register user data
+     */
     public List<String> validateUser( User user ) {
         List<String> errors = new LinkedList<String>();
 
@@ -119,10 +148,16 @@ public class AppService {
         return errors;
     }
 
+    /*
+     * This method validates a given email
+     */
     private boolean isValidEmail( String email ) {
         return emailPattern.matcher( email ).matches();
     }
 
+    /*
+     * This method validates a given company
+     */
     public List<String> validateCompany( Company company ) {
         List<String> errors = new LinkedList<String>();
 
@@ -136,12 +171,18 @@ public class AppService {
         return errors;
     }
 
+    /*
+     * This method generates a random password salt
+     */
     public byte[] getSalt() {
         byte[] salt = new byte[SALT_LEN];
         rng.nextBytes( salt );
         return salt;
     }
 
+    /*
+     * This method hashes a given password with a given salt
+     */
     public byte[] hashPassword( String password, byte[] salt ) {
         try {
             MessageDigest md = MessageDigest.getInstance( HASH_ALGORITHM );
@@ -154,38 +195,65 @@ public class AppService {
         }
     }
 
+    /*
+     * This method calls data handler to retrieve user from given mail
+     */
     public User getUser( String email ) {
         return dataHandler.getUser( email );
     }
 
+    /*
+     * This method calls data handler to store given user
+     */
     public int storeUser( User user ) {
         return dataHandler.storeUser( user );
     }
 
+    /*
+     * This method calls data handler to check if given company exists
+     */
     public int existsCompany( String name ) {
         return dataHandler.existsCompany( name );
     }
 
+    /*
+     * This method calls data handler to retrieve company from given id
+     */
     public Company getCompany( int companyId ) {
         return dataHandler.getCompany( companyId );
     }
 
+    /*
+     * This method calls data handler to store given user
+     */
     public int storeCompany( Company company ) {
         return dataHandler.storeCompany( company );
     }
 
+    /*
+     * This method calls data handler to check if given phone number exists
+     */
     public boolean existsPhoneNumber( String phoneNumber ) {
         return dataHandler.existsPhoneNumber( phoneNumber );
     }
 
+    /*
+     * This method calls data handler to store phone number for given company id
+     */
     public boolean storePhoneNumber( String phoneNumber, int companyId ) {
         return dataHandler.storePhoneNumber( phoneNumber, companyId );
     }
 
+    /*
+     * This method calls data handler to get words from given phone number
+     */
     public List<Word> getWords( String phoneNumber ) {
         return dataHandler.getWords( phoneNumber );
     }
 
+    /*
+     * This method calls data handler to store words for given phone number
+     */
     public List<Integer> storeWords( List<Word> words, String phoneNumber ) {
         return dataHandler.storeWords( words, phoneNumber );
     }
