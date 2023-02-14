@@ -51,9 +51,6 @@ public class App {
                 execUserOption( selectedUserOption );
             }
         }
-
-        // Close scanner
-        input.close();
     }
 
     /*
@@ -436,6 +433,7 @@ public class App {
      */
     private void exit() {
         System.out.println( "Exiting..." );
+        input.close();
         System.exit( 0 );
     }
 
