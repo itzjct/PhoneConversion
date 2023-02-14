@@ -10,8 +10,8 @@ public class App {
     private User currentUser;
     private String selectedPhoneNumber;
     private Scanner input;
-    private boolean isStartLoopRunning = true;
-    private boolean isUserLoopRunning = true;
+    private boolean isStartMenuRunning = true;
+    private boolean isUserMenuRunning = true;
 
     public static void main( String[] args ) {
 
@@ -32,20 +32,20 @@ public class App {
     public void start() {
 
         // Loop to handle start options
-        while ( isStartLoopRunning ) {
+        while ( isStartMenuRunning ) {
 
             // Select a start option
-            int selectedStartOption = selectStartOption();
+            int selectedStartOption = selectOption( false );
 
             // Execute the selected start option
             execStartOption( selectedStartOption );
 
             // Loop to handle user options
-            isUserLoopRunning = true;
-            while ( isUserLoopRunning ) {
+            isUserMenuRunning = true;
+            while ( isUserMenuRunning ) {
 
                 // Select a user option
-                int selectedUserOption = selectUserOptions();
+                int selectedUserOption = selectOption( true );
 
                 // Execute the selected user option
                 execUserOption( selectedUserOption );
@@ -58,12 +58,20 @@ public class App {
 
     /*
      * This method handles logic to allow the selection
-     * of a start option
+     * of a menu option
+     * 
+     * Return: int representing a menu option
      */
-    private int selectStartOption() {
+    private int selectOption( boolean isUserMenu ) {
 
-        // Number of options presented to user (may change in future)
+        // Number of options presented
         int numOfOptions = 3;
+
+        // Check number of options if user menu and greet user
+        if ( isUserMenu ) {
+            System.out.println( "\nWelcome " + currentUser.getFirstName() + "!" );
+            numOfOptions = currentUser.isIsAdmin() ? 5 : 4;
+        }
 
         // Store selected option as int
         int selectedOption = 0;
@@ -74,8 +82,13 @@ public class App {
         // Loop to display and read start options
         do {
 
-            // Print start options
-            printStartOptions();
+            // Print menu options
+            if ( isUserMenu ) {
+                printUserOptions();
+            }
+            else {
+                printStartOptions();
+            }
 
             try {
 
@@ -146,7 +159,7 @@ public class App {
         case 3:
             exit();
 
-        // Unknown option
+            // Unknown option
         default:
             System.out.println( "Invalid option parsed!" );
             exit();
@@ -303,66 +316,6 @@ public class App {
     }
 
     /*
-     * This method handles logic to allow the selection
-     * of a user option
-     */
-    public int selectUserOptions() {
-
-        // Print greetings
-        System.out.println( "\nWelcome " + currentUser.getFirstName() + "!" );
-
-        // Number of options presented to user (may change in future)
-        int numOfOptions = currentUser.isIsAdmin() ? 5 : 4;
-
-        // Store selected option as int
-        int selectedOption = 0;
-
-        // Flag used to control continuation of print user options loop
-        boolean isError = false;
-
-        // Loop to display and read start options
-        do {
-
-            // Print start options
-            printUserOptions();
-
-            try {
-
-                // Read and parse input
-                String unparsedOption = input.nextLine();
-                selectedOption = Integer.parseInt( unparsedOption );
-
-                // Ensure input is valid
-                if ( !isValidRange( selectedOption, 1, numOfOptions ) ) {
-                    printErrorMsgs( Arrays.asList( selectedOption + " is not an option!" ) );
-                    isError = true;
-                }
-
-                // Selected option is valid, exit loop
-                else {
-                    isError = false;
-                }
-            }
-
-            // Error parsing input to int
-            catch ( NumberFormatException ex ) {
-                printErrorMsgs( Arrays.asList( "Invalid input entered!" ) );
-                isError = true;
-            }
-
-            // Any other errors
-            catch ( Exception ex ) {
-                System.out.println( ex.getMessage() ); // remove
-                printErrorMsgs( Arrays.asList( "Something went wrong. Try again!" ) );
-                isError = true;
-            }
-        }
-        while ( isError );
-
-        return selectedOption;
-    }
-
-    /*
      * This method displays the user options
      */
     private void printUserOptions() {
@@ -382,12 +335,12 @@ public class App {
      */
     private void execUserOption( int option ) {
         switch ( option ) {
-        
+
         // Exit option
         case 1:
             exit();
-        
-        // Logout option
+
+            // Logout option
         case 2:
             logout();
             break;
@@ -422,7 +375,7 @@ public class App {
      */
     private void logout() {
         currentUser = null;
-        isUserLoopRunning = false;
+        isUserMenuRunning = false;
     }
 
     /*
