@@ -162,8 +162,12 @@ public class AppService {
         return dataHandler.storeUser( user );
     }
 
-    public boolean existsCompany( String name ) {
+    public int existsCompany( String name ) {
         return dataHandler.existsCompany( name );
+    }
+
+    public Company getCompany( int companyId ) {
+        return dataHandler.getCompany( companyId );
     }
 
     public int storeCompany( Company company ) {

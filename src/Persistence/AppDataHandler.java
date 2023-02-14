@@ -107,21 +107,23 @@ public class AppDataHandler {
         }
     }
 
-    public boolean existsCompany( String name ) {
+    public int existsCompany( String name ) {
         String query = "SELECT company_id FROM companies WHERE company_name = ?;";
+        int id = 0;
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setString( 1, name );
 
             ResultSet result = stmt.executeQuery();
             while ( result.next() ) {
-                return true;
+                id = result.getInt( "company_id" );
             }
-            return false;
+            result.close();
+            return id;
         }
         catch ( Exception ex ) {
             System.out.println( ex.getMessage() );
-            return false;
+            return id;
         }
     }
 

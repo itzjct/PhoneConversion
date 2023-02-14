@@ -264,15 +264,22 @@ public class App {
         // Submit company and user to db
         try {
 
+            // Check if company exists
+            int companyId = appService.existsCompany( user.getCompany().getName() );
+
             // If company does not exist in db then add it
-            boolean isCompanyExist = appService.existsCompany( user.getCompany().getName() );
-            if ( !isCompanyExist ) {
-                int companyId = appService.storeCompany( user.getCompany() );
-                user.getCompany().setId( companyId );
+            if ( companyId == 0 ) {
+                companyId = appService.storeCompany( user.getCompany() );
             }
+
+            // Create link between company and user
+            user.getCompany().setId( companyId );
 
             // Add user
             user.setId( appService.storeUser( user ) );
+
+            // Load company's data
+            user.setCompany( appService.getCompany( companyId ) );
         }
         catch ( Exception ex ) {
             System.out.println( ex.getMessage() );
