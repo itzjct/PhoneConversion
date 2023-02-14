@@ -33,9 +33,53 @@ public class AppService {
     public boolean validatePhoneNumber( String phoneNumber ) {
         return true;
     }
-
+    
     public LinkedList<Word> generateWords( String phoneNumber ) {
         return new LinkedList<Word>();
+    }
+
+    public LinkedList<String> authenticateUser( User user ) {
+        LinkedList<String> errors = new LinkedList<String>();
+        User userFromDb = new User();
+        try {
+            userFromDb = dataHandler.getUser( user.getEmail() );
+        }
+        catch ( Exception ex ) {
+            errors.addLast( ex.getMessage() );
+            return errors;
+        }
+        if ( userFromDb == null ) {
+            errors.addLast( "Email not found" );
+            return errors;
+        }
+
+        byte[] hashedPassword = hashPassword( user.getPasswordString(), userFromDb.getPasswordSalt() );
+        if ( !Arrays.equals( hashedPassword, userFromDb.getPassword() ) ) {
+            errors.addLast( "Invalid password" );
+            return errors;
+        }
+        User.copy( user, userFromDb );
+
+        return errors;
+    }
+
+    public LinkedList<String> validateLogin( User user ) {
+        LinkedList<String> errors = new LinkedList<String>();
+
+        if ( user.getEmail() == null || user.getEmail().equals( "" ) ) {
+            errors.addLast( "Email cannot be empty" );
+        }
+        if ( user.getPasswordString() == null || user.getPasswordString().equals( "" ) ) {
+            errors.addLast( "Password cannot be empty" );
+        }
+        if ( user.getPasswordString() != null && user.getPasswordString().length() < PW_CHAR_MIN ) {
+            errors.addLast( "Invalid password" );
+        }
+        if ( user.getPasswordString() != null && user.getPasswordString().length() > PW_CHAR_MAX ) {
+            errors.addLast( "Invalid password" );
+        }
+
+        return errors;
     }
 
     public LinkedList<String> validateUser( User user ) {
@@ -116,6 +160,14 @@ public class AppService {
 
     public int storeUser( User user ) {
         return dataHandler.storeUser( user );
+    }
+
+    public boolean existsCompany( String name ) {
+        return dataHandler.existsCompany( name );
+    }
+
+    public int storeCompany( Company company ) {
+        return dataHandler.storeCompany( company );
     }
 
     public boolean existsPhoneNumber( String phoneNumber ) {

@@ -30,4 +30,13 @@ public class Company {
     public void setPhoneNumbersToWords( Map<String, LinkedList<Word>> phoneNumbersToWords ) {
         this.phoneNumbersToWords = phoneNumbersToWords;
     }
+
+    public static void copy( Company to, Company from ) {
+        to.setId( from.getId() );
+        to.setName( from.getName() );
+        to.getPhoneNumbersToWords().clear();
+        for ( Map.Entry<String, LinkedList<Word>> entry: from.getPhoneNumbersToWords().entrySet() ) {
+            to.getPhoneNumbersToWords().put( entry.getKey(), entry.getValue() );
+        }
+    }
 }

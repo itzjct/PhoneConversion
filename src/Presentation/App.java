@@ -57,7 +57,7 @@ public class App {
     private int selectStartOption() {
 
         // Initial message
-        String message = "Welcome!:";
+        String message = "\nWelcome!:";
 
         // Number of options presented to user (may change in future)
         int numOfOptions = 3;
@@ -151,7 +151,43 @@ public class App {
     }
 
     private User login() {
-        return null;
+        boolean isError = false;
+        User user = new User();
+        do {
+            // Temporary objects to store input
+            user = new User();
+
+            // Capture registration information
+            System.out.print( "Enter email: " );
+            user.setEmail( input.nextLine().trim().toUpperCase() );
+            System.out.print( "Enter password: " );
+            user.setPasswordString( input.nextLine().trim() );
+
+            // Validate login information
+            LinkedList<String> errors = appService.validateLogin( user );
+            if ( errors.size() > 0 ) {
+                printErrorMsgs( errors );
+                isError = true;
+                continue;
+            }
+
+            // Authenticate user
+            errors = appService.authenticateUser( user );
+            if ( errors.size() > 0 ) {
+                printErrorMsgs( errors );
+                isError = true;
+                continue;
+            }
+
+            // User info is valid
+            isError = false;
+        }
+        while ( isError );
+
+        // Clear user's text password (for security)
+        user.setPasswordString( null );
+
+        return user;
     }
 
     /*
@@ -213,12 +249,21 @@ public class App {
         // Clear user's text password (for security)
         user.setPasswordString( null );
 
-        // Submit user to db
+        // Submit company and user to db
         try {
+
+            // If company does not exist in db then add it
+            boolean isCompanyExist = appService.existsCompany( user.getCompany().getName() );
+            if ( !isCompanyExist ) {
+                int companyId = appService.storeCompany( user.getCompany() );
+                user.getCompany().setId( companyId );
+            }
+
+            // Add user
             user.setId( appService.storeUser( user ) );
         }
         catch ( Exception ex ) {
-            System.out.println( "Error submitting user to database" );
+            System.out.println( ex.getMessage() );
 
             // If db submission failed then return null
             return null;

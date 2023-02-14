@@ -86,4 +86,15 @@ public class User {
     public void setIsAdmin( boolean isAdmin ) {
         this.isAdmin = isAdmin;
     }
+
+    public static void copy( User to, User from ) {
+        to.setId( from.getId() );
+        to.setFirstName( from.getFirstName() );
+        to.setLastName( from.getLastName() );
+        to.setEmail( from.getEmail() );
+        to.setPassword( from.getPassword() );
+        to.setPasswordSalt( from.getPasswordSalt() );
+        to.setIsAdmin( from.getIsAdmin() );
+        Company.copy( to.getCompany(), from.getCompany() );
+    }
 }
