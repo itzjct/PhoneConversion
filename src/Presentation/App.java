@@ -10,6 +10,8 @@ public class App {
     private User currentUser;
     private String selectedPhoneNumber;
     private Scanner input;
+    boolean isStartLoopRunning = true;
+    boolean isUserLoopRunning = true;
 
     public static void main( String[] args ) {
 
@@ -29,20 +31,24 @@ public class App {
      */
     public void start() {
 
-        // Flag used to stop execution
-        boolean isRunning = true;
-
         // Loop to handle start options
-        while ( isRunning ) {
+        while ( isStartLoopRunning ) {
 
             // Select a start option
-            int selectedOption = selectStartOption();
+            int selectedStartOption = selectStartOption();
 
-            // Execute the selected option
-            isRunning = execStartOption( selectedOption );
-            if ( !isRunning ) {
-                System.out.println( "Exiting..." );
-                continue;
+            // Execute the selected start option
+            execStartOption( selectedStartOption );
+
+            // Loop to handle user options
+            isUserLoopRunning = true;
+            while ( isUserLoopRunning ) {
+
+                // Select a user option
+                int selectedUserOption = selectUserOptions();
+
+                // Execute the selected user option
+                execUserOption( selectedUserOption );
             }
         }
 
@@ -55,9 +61,6 @@ public class App {
      * of a start option
      */
     private int selectStartOption() {
-
-        // Initial message
-        String message = "\nWelcome!:";
 
         // Number of options presented to user (may change in future)
         int numOfOptions = 3;
@@ -72,7 +75,7 @@ public class App {
         do {
 
             // Print start options
-            printStartOptions( message );
+            printStartOptions();
 
             try {
 
@@ -82,7 +85,7 @@ public class App {
 
                 // Ensure input is valid
                 if ( !isValidRange( selectedOption, 1, numOfOptions ) ) {
-                    message = selectedOption + " is not an option!";
+                    printErrorMsgs( Arrays.asList( selectedOption + " is not an option!" ) );
                     isError = true;
                 }
 
@@ -94,14 +97,14 @@ public class App {
 
             // Error parsing input to int
             catch ( NumberFormatException ex ) {
-                message = "Invalid input entered!";
+                printErrorMsgs( Arrays.asList( "Invalid input entered!" ) );
                 isError = true;
             }
 
             // Any other errors
             catch ( Exception ex ) {
                 System.out.println( ex.getMessage() ); // remove
-                message = "Something went wrong. Try again!";
+                printErrorMsgs( Arrays.asList( "Something went wrong. Try again!" ) );
                 isError = true;
             }
         }
@@ -113,8 +116,8 @@ public class App {
     /*
      * This method displays the start options
      */
-    private void printStartOptions( String message ) {
-        System.out.println( message );
+    private void printStartOptions() {
+        printHeader( "Start Menu" );
         System.out.println( "Enter the corresponding option number:" );
         System.out.println( "1: Login" );
         System.out.println( "2: Register" );
@@ -124,33 +127,34 @@ public class App {
     /*
      * This method executes the given start option
      */
-    private boolean execStartOption( int option ) {
+    private void execStartOption( int option ) {
         switch ( option ) {
         case 1:
-            System.out.println( "Login chosen" );
-            currentUser = login();
-            return currentUser != null;
+            while ( login() ) {
+            }
+            break;
         case 2:
-            System.out.println( "Register chosen" );
-            currentUser = register();
-            return currentUser != null;
+            while ( register() ) {
+            }
+            break;
         case 3:
-            return false;
+            exit();
         default:
             System.out.println( "Invalid option parsed!" );
-            return false;
+            exit();
         }
     }
 
-    // This method ensures a value is within given a range
-    private boolean isValidRange( int n, int lo, int hi ) {
-        if ( lo > hi ) {
-            return n >= hi && n <= lo;
-        }
-        return n >= lo && n <= hi;
-    }
+    /*
+     * This method handles login user logic
+     * 
+     * Returns:
+     * True: if error was encountered
+     * False: if no errors were encountered
+     */
+    private boolean login() {
+        printHeader( "Login" );
 
-    private User login() {
         boolean isError = false;
         User user = new User();
         do {
@@ -164,7 +168,7 @@ public class App {
             user.setPasswordString( input.nextLine().trim() );
 
             // Validate login information
-            LinkedList<String> errors = appService.validateLogin( user );
+            List<String> errors = appService.validateLogin( user );
             if ( errors.size() > 0 ) {
                 printErrorMsgs( errors );
                 isError = true;
@@ -187,13 +191,21 @@ public class App {
         // Clear user's text password (for security)
         user.setPasswordString( null );
 
-        return user;
+        // Store current user
+        currentUser = user;
+
+        return false;
     }
 
     /*
      * This method handles register user logic
+     * 
+     * Returns:
+     * True: if error was encountered
+     * False: if no errors were encountered
      */
-    private User register() {
+    private boolean register() {
+        printHeader( "Register" );
 
         boolean isError = false;
         User user = new User();
@@ -217,7 +229,7 @@ public class App {
             user.setIsAdmin( isAdmin.equals( "y" ) );
 
             // Validate user information
-            LinkedList<String> errors = appService.validateUser( user );
+            List<String> errors = appService.validateUser( user );
             if ( errors.size() > 0 ) {
                 printErrorMsgs( errors );
                 isError = true;
@@ -243,7 +255,7 @@ public class App {
 
         // If password hashing failed then return null
         if ( user.getPassword().length == 0 ) {
-            return null;
+            return true;
         }
 
         // Clear user's text password (for security)
@@ -266,18 +278,169 @@ public class App {
             System.out.println( ex.getMessage() );
 
             // If db submission failed then return null
-            return null;
+            return true;
         }
 
-        return user;
+        // Store current user
+        currentUser = user;
+
+        return false;
+    }
+
+    public int selectUserOptions() {
+
+        // Print greetings
+        System.out.println( "\nWelcome " + currentUser.getFirstName() + "!" );
+
+        // Number of options presented to user (may change in future)
+        int numOfOptions = currentUser.isIsAdmin() ? 5 : 4;
+
+        // Store selected option as int
+        int selectedOption = 0;
+
+        // Flag used to control continuation of print user options loop
+        boolean isError = false;
+
+        // Loop to display and read start options
+        do {
+
+            // Print start options
+            printUserOptions();
+
+            try {
+
+                // Read and parse input
+                String unparsedOption = input.nextLine();
+                selectedOption = Integer.parseInt( unparsedOption );
+
+                // Ensure input is valid
+                if ( !isValidRange( selectedOption, 1, numOfOptions ) ) {
+                    printErrorMsgs( Arrays.asList( selectedOption + " is not an option!" ) );
+                    isError = true;
+                }
+
+                // Selected option is valid, exit loop
+                else {
+                    isError = false;
+                }
+            }
+
+            // Error parsing input to int
+            catch ( NumberFormatException ex ) {
+                printErrorMsgs( Arrays.asList( "Invalid input entered!" ) );
+                isError = true;
+            }
+
+            // Any other errors
+            catch ( Exception ex ) {
+                System.out.println( ex.getMessage() ); // remove
+                printErrorMsgs( Arrays.asList( "Something went wrong. Try again!" ) );
+                isError = true;
+            }
+        }
+        while ( isError );
+
+        return selectedOption;
+    }
+
+    /*
+     * This method displays the user options
+     */
+    private void printUserOptions() {
+        printHeader( "User Menu" );
+        System.out.println( "Enter the corresponding option number:" );
+        System.out.println( "1: Exit" );
+        System.out.println( "2: Logout" );
+        System.out.println( "3: Generate Words" );
+        System.out.println( "4: View Company Phone Numbers" );
+        if ( currentUser.getIsAdmin() ) {
+            System.out.println( "5: Approve Words" );
+        }
+    }
+
+    /*
+     * This method executes the given user option
+     */
+    private void execUserOption( int option ) {
+        switch ( option ) {
+        case 1:
+            exit();
+        case 2:
+            logout();
+            break;
+        case 3:
+            while ( generateWords() ) {
+            }
+            break;
+        case 4:
+            while ( viewPhoneNumbers() ) {
+            }
+            break;
+        case 5:
+            while ( approveWords() ) {
+            }
+            break;
+        default:
+            System.out.println( "Invalid option parsed!" );
+            exit();
+        }
+    }
+
+    /*
+     * This method logs out the current user
+     */
+    private void logout() {
+        currentUser = null;
+        isUserLoopRunning = false;
+    }
+
+    private boolean generateWords() {
+        printHeader( "Generate Words" );
+        return false;
+    }
+
+    private boolean viewPhoneNumbers() {
+        printHeader( "View Phone Numbers" );
+        return false;
+    }
+
+    private boolean approveWords() {
+        printHeader( "Approve Words" );
+        return false;
     }
 
     /*
      * This method prints a list of error messages to console
      */
-    private void printErrorMsgs( LinkedList<String> errors ) {
+    private void printErrorMsgs( List<String> errors ) {
         for ( String msg : errors ) {
             System.out.println( msg );
         }
     }
+
+    /*
+     * This method ensures a value is within given a range
+     */
+    private boolean isValidRange( int n, int lo, int hi ) {
+        if ( lo > hi ) {
+            return n >= hi && n <= lo;
+        }
+        return n >= lo && n <= hi;
+    }
+
+    /*
+     * This method prints a header
+     */
+    private void printHeader( String title ) {
+        System.out.println( "========== " + title + "==========" );
+    }
+
+    /*
+     * This method gracefully exits application
+     */
+    private void exit() {
+        System.out.println( "Exiting..." );
+        System.exit( 0 );
+    }
+
 }
