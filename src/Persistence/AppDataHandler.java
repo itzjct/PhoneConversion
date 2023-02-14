@@ -1,6 +1,7 @@
 package Persistence;
 
 import Application.Domain.*;
+import Application.Services.ConfigService;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,7 +10,23 @@ import java.sql.ResultSet;
 import java.util.*;
 
 public class AppDataHandler {
-    private final String connectionString = "jdbc:sqlite:C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\word_conversion.db";
+    private String connectionString;
+
+    public AppDataHandler() {
+        ConfigService configService = new ConfigService();
+        Properties properties = configService.getProperties();
+        String base = properties.getProperty( ConfigService.DB_BASE );
+        String path = properties.getProperty( ConfigService.DB_PATH );
+        connectionString = base + path;
+    }
+
+    /*
+     * This constructor initializes object with a given connection string
+     * USED ONLY FOR TESTS
+     */
+    public AppDataHandler( String connectionString ) {
+        this.connectionString = connectionString;
+    }
 
     private Connection getConnection() {
         Connection conn = null;

@@ -10,8 +10,8 @@ public class App {
     private User currentUser;
     private String selectedPhoneNumber;
     private Scanner input;
-    boolean isStartLoopRunning = true;
-    boolean isUserLoopRunning = true;
+    private boolean isStartLoopRunning = true;
+    private boolean isUserLoopRunning = true;
 
     public static void main( String[] args ) {
 

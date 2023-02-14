@@ -1,6 +1,7 @@
-package Tests.Unit;
+package Test.Unit;
 
 import Application.Domain.*;
+import Application.Services.ConfigService;
 import Persistence.AppDataHandler;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,7 +9,8 @@ import org.junit.jupiter.api.*;
 import java.util.*;
 
 public class AppDataHandlerTests {
-    private AppDataHandler appDataHandler = new AppDataHandler();
+    private String connectionString = "jdbc:sqlite:C:/Users/Julian/Desktop/School/Software Engineering/Project/db/word_conversion.db";
+    private AppDataHandler appDataHandler = new AppDataHandler( connectionString );
 
     private User getUserObject() {
         User user = new User();
@@ -120,9 +122,9 @@ public class AppDataHandlerTests {
         Company company = getCompanyObject();
         int id = appDataHandler.storeCompany( company );
 
-        boolean result = appDataHandler.existsCompany( company.getName() );
+        int result = appDataHandler.existsCompany( company.getName() );
 
-        assertTrue( result );
+        assertTrue( result > 0 );
         assertTrue( id > 0 );
     }
 
@@ -130,9 +132,9 @@ public class AppDataHandlerTests {
     public void existsCompany_InvalidCompanyName_ReturnsFalse() {
         String companyName = "_";
 
-        boolean result = appDataHandler.existsCompany( companyName );
+        int result = appDataHandler.existsCompany( companyName );
 
-        assertFalse( result );
+        assertFalse( result > 0 );
     }
 
     @Test
