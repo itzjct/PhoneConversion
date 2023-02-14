@@ -91,6 +91,22 @@ public class AppDataHandler {
         }
     }
 
+    public int deleteUser( User user ) {
+        String query = "DELETE FROM users WHERE user_id = ?;";
+        int id = 0;
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setInt( 1, user.getId() );
+
+            stmt.executeUpdate();
+            return user.getId();
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return id;
+        }
+    }
+
     public boolean existsCompany( String name ) {
         String query = "SELECT company_id FROM companies WHERE company_name = ?;";
         try (Connection conn = getConnection();
@@ -161,6 +177,22 @@ public class AppDataHandler {
         }
     }
 
+    public int deleteCompany( Company company ) {
+        String query = "DELETE FROM companies WHERE company_id = ?;";
+        int id = 0;
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setInt( 1, company.getId() );
+
+            stmt.executeUpdate();
+            return company.getId();
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return id;
+        }
+    }
+
     public boolean existsPhoneNumber( String phoneNumber ) {
         String query = "SELECT phone_number FROM phone_numbers WHERE phone_number = ?;";
         try (Connection conn = getConnection();
@@ -213,9 +245,8 @@ public class AppDataHandler {
         return phoneToWords;
     }
 
-    public int storePhoneNumber( String phoneNumber, int companyId ) {
+    public boolean storePhoneNumber( String phoneNumber, int companyId ) {
         String query = "INSERT INTO phone_numbers ( phone_number, company_id ) VALUES ( ?, ? );";
-        int id = 0;
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             int index = 1;
@@ -223,16 +254,26 @@ public class AppDataHandler {
             stmt.setInt( index++, companyId );
 
             stmt.executeUpdate();
-            ResultSet keys = stmt.getGeneratedKeys();
-            while ( keys.next() ) {
-                id = keys.getInt( 1 );
-            }
-            keys.close();
-            return id;
+            return true;
         }
         catch ( Exception ex ) {
             System.out.println( ex.getMessage() );
-            return id;
+            return false;
+        }
+    }
+
+    public boolean deletePhoneNumber( String phoneNumber ) {
+        String query = "DELETE FROM phone_numbers WHERE phone_number = ?;";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setString( 1, phoneNumber );
+
+            stmt.executeUpdate();
+            return true;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return false;
         }
     }
 
@@ -246,25 +287,47 @@ public class AppDataHandler {
         LinkedList<Integer> ids = new LinkedList<Integer>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
+            ResultSet keys = null;
             for ( Word word : words ) {
                 int index = 1;
                 stmt.setString( index++, word.getWord() );
                 stmt.setBoolean( index++, word.getIsApproved() );
                 stmt.setString( index++, phoneNumber );
-                stmt.addBatch();
-            }
-            stmt.executeBatch();
 
-            ResultSet keys = stmt.getGeneratedKeys();
-            while ( keys.next() ) {
-                ids.addLast( keys.getInt( 1 ) );
+                stmt.executeUpdate();
+                keys = stmt.getGeneratedKeys();
+                while ( keys.next() ) {
+                    int id = keys.getInt( 1 );
+                    word.setId( id );
+                    ids.addLast( id );
+                }
+                stmt.clearParameters();
             }
-            keys.close();
             return ids;
         }
         catch ( Exception ex ) {
             System.out.println( ex.getMessage() );
             return ids;
+        }
+    }
+
+    public boolean deleteWords( LinkedList<Integer> wordIds ) {
+        String query = "DELETE FROM words WHERE word_id = ?;";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            for ( int id : wordIds ) {
+                stmt.setInt( 1, id );
+                stmt.executeUpdate();
+                stmt.clearParameters();
+            }
+            if ( wordIds == null || wordIds.size() == 0 ) {
+                return false;
+            }
+            return true;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return false;
         }
     }
 }

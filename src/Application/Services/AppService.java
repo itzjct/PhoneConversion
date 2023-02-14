@@ -122,7 +122,7 @@ public class AppService {
         return dataHandler.existsPhoneNumber( phoneNumber );
     }
 
-    public int storePhoneNumber( String phoneNumber, int companyId ) {
+    public boolean storePhoneNumber( String phoneNumber, int companyId ) {
         return dataHandler.storePhoneNumber( phoneNumber, companyId );
     }
 
