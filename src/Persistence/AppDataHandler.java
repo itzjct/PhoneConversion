@@ -92,11 +92,11 @@ public class AppDataHandler {
     }
 
     public int deleteUser( User user ) {
-        String query = "DELETE FROM users WHERE user_id = ?;";
+        String query = "DELETE FROM users WHERE email = ?;";
         int id = 0;
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
-            stmt.setInt( 1, user.getId() );
+            stmt.setString( 1, user.getEmail() );
 
             stmt.executeUpdate();
             return user.getId();
@@ -178,11 +178,11 @@ public class AppDataHandler {
     }
 
     public int deleteCompany( Company company ) {
-        String query = "DELETE FROM companies WHERE company_id = ?;";
+        String query = "DELETE FROM companies WHERE company_name = ?;";
         int id = 0;
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
-            stmt.setInt( 1, company.getId() );
+            stmt.setString( 1, company.getName() );
 
             stmt.executeUpdate();
             return company.getId();
@@ -311,16 +311,16 @@ public class AppDataHandler {
         }
     }
 
-    public boolean deleteWords( LinkedList<Integer> wordIds ) {
-        String query = "DELETE FROM words WHERE word_id = ?;";
+    public boolean deleteWords( LinkedList<Word> words ) {
+        String query = "DELETE FROM words WHERE word = ?;";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
-            for ( int id : wordIds ) {
-                stmt.setInt( 1, id );
+            for ( Word word : words ) {
+                stmt.setString( 1, word.getWord() );
                 stmt.executeUpdate();
                 stmt.clearParameters();
             }
-            if ( wordIds == null || wordIds.size() == 0 ) {
+            if ( words == null || words.size() == 0 ) {
                 return false;
             }
             return true;
