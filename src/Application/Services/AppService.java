@@ -33,29 +33,29 @@ public class AppService {
     public boolean validatePhoneNumber( String phoneNumber ) {
         return true;
     }
-    
-    public LinkedList<Word> generateWords( String phoneNumber ) {
+
+    public List<Word> generateWords( String phoneNumber ) {
         return new LinkedList<Word>();
     }
 
-    public LinkedList<String> authenticateUser( User user ) {
-        LinkedList<String> errors = new LinkedList<String>();
+    public List<String> authenticateUser( User user ) {
+        List<String> errors = new LinkedList<String>();
         User userFromDb = new User();
         try {
             userFromDb = dataHandler.getUser( user.getEmail() );
         }
         catch ( Exception ex ) {
-            errors.addLast( ex.getMessage() );
+            errors.add( ex.getMessage() );
             return errors;
         }
         if ( userFromDb == null ) {
-            errors.addLast( "Email not found" );
+            errors.add( "Email not found" );
             return errors;
         }
 
         byte[] hashedPassword = hashPassword( user.getPasswordString(), userFromDb.getPasswordSalt() );
         if ( !Arrays.equals( hashedPassword, userFromDb.getPassword() ) ) {
-            errors.addLast( "Invalid password" );
+            errors.add( "Invalid password" );
             return errors;
         }
         User.copy( user, userFromDb );
@@ -63,57 +63,57 @@ public class AppService {
         return errors;
     }
 
-    public LinkedList<String> validateLogin( User user ) {
-        LinkedList<String> errors = new LinkedList<String>();
+    public List<String> validateLogin( User user ) {
+        List<String> errors = new LinkedList<String>();
 
         if ( user.getEmail() == null || user.getEmail().equals( "" ) ) {
-            errors.addLast( "Email cannot be empty" );
+            errors.add( "Email cannot be empty" );
         }
         if ( user.getPasswordString() == null || user.getPasswordString().equals( "" ) ) {
-            errors.addLast( "Password cannot be empty" );
+            errors.add( "Password cannot be empty" );
         }
         if ( user.getPasswordString() != null && user.getPasswordString().length() < PW_CHAR_MIN ) {
-            errors.addLast( "Invalid password" );
+            errors.add( "Invalid password" );
         }
         if ( user.getPasswordString() != null && user.getPasswordString().length() > PW_CHAR_MAX ) {
-            errors.addLast( "Invalid password" );
+            errors.add( "Invalid password" );
         }
 
         return errors;
     }
 
-    public LinkedList<String> validateUser( User user ) {
-        LinkedList<String> errors = new LinkedList<String>();
+    public List<String> validateUser( User user ) {
+        List<String> errors = new LinkedList<String>();
 
         if ( user.getFirstName() == null || user.getFirstName().equals( "" ) ) {
-            errors.addLast( "First name cannot be empty" );
+            errors.add( "First name cannot be empty" );
         }
         if ( user.getFirstName() != null && user.getFirstName().length() > NAME_CHAR_MAX ) {
-            errors.addLast( "First name cannot exceed " + NAME_CHAR_MAX + " characters" );
+            errors.add( "First name cannot exceed " + NAME_CHAR_MAX + " characters" );
         }
         if ( user.getLastName() == null || user.getLastName().equals( "" ) ) {
-            errors.addLast( "Last name cannot be empty" );
+            errors.add( "Last name cannot be empty" );
         }
         if ( user.getLastName() != null && user.getLastName().length() > NAME_CHAR_MAX ) {
-            errors.addLast( "Last name cannot exceed " + NAME_CHAR_MAX + " characters" );
+            errors.add( "Last name cannot exceed " + NAME_CHAR_MAX + " characters" );
         }
         if ( user.getEmail() == null || user.getEmail().equals( "" ) ) {
-            errors.addLast( "Email cannot be empty" );
+            errors.add( "Email cannot be empty" );
         }
         if ( user.getEmail() != null && user.getEmail().length() > EMAIL_CHAR_MAX ) {
-            errors.addLast( "Email cannot exceed " + EMAIL_CHAR_MAX + " characters" );
+            errors.add( "Email cannot exceed " + EMAIL_CHAR_MAX + " characters" );
         }
         if ( user.getEmail() != null && !isValidEmail( user.getEmail() ) ) {
-            errors.addLast( "Invalid email" );
+            errors.add( "Invalid email" );
         }
         if ( user.getPasswordString() == null || user.getPasswordString().equals( "" ) ) {
-            errors.addLast( "Password cannot be empty" );
+            errors.add( "Password cannot be empty" );
         }
         if ( user.getPasswordString() != null && user.getPasswordString().length() < PW_CHAR_MIN ) {
-            errors.addLast( "Password must be at least " + PW_CHAR_MIN + " characters" );
+            errors.add( "Password must be at least " + PW_CHAR_MIN + " characters" );
         }
         if ( user.getPasswordString() != null && user.getPasswordString().length() > PW_CHAR_MAX ) {
-            errors.addLast( "Password cannot exceed " + PW_CHAR_MAX + " characters" );
+            errors.add( "Password cannot exceed " + PW_CHAR_MAX + " characters" );
         }
 
         return errors;
@@ -123,14 +123,14 @@ public class AppService {
         return emailPattern.matcher( email ).matches();
     }
 
-    public LinkedList<String> validateCompany( Company company ) {
-        LinkedList<String> errors = new LinkedList<String>();
+    public List<String> validateCompany( Company company ) {
+        List<String> errors = new LinkedList<String>();
 
         if ( company.getName() == null || company.getName().equals( "" ) ) {
-            errors.addLast( "Company name cannot be empty" );
+            errors.add( "Company name cannot be empty" );
         }
         if ( company.getName() == null || company.getName().equals( "" ) ) {
-            errors.addLast( "Company name cannot exceed " + NAME_CHAR_MAX + " characters" );
+            errors.add( "Company name cannot exceed " + NAME_CHAR_MAX + " characters" );
         }
 
         return errors;
@@ -178,11 +178,11 @@ public class AppService {
         return dataHandler.storePhoneNumber( phoneNumber, companyId );
     }
 
-    public LinkedList<Word> getWords( String phoneNumber ) {
+    public List<Word> getWords( String phoneNumber ) {
         return dataHandler.getWords( phoneNumber );
     }
 
-    public LinkedList<Integer> storeWords( LinkedList<Word> words, String phoneNumber ) {
+    public List<Integer> storeWords( List<Word> words, String phoneNumber ) {
         return dataHandler.storeWords( words, phoneNumber );
     }
 }

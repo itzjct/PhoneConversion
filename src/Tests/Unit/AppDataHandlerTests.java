@@ -5,7 +5,7 @@ import Persistence.AppDataHandler;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
-import java.util.LinkedList;
+import java.util.*;
 
 public class AppDataHandlerTests {
     private AppDataHandler appDataHandler = new AppDataHandler();
@@ -31,11 +31,11 @@ public class AppDataHandlerTests {
         return "0";
     }
 
-    private LinkedList<Word> getWordList() {
-        LinkedList<Word> list = new LinkedList<Word>();
-        list.addLast( new Word( "test_1", true ) );
-        list.addLast( new Word( "test_2", true ) );
-        list.addLast( new Word( "test_3", false ) );
+    private List<Word> getWordList() {
+        List<Word> list = new LinkedList<Word>();
+        list.add( new Word( "test_1", true ) );
+        list.add( new Word( "test_2", true ) );
+        list.add( new Word( "test_3", false ) );
         return list;
     }
 
@@ -55,7 +55,7 @@ public class AppDataHandlerTests {
     }
 
     private void deleteTestWordsFromDB() {
-        LinkedList<Word> words = getWordList();
+        List<Word> words = getWordList();
         appDataHandler.deleteWords( words );
     }
 
@@ -209,9 +209,9 @@ public class AppDataHandlerTests {
     @Test
     public void storeWords_ValidWordsAndValidPhoneNumber_ReturnIds() {
         String phoneNumber = getPhoneNumber();
-        LinkedList<Word> words = getWordList();
+        List<Word> words = getWordList();
 
-        LinkedList<Integer> ids = appDataHandler.storeWords( words, phoneNumber );
+        List<Integer> ids = appDataHandler.storeWords( words, phoneNumber );
 
         for ( int id : ids ) {
             assertTrue( id > 0 );
@@ -220,8 +220,8 @@ public class AppDataHandlerTests {
 
     @Test
     public void deleteWords_ValidWords_ReturnIds() {
-        LinkedList<Word> words = getWordList();
-        LinkedList<Integer> ids = appDataHandler.storeWords( words, getPhoneNumber() );
+        List<Word> words = getWordList();
+        List<Integer> ids = appDataHandler.storeWords( words, getPhoneNumber() );
 
         boolean isDeleted = appDataHandler.deleteWords( words );
 

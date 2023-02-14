@@ -211,12 +211,12 @@ public class AppDataHandler {
         }
     }
 
-    public Map<String, LinkedList<Word>> getPhoneNumbers( int companyId ) {
+    public Map<String, List<Word>> getPhoneNumbers( int companyId ) {
         String query = "SELECT phone_numbers.phone_number, words.word_id, words.word, words.is_approved " +
                 "FROM phone_numbers " +
                 "INNER JOIN words ON phone_numbers.phone_number = words.phone_number " +
                 "WHERE company_id = ?;";
-        TreeMap<String, LinkedList<Word>> phoneToWords = new TreeMap<String, LinkedList<Word>>();
+        TreeMap<String, List<Word>> phoneToWords = new TreeMap<String, List<Word>>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setInt( 1, companyId );
@@ -229,10 +229,10 @@ public class AppDataHandler {
 
                 String phoneNumber = result.getString( "phone_number" );
                 if ( phoneToWords.containsKey( phoneNumber ) ) {
-                    phoneToWords.get( phoneNumber ).addLast( word );
+                    phoneToWords.get( phoneNumber ).add( word );
                 }
                 else {
-                    LinkedList<Word> words = new LinkedList<Word>();
+                    List<Word> words = new LinkedList<Word>();
                     words.add( word );
                     phoneToWords.put( phoneNumber, words );
                 }
@@ -278,13 +278,13 @@ public class AppDataHandler {
     }
 
     // May not be needed
-    public LinkedList<Word> getWords( String phoneNumber ) {
+    public List<Word> getWords( String phoneNumber ) {
         return new LinkedList<Word>();
     }
 
-    public LinkedList<Integer> storeWords( LinkedList<Word> words, String phoneNumber ) {
+    public List<Integer> storeWords( List<Word> words, String phoneNumber ) {
         String query = "INSERT INTO words ( word, is_approved, phone_number ) VALUES ( ?, ?, ? );";
-        LinkedList<Integer> ids = new LinkedList<Integer>();
+        List<Integer> ids = new LinkedList<Integer>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             ResultSet keys = null;
@@ -299,7 +299,7 @@ public class AppDataHandler {
                 while ( keys.next() ) {
                     int id = keys.getInt( 1 );
                     word.setId( id );
-                    ids.addLast( id );
+                    ids.add( id );
                 }
                 stmt.clearParameters();
             }
@@ -311,7 +311,7 @@ public class AppDataHandler {
         }
     }
 
-    public boolean deleteWords( LinkedList<Word> words ) {
+    public boolean deleteWords( List<Word> words ) {
         String query = "DELETE FROM words WHERE word = ?;";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
