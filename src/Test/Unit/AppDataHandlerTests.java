@@ -23,22 +23,43 @@ public class AppDataHandlerTests {
         return user;
     }
 
+    private void storeUserObject() {
+        User user = getUserObject();
+        
+    }
+
     private Company getCompanyObject() {
         Company company = new Company();
         company.setName( "TestCompany" );
         return company;
     }
 
+    private int storeCompanyObject() {
+        Company company = getCompanyObject();
+        return appDataHandler.storeCompany( company );
+    }
+
     private String getPhoneNumber() {
         return "0";
+    }
+
+    private String storePhoneNumber() {
+        String phoneNumber = getPhoneNumber();
+        appDataHandler.storePhoneNumber( phoneNumber, storeCompanyObject() );
+        return phoneNumber;
     }
 
     private List<Word> getWordList() {
         List<Word> list = new LinkedList<Word>();
         list.add( new Word( "test_1", true ) );
-        list.add( new Word( "test_2", true ) );
+        list.add( new Word( "test_2", false ) );
         list.add( new Word( "test_3", false ) );
         return list;
+    }
+
+    private List<Integer> storeWordList() {
+        List<Word> words = getWordList();
+        return appDataHandler.storeWords( words, storePhoneNumber() );
     }
 
     private void deleteTestUsersFromDB() {
@@ -217,6 +238,23 @@ public class AppDataHandlerTests {
 
         for ( int id : ids ) {
             assertTrue( id > 0 );
+        }
+    }
+
+    @Test
+    public void storeWords_UpdateValidWordsAndValidPhoneNumber_InfoIsUpdatedInDb() {
+        String phoneNumber = getPhoneNumber();
+        List<Word> words = getWordList();
+        appDataHandler.storeWords( words, phoneNumber );
+        for ( Word word : words ) {
+            word.setIsApproved( true );
+        }
+
+        appDataHandler.storeWords( words, phoneNumber );
+        List<Word> updatedWords = appDataHandler.getWords( phoneNumber );
+
+        for ( Word word : updatedWords ) {
+            assertTrue( word.getIsApproved() );
         }
     }
 

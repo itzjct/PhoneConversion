@@ -255,7 +255,8 @@ public class AppDataHandler {
     }
 
     /*
-     * This method retrieves the map from phone numbers to words for a given company id
+     * This method retrieves the map from phone numbers to words for a given company
+     * id
      */
     public Map<String, List<Word>> getPhoneNumbers( int companyId ) {
         String query = "SELECT phone_numbers.phone_number, words.word_id, words.word, words.is_approved " +
@@ -341,16 +342,19 @@ public class AppDataHandler {
      * This method stores words to given phone number into db
      */
     public List<Integer> storeWords( List<Word> words, String phoneNumber ) {
-        String query = "INSERT INTO words ( word, is_approved, phone_number ) VALUES ( ?, ?, ? );";
+        String insertQuery = "INSERT INTO words ( word, is_approved, phone_number ) VALUES ( ?, ?, ? );";
+        String updateQuery = "UPDATE words SET word = ?, is_approved = ?, phone_number = ? WHERE word_id = ?;";
         List<Integer> ids = new LinkedList<Integer>();
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement( query )) {
+        try (Connection conn = getConnection()) {
+            PreparedStatement stmt = null;
             ResultSet keys = null;
             for ( Word word : words ) {
+                stmt = conn.prepareStatement( word.getId() > 0 ? updateQuery : insertQuery );
                 int index = 1;
                 stmt.setString( index++, word.getWord() );
                 stmt.setBoolean( index++, word.getIsApproved() );
                 stmt.setString( index++, phoneNumber );
+                stmt.setInt( index++, word.getId() );
 
                 stmt.executeUpdate();
                 keys = stmt.getGeneratedKeys();

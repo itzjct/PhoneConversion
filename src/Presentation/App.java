@@ -425,7 +425,7 @@ public class App {
      * This method prints a header
      */
     private void printHeader( String title ) {
-        System.out.println( "========== " + title + "==========" );
+        System.out.println( "========== " + title + " ==========" );
     }
 
     /*
