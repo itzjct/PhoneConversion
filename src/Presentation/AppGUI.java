@@ -174,14 +174,12 @@ public class AppGUI {
 
         // Login option
         case 1:
-            while ( login() ) {
-            }
+            while ( !login() );
             break;
 
         // Register option
         case 2:
-            while ( register() ) {
-            }
+            while ( register() );
             break;
 
         // Exit option
