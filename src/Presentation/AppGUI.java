@@ -6,12 +6,16 @@ import Application.Services.*;
 
 public class AppGUI {
 
-    private AppService appService;
-    private User currentUser;
-    private String selectedPhoneNumber;
+    public final int START_MENU = 0;
+    public final int USER_MENU = 1;
+    public final int ADMIN_MENU = 2;
+
+    private App app;
     private Scanner input;
-    private boolean isStartMenuRunning = true;
-    private boolean isUserMenuRunning = true;
+
+    // Turn into an array of flags for each menu that will be needed
+    private boolean isStartMenuRunning;
+    private boolean isUserMenuRunning;
 
     public static void main( String[] args ) {
 
@@ -21,7 +25,7 @@ public class AppGUI {
     }
 
     public AppGUI() {
-        appService = new AppService();
+        app = new App();
         input = new Scanner( System.in );
     }
 
@@ -31,11 +35,15 @@ public class AppGUI {
      */
     public void start() {
 
+        // Initialize menu flags to true
+        isStartMenuRunning = true;
+        isUserMenuRunning = true;
+
         // Loop to handle start options
         while ( isStartMenuRunning ) {
 
             // Select a start option
-            int selectedStartOption = selectOption( false );
+            int selectedStartOption = selectOption( START_MENU );
 
             // Execute the selected start option
             execStartOption( selectedStartOption );
@@ -44,8 +52,9 @@ public class AppGUI {
             isUserMenuRunning = true;
             while ( isUserMenuRunning ) {
 
-                // Select a user option
-                int selectedUserOption = selectOption( true );
+                // Select a user (or admin) option
+                // **ENSURE CURRENT USER IS NEVER NULL HERE**
+                int selectedUserOption = selectOption( app.getCurrentUser().getIsAdmin() ? ADMIN_MENU : USER_MENU );
 
                 // Execute the selected user option
                 execUserOption( selectedUserOption );
@@ -59,33 +68,22 @@ public class AppGUI {
      * 
      * Return: int representing a menu option
      */
-    private int selectOption( boolean isUserMenu ) {
+    private int selectOption( int menuType ) {
 
         // Number of options presented
-        int numOfOptions = 3;
-
-        // Check number of options if user menu and greet user
-        if ( isUserMenu ) {
-            System.out.println( "\nWelcome " + currentUser.getFirstName() + "!" );
-            numOfOptions = currentUser.isIsAdmin() ? 5 : 4;
-        }
+        int numOfOptions = getMenuOptionsNumber( menuType );
 
         // Store selected option as int
         int selectedOption = 0;
 
-        // Flag used to control continuation of print start options loop
+        // Flag used to control menu execution
         boolean isError = false;
 
-        // Loop to display and read start options
+        // Print corresponding menu
         do {
 
             // Print menu options
-            if ( isUserMenu ) {
-                printUserOptions();
-            }
-            else {
-                printStartOptions();
-            }
+            printMenu( menuType );
 
             try {
 
@@ -121,6 +119,40 @@ public class AppGUI {
         while ( isError );
 
         return selectedOption;
+    }
+
+    private int getMenuOptionsNumber( int menuType ) {
+        switch ( menuType ) {
+        // Start menu
+        case START_MENU:
+            return 3;
+
+        // User menu
+        case USER_MENU:
+            return 4;
+
+        // User admin menu
+        case ADMIN_MENU:
+            return 5;
+
+        // Invalid menu
+        default:
+            System.out.println( "Invalid menu type" );
+            return 0;
+        }
+    }
+
+    private void printMenu( int menuType ) {
+        switch ( menuType ) {
+        case START_MENU:
+            printStartOptions();
+        case USER_MENU:
+            printUserOptions( false );
+        case ADMIN_MENU:
+            printUserOptions( true );
+        default:
+            System.out.println( "Invalid menu type" );
+        }
     }
 
     /*
@@ -315,14 +347,14 @@ public class AppGUI {
     /*
      * This method displays the user options
      */
-    private void printUserOptions() {
+    private void printUserOptions( boolean isAdmin ) {
         printHeader( "User Menu" );
         System.out.println( "Enter the corresponding option number:" );
         System.out.println( "1: Exit" );
         System.out.println( "2: Logout" );
         System.out.println( "3: Generate Words" );
         System.out.println( "4: View Company Phone Numbers" );
-        if ( currentUser.getIsAdmin() ) {
+        if ( isAdmin ) {
             System.out.println( "5: Approve Words" );
         }
     }
