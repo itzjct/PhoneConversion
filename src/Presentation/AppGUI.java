@@ -4,7 +4,7 @@ import java.util.*;
 import Application.Domain.*;
 import Application.Services.*;
 
-public class App {
+public class AppGUI {
 
     private AppService appService;
     private User currentUser;
@@ -16,11 +16,11 @@ public class App {
     public static void main( String[] args ) {
 
         // Run app
-        App app = new App();
+        AppGUI app = new AppGUI();
         app.start();
     }
 
-    public App() {
+    public AppGUI() {
         appService = new AppService();
         input = new Scanner( System.in );
     }
