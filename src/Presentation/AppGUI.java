@@ -199,17 +199,20 @@ public class AppGUI {
      * This method handles login user logic
      * 
      * Returns:
-     * True: if error was encountered
-     * False: if no errors were encountered
+     * True: if operation successed
+     * False: if operation failed
      */
     private boolean login() {
         printHeader( "Login" );
 
         boolean isError = false;
-        User user = new User();
+        int numOfTries = 5;
         do {
+            // Decrease number of tries
+            numOfTries--;
+
             // Temporary objects to store input
-            user = new User();
+            User user = new User();
 
             // Capture registration information
             System.out.print( "Enter email: " );
@@ -218,7 +221,7 @@ public class AppGUI {
             user.setPasswordString( input.nextLine().trim() );
 
             // Validate login information
-            List<String> errors = appService.validateLogin( user );
+            List<String> errors = app.validateLogin( user );
             if ( errors.size() > 0 ) {
                 printErrorMsgs( errors );
                 isError = true;
@@ -226,9 +229,9 @@ public class AppGUI {
             }
 
             // Authenticate user
-            errors = appService.authenticateUser( user );
-            if ( errors.size() > 0 ) {
-                printErrorMsgs( errors );
+            boolean isSuccess = app.login( user );
+            if ( !isSuccess ) {
+                printErrorMsgs( Arrays.asList( "Login failed. Try again!" ) );
                 isError = true;
                 continue;
             }
@@ -236,15 +239,11 @@ public class AppGUI {
             // User info is valid
             isError = false;
         }
-        while ( isError );
+        while ( isError && numOfTries >= 0 );
 
-        // Clear user's text password (for security)
-        user.setPasswordString( null );
-
-        // Store current user
-        currentUser = user;
-
-        return false;
+        // Return true if number of tries was not exhausted
+        // else return false
+        return numOfTries >= 0;
     }
 
     /*
