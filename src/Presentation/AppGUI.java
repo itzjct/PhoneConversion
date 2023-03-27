@@ -174,12 +174,14 @@ public class AppGUI {
 
         // Login option
         case 1:
-            while ( !login() );
+            while ( !login() )
+                ;
             break;
 
         // Register option
         case 2:
-            while ( register() );
+            while ( register() )
+                ;
             break;
 
         // Exit option
@@ -205,12 +207,13 @@ public class AppGUI {
 
         boolean isError = false;
         int numOfTries = 5;
+        User user = new User();
         do {
             // Decrease number of tries
             numOfTries--;
 
             // Temporary objects to store input
-            User user = new User();
+            user = new User();
 
             // Capture registration information
             System.out.print( "Enter email: " );
@@ -226,39 +229,41 @@ public class AppGUI {
                 continue;
             }
 
-            // Authenticate user
-            boolean isSuccess = app.login( user );
-            if ( !isSuccess ) {
-                printErrorMsgs( Arrays.asList( "Login failed. Try again!" ) );
-                isError = true;
-                continue;
-            }
-
             // User info is valid
             isError = false;
         }
         while ( isError && numOfTries >= 0 );
 
-        // Return true if number of tries was not exhausted
-        // else return false
-        return numOfTries >= 0;
+        // Check if number of tries exhausted
+        if ( numOfTries < 0 ) {
+            printErrorMsgs( Arrays.asList( "Number of login attempts exhausted!" ) );
+            return false;
+        }
+
+        // Authenticate user
+        boolean isSuccess = app.login( user );
+        if ( !isSuccess ) {
+            printErrorMsgs( Arrays.asList( "Login failed!" ) );
+            return false;
+        }
+
+        return true;
     }
 
     /*
      * This method handles register user logic
      * 
      * Returns:
-     * True: if error was encountered
-     * False: if no errors were encountered
+     * True: if operation successed
+     * False: if operation failed
      */
     private boolean register() {
         printHeader( "Register" );
 
         boolean isError = false;
-        User user = new User();
         do {
             // Temporary objects to store input
-            user = new User();
+            User user = new User();
 
             // Capture registration information
             System.out.print( "Enter first name: " );
@@ -276,7 +281,7 @@ public class AppGUI {
             user.setIsAdmin( isAdmin.equals( "y" ) );
 
             // Validate user information
-            List<String> errors = appService.validateUser( user );
+            List<String> errors = app.validateUser( user );
             if ( errors.size() > 0 ) {
                 printErrorMsgs( errors );
                 isError = true;
@@ -284,7 +289,7 @@ public class AppGUI {
             }
 
             // Validate company information
-            errors = appService.validateCompany( user.getCompany() );
+            errors = app.validateCompany( user.getCompany() );
             if ( errors.size() > 0 ) {
                 printErrorMsgs( errors );
                 isError = true;
