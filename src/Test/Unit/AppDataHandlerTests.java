@@ -143,9 +143,9 @@ public class AppDataHandlerTests {
         Company company = getCompanyObject();
         int id = appDataHandler.storeCompany( company );
 
-        int result = appDataHandler.existsCompany( company.getName() );
+        Company result = appDataHandler.getCompany( company.getName() );
 
-        assertTrue( result > 0 );
+        assertTrue( result.getId() > 0 );
         assertTrue( id > 0 );
     }
 
@@ -153,9 +153,9 @@ public class AppDataHandlerTests {
     public void existsCompany_InvalidCompanyName_ReturnsFalse() {
         String companyName = "_";
 
-        int result = appDataHandler.existsCompany( companyName );
+        Company result = appDataHandler.getCompany( companyName );
 
-        assertFalse( result > 0 );
+        assertFalse( result.getId() > 0 );
     }
 
     @Test
