@@ -146,10 +146,13 @@ public class AppGUI {
         switch ( menuType ) {
         case START_MENU:
             printStartOptions();
+            break;
         case USER_MENU:
             printUserOptions( false );
+            break;
         case ADMIN_MENU:
             printUserOptions( true );
+            break;
         default:
             System.out.println( "Invalid menu type" );
         }
@@ -180,7 +183,7 @@ public class AppGUI {
 
         // Register option
         case 2:
-            while ( register() )
+            while ( !register() )
                 ;
             break;
 
