@@ -357,20 +357,20 @@ public class AppGUI {
 
         // Generate words option
         case 3:
-            while ( generateWords() ) {
-            }
+            while ( generateWords() )
+                ;
             break;
 
         // View phone numbers option
         case 4:
-            while ( viewPhoneNumbers() ) {
-            }
+            while ( viewPhoneNumbers() )
+                ;
             break;
 
         // Approve words option
         case 5:
-            while ( approveWords() ) {
-            }
+            while ( approveWords() )
+                ;
             break;
 
         // Unknown option
@@ -384,7 +384,7 @@ public class AppGUI {
      * This method logs out the current user
      */
     private void logout() {
-        currentUser = null;
+        app.logout();
         isUserMenuRunning = false;
     }
 
