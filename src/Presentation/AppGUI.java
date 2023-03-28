@@ -230,6 +230,14 @@ public class AppGUI {
                 continue;
             }
 
+            // Authenticate user
+            errors = app.login( user );
+            if ( errors.size() > 0 ) {
+                printErrorMsgs( errors );
+                isError = true;
+                continue;
+            }
+
             // User info is valid
             isError = false;
         }
@@ -238,13 +246,6 @@ public class AppGUI {
         // Check if number of tries exhausted
         if ( numOfTries < 0 ) {
             printErrorMsgs( Arrays.asList( "Number of login attempts exhausted!" ) );
-            return false;
-        }
-
-        // Authenticate user
-        boolean isSuccess = app.login( user );
-        if ( !isSuccess ) {
-            printErrorMsgs( Arrays.asList( "Login failed!" ) );
             return false;
         }
 
@@ -262,10 +263,13 @@ public class AppGUI {
         printHeader( "Register" );
 
         boolean isError = false;
+        int numOfTries = 5;
 
         // Temporary objects to store input
         User user = new User();
         do {
+            // Decrease number of tries
+            numOfTries--;
             user = new User();
 
             // Capture registration information
@@ -310,7 +314,13 @@ public class AppGUI {
             // User info is valid
             isError = false;
         }
-        while ( isError );
+        while ( isError && numOfTries >= 0 );
+
+        // Check if number of tries exhausted
+        if ( numOfTries < 0 ) {
+            printErrorMsgs( Arrays.asList( "Number of register attempts exhausted!" ) );
+            return false;
+        }
 
         return true;
     }
