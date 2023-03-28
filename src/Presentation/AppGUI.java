@@ -431,25 +431,22 @@ public class AppGUI {
      * This method ensures a value is within given a range
      */
     private boolean isValidRange( int n, int lo, int hi ) {
-        if ( lo > hi ) {
-            return n >= hi && n <= lo;
-        }
-        return n >= lo && n <= hi;
+        return lo > hi ? n >= hi && n <= lo : n >= lo && n <= hi;
     }
 
     /*
      * This method prints a header
      */
     private void printHeader( String title ) {
-        System.out.println( "========== " + title + " ==========" );
+        System.out.println( "\n========== " + title + " ==========" );
     }
 
     /*
      * This method gracefully exits application
      */
     private void exit() {
-        System.out.println( "Exiting..." );
         input.close();
+        System.out.println( "Exiting..." );
         System.exit( 0 );
     }
 
