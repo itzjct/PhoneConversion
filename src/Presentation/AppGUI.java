@@ -12,8 +12,6 @@ public class AppGUI {
 
     private App app;
     private Scanner input;
-
-    // Turn into an array of flags for each menu that will be needed
     private boolean isStartMenuRunning;
     private boolean isUserMenuRunning;
 
@@ -121,6 +119,11 @@ public class AppGUI {
         return selectedOption;
     }
 
+    /*
+     * This method returns the number of options for
+     * a given menu type. Used to determine boundaries
+     * when user is selecting an option
+     */
     private int getMenuOptionsNumber( int menuType ) {
         switch ( menuType ) {
         // Start menu
@@ -142,16 +145,20 @@ public class AppGUI {
         }
     }
 
+    /*
+     * This method prints out the corresponding menu options
+     * from a given menu type
+     */
     private void printMenu( int menuType ) {
         switch ( menuType ) {
         case START_MENU:
-            printStartOptions();
+            printStartMenu();
             break;
         case USER_MENU:
-            printUserOptions( false );
+            printUserMenu( false );
             break;
         case ADMIN_MENU:
-            printUserOptions( true );
+            printUserMenu( true );
             break;
         default:
             System.out.println( "Invalid menu type" );
@@ -159,14 +166,29 @@ public class AppGUI {
     }
 
     /*
-     * This method displays the start options
+     * This method displays the start menu
      */
-    private void printStartOptions() {
+    private void printStartMenu() {
         printHeader( "Start Menu" );
         System.out.println( "Enter the corresponding option number:" );
         System.out.println( "1: Login" );
         System.out.println( "2: Register" );
         System.out.println( "3: Exit" );
+    }
+
+    /*
+     * This method displays the user menu
+     */
+    private void printUserMenu( boolean isAdmin ) {
+        printHeader( "User Menu" );
+        System.out.println( "Enter the corresponding option number:" );
+        System.out.println( "1: Exit" );
+        System.out.println( "2: Logout" );
+        System.out.println( "3: Generate Words" );
+        System.out.println( "4: View Company Phone Numbers" );
+        if ( isAdmin ) {
+            System.out.println( "5: Approve Words" );
+        }
     }
 
     /*
@@ -192,6 +214,46 @@ public class AppGUI {
             exit();
 
             // Unknown option
+        default:
+            System.out.println( "Invalid option parsed!" );
+            exit();
+        }
+    }
+
+    /*
+     * This method executes the given user option
+     */
+    private void execUserOption( int option ) {
+        switch ( option ) {
+
+        // Exit option
+        case 1:
+            exit();
+
+            // Logout option
+        case 2:
+            logout();
+            break;
+
+        // Generate words option
+        case 3:
+            while ( generateWords() )
+                ;
+            break;
+
+        // View phone numbers option
+        case 4:
+            while ( viewPhoneNumbers() )
+                ;
+            break;
+
+        // Approve words option
+        case 5:
+            while ( approveWords() )
+                ;
+            break;
+
+        // Unknown option
         default:
             System.out.println( "Invalid option parsed!" );
             exit();
@@ -326,61 +388,6 @@ public class AppGUI {
         }
 
         return true;
-    }
-
-    /*
-     * This method displays the user options
-     */
-    private void printUserOptions( boolean isAdmin ) {
-        printHeader( "User Menu" );
-        System.out.println( "Enter the corresponding option number:" );
-        System.out.println( "1: Exit" );
-        System.out.println( "2: Logout" );
-        System.out.println( "3: Generate Words" );
-        System.out.println( "4: View Company Phone Numbers" );
-        if ( isAdmin ) {
-            System.out.println( "5: Approve Words" );
-        }
-    }
-
-    /*
-     * This method executes the given user option
-     */
-    private void execUserOption( int option ) {
-        switch ( option ) {
-
-        // Exit option
-        case 1:
-            exit();
-
-            // Logout option
-        case 2:
-            logout();
-            break;
-
-        // Generate words option
-        case 3:
-            while ( generateWords() )
-                ;
-            break;
-
-        // View phone numbers option
-        case 4:
-            while ( viewPhoneNumbers() )
-                ;
-            break;
-
-        // Approve words option
-        case 5:
-            while ( approveWords() )
-                ;
-            break;
-
-        // Unknown option
-        default:
-            System.out.println( "Invalid option parsed!" );
-            exit();
-        }
     }
 
     /*

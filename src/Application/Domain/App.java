@@ -39,21 +39,9 @@ public class App {
         emailPattern = Pattern.compile( emailRegex );
     }
 
-    public void executeOption( int option ) {
-
-        // Login
-
-        // Register
-
-        // Generate words
-
-        // View company phone numbers
-
-        // Get words (approve words pt 1)
-
-        // Select approved (approve words pt 2)
-    }
-
+    /*
+     * This method authenticates a login
+     */
     public List<String> login( User user ) {
         List<String> errors = new LinkedList<String>();
 
@@ -90,6 +78,9 @@ public class App {
         return errors;
     }
 
+    /*
+     * This method registers a user
+     */
     public List<String> register( User user ) {
 
         List<String> errors = new LinkedList<String>();
@@ -138,22 +129,37 @@ public class App {
         return errors;
     }
 
+    /*
+     * Not implemented
+     */
     public List<Word> generateWords( String phoneNumber ) {
         return new LinkedList<Word>();
     }
 
+    /*
+     * Not implemented
+     */
     public List<String> getPhoneNumbers() {
         return new LinkedList<String>();
     }
 
+    /*
+     * Not implemented
+     */
     public List<Word> getWords() {
         return new LinkedList<Word>();
     }
 
+    /*
+     * Not implemented
+     */
     public boolean storeWords( List<Word> words ) {
         return true;
     }
 
+    /*
+     * This method logs out current user
+     */
     public void logout() {
         currentUser = null;
         phoneNumber = null;
@@ -266,6 +272,13 @@ public class App {
      */
     private boolean isValidEmail( String email ) {
         return emailPattern.matcher( email ).matches();
+    }
+
+    /*
+     * Not implemented
+     */
+    public boolean validatePhoneNumber( String phoneNumber ) {
+        return true;
     }
 
     /*
