@@ -134,26 +134,37 @@ public class AppDataHandler {
     }
 
     /*
-     * This method checks if a given company exists in db
+     * This method retrieves company from db with given name
      */
-    public int existsCompany( String name ) {
-        String query = "SELECT company_id FROM companies WHERE company_name = ?;";
-        int id = 0;
+    public Company getCompany( String name ) {
+        String query = "SELECT company_id, company_name FROM companies WHERE company_name = ?;";
+        Company company = new Company();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setString( 1, name );
-
             ResultSet result = stmt.executeQuery();
+            int count = 0;
             while ( result.next() ) {
-                id = result.getInt( "company_id" );
+                count++;
+                company.setId( result.getInt( "company_id" ) );
+                company.setName( result.getString( "company_name" ) );
             }
             result.close();
-            return id;
+
+            // No company found
+            if ( count == 0 ) {
+                return null;
+            }
         }
         catch ( Exception ex ) {
             System.out.println( ex.getMessage() );
-            return id;
+            return null;
         }
+
+        // Retrieve phone numbers to words map
+        company.setPhoneNumbersToWords( getPhoneNumbers( company.getId() ) );
+
+        return company;
     }
 
     /*
