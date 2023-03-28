@@ -74,6 +74,7 @@ public class App {
         // Capture current user
         // User.copy( user, userFromDb );
         currentUser = userFromDb;
+        isUserLoggedIn = true;
 
         return errors;
     }
@@ -125,6 +126,7 @@ public class App {
 
         // Capture current user
         currentUser = user;
+        isUserLoggedIn = true;
 
         return errors;
     }
