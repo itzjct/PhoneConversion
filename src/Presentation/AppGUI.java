@@ -207,12 +207,13 @@ public class AppGUI {
 
         boolean isError = false;
         int numOfTries = 5;
+
+        // Temporary objects to store input
         User user = new User();
         do {
             // Decrease number of tries
             numOfTries--;
 
-            // Temporary objects to store input
             user = new User();
 
             // Capture registration information
@@ -261,9 +262,11 @@ public class AppGUI {
         printHeader( "Register" );
 
         boolean isError = false;
+
+        // Temporary objects to store input
+        User user = new User();
         do {
-            // Temporary objects to store input
-            User user = new User();
+            user = new User();
 
             // Capture registration information
             System.out.print( "Enter first name: " );
@@ -296,54 +299,20 @@ public class AppGUI {
                 continue;
             }
 
+            // Register user
+            errors = app.register( user );
+            if ( errors.size() > 0 ) {
+                printErrorMsgs( errors );
+                isError = true;
+                continue;
+            }
+
             // User info is valid
             isError = false;
         }
         while ( isError );
 
-        // Generate password salt and hash password
-        user.setPasswordSalt( appService.getSalt() );
-        user.setPassword( appService.hashPassword( user.getPasswordString(), user.getPasswordSalt() ) );
-
-        // If password hashing failed then return null
-        if ( user.getPassword().length == 0 ) {
-            return true;
-        }
-
-        // Clear user's text password (for security)
-        user.setPasswordString( null );
-
-        // Submit company and user to db
-        try {
-
-            // Check if company exists
-            int companyId = appService.existsCompany( user.getCompany().getName() );
-
-            // If company does not exist in db then add it
-            if ( companyId == 0 ) {
-                companyId = appService.storeCompany( user.getCompany() );
-            }
-
-            // Create link between company and user
-            user.getCompany().setId( companyId );
-
-            // Add user
-            user.setId( appService.storeUser( user ) );
-
-            // Load company's data
-            user.setCompany( appService.getCompany( companyId ) );
-        }
-        catch ( Exception ex ) {
-            System.out.println( ex.getMessage() );
-
-            // If db submission failed then return null
-            return true;
-        }
-
-        // Store current user
-        currentUser = user;
-
-        return false;
+        return true;
     }
 
     /*
