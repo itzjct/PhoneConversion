@@ -18,13 +18,23 @@ public class App {
     public final int PW_CHAR_MAX = 128;
     public final int PW_CHAR_MIN = 6;
 
-    
+    private Map<Character, char[]> numberToChars = Map.ofEntries(
+            entry( '0', new char[] { '+' } ),
+            entry( '1', new char[] { '\0' } ), // Does 1 have a char associated with it?
+            entry( '2', new char[] { 'a', 'b', 'c' } ),
+            entry( '3', new char[] { 'd', 'e', 'f' } ),
+            entry( '4', new char[] { 'g', 'h', 'i' } ),
+            entry( '5', new char[] { 'j', 'k', 'l' } ),
+            entry( '6', new char[] { 'm', 'n', 'o' } ),
+            entry( '7', new char[] { 'p', 'q', 'r', 's' } ),
+            entry( '8', new char[] { 't', 'u', 'v' } ),
+            entry( '9', new char[] { 'w', 'x', 'y', 'z' } ) );
+
     private User currentUser;
     private String phoneNumber;
     private boolean isUserLoggedIn;
     private SecureRandom rng;
     private Pattern emailPattern;
-    private Map<Character, char[]> numberToChars;
     private AppDataHandler appDataHandler;
 
     public App() {
@@ -40,24 +50,11 @@ public class App {
                 "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
                 "A-Z]{2,7}$";
         emailPattern = Pattern.compile( emailRegex );
-
-        // Initialize number to chars map
-        numberToChars = Map.ofEntries(
-            entry( '0', new char[] { '+' } ),
-            entry( '1', new char[] { '\0' } ), // Does 1 have a char associated with it?
-            entry( '2', new char[] { 'a', 'b', 'c' } ),
-            entry( '3', new char[] { 'd', 'e', 'f' } ),
-            entry( '4', new char[] { 'g', 'h', 'i' } ),
-            entry( '5', new char[] { 'j', 'k', 'l' } ),
-            entry( '6', new char[] { 'm', 'n', 'o' } ),
-            entry( '7', new char[] { 'p', 'q', 'r', 's' } ),
-            entry( '8', new char[] { 't', 'u', 'v' } ),
-            entry( '9', new char[] { 'w', 'x', 'y', 'z' } )
-        );
     }
 
     // Constructor for tests only
-    public App( boolean isTest ) {
+    public App( AppDataHandler appDataHandler ) {
+        this.appDataHandler = appDataHandler;
         // Regex and pattern to check validity of email
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
                 "[a-zA-Z0-9_+&*-]+)*@" +
@@ -161,40 +158,100 @@ public class App {
     /*
      * This method will generate valid english words
      * for a given phone number
+     * 
+     * Not finished
      */
     public List<Word> generateWords( String phoneNumber ) {
         // Convert to char array
+        char[] numbers = phoneNumber.toCharArray();
 
         // Perform cartersian product on area code
+        List<String> product1 = new LinkedList<String>();
+        for ( int first = 0; first < numberToChars.get( numbers[0] ).length; first++ ) {
+            for ( int second = 0; second < numberToChars.get( numbers[1] ).length; second++ ) {
+                for ( int third = 0; third < numberToChars.get( numbers[2] ).length; third++ ) {
+                    String word = "" + numberToChars.get( numbers[0] )[first] + numberToChars.get( numbers[1] )[second]
+                            + numberToChars.get( numbers[2] )[third];
+                    product1.add( word );
+                }
+            }
+        }
 
         // Perform cartersian product on prefix
+        List<String> product2 = new LinkedList<String>();
+        for ( int first = 0; first < numberToChars.get( numbers[3] ).length; first++ ) {
+            for ( int second = 0; second < numberToChars.get( numbers[4] ).length; second++ ) {
+                for ( int third = 0; third < numberToChars.get( numbers[5] ).length; third++ ) {
+                    String word = "" + numberToChars.get( numbers[3] )[first] + numberToChars.get( numbers[4] )[second]
+                            + numberToChars.get( numbers[5] )[third];
+                    product2.add( word );
+                }
+            }
+        }
 
         // Perform cartersian product on suffix
+        List<String> product3 = new LinkedList<String>();
+        for ( int first = 0; first < numberToChars.get( numbers[6] ).length; first++ ) {
+            for ( int second = 0; second < numberToChars.get( numbers[7] ).length; second++ ) {
+                for ( int third = 0; third < numberToChars.get( numbers[8] ).length; third++ ) {
+                    for ( int fourth = 0; fourth < numberToChars.get( numbers[9] ).length; fourth++ ) {
+                        String word = "" + numberToChars.get( numbers[6] )[first] + numberToChars.get( numbers[7] )[second]
+                                + numberToChars.get( numbers[8] )[third] + numberToChars.get( numbers[9] )[fourth];
+                        product3.add( word );
+                    }
+                }
+            }
+        }
 
-        // 
+        // Perform cartersian product on all parts of phone number
+
+        // Find valid english words
+
+        // Convert results from List of String to Word
 
         return new LinkedList<Word>();
     }
 
     /*
-     * Not implemented
+     * This method retrieves the phone numbers associated with
+     * a given company
+     * 
+     * Returns null if Company object is null or if company has invalid id
      */
-    public List<String> getPhoneNumbers() {
-        return new LinkedList<String>();
+    public List<String> getPhoneNumbers( Company company ) {
+        if ( company == null || company.getId() == 0 ) {
+            return null;
+        }
+        List<String> phoneNumbers = appDataHandler.getPhoneNumbers( company.getId() );
+        return phoneNumbers;
     }
 
     /*
-     * Not implemented
+     * This method retrieves the words associated with a
+     * given phone number
+     * 
+     * Returns null if phone number String is null
      */
-    public List<Word> getWords() {
-        return new LinkedList<Word>();
+    public List<Word> getWords( String phoneNumber ) {
+        if ( phoneNumber == null ) {
+            return null;
+        }
+        List<Word> words = appDataHandler.getWords( phoneNumber );
+        return words;
     }
 
     /*
-     * Not implemented
+     * This method stores list of words associated with a given
+     * phone number
+     * 
+     * Returns true if operation succeeded and false otherwise
      */
-    public boolean storeWords( List<Word> words ) {
-        return true;
+    public boolean storeWords( List<Word> words, String phoneNumber ) {
+        List<Integer> ids = appDataHandler.storeWords( words, phoneNumber );
+        
+        // If all words were successfully stored, the size of ids such
+        // match the size of words
+        return ids.size() == words.size();
     }
 
     /*
