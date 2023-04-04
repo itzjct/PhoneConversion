@@ -248,7 +248,7 @@ public class App {
      */
     public boolean storeWords( List<Word> words, String phoneNumber ) {
         List<Integer> ids = appDataHandler.storeWords( words, phoneNumber );
-        
+
         // If all words were successfully stored, the size of ids such
         // match the size of words
         return ids.size() == words.size();
@@ -408,6 +408,16 @@ public class App {
             errors.add( "Invalid prefix" );
             return errors;
         }
+
+        return errors;
+    }
+
+    /*
+     * This method checks if a given phone number already
+     * exists in database
+     */
+    public List<String> existsPhoneNumber( String phoneNumber ) {
+        List<String> errors = new LinkedList<String>();
 
         // Ensure is not duplicate
         if ( appDataHandler.existsPhoneNumber( phoneNumber ) ) {
