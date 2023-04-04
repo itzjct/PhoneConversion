@@ -415,6 +415,10 @@ public class AppGUI {
     /*
      * This method displays the phone numbers associated
      * with the current user's company
+     * 
+     * Returns:
+     * True: if operation successed
+     * False: if operation failed
      */
     private boolean viewPhoneNumbers() {
         printHeader( "View Phone Numbers" );
