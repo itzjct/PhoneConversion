@@ -185,8 +185,9 @@ public class AppGUI {
         System.out.println( "2: Logout" );
         System.out.println( "3: Generate Words" );
         System.out.println( "4: View Company Phone Numbers" );
+        System.out.println( "5: View Words" );
         if ( isAdmin ) {
-            System.out.println( "5: Approve Words" );
+            System.out.println( "6: Approve Words" );
         }
     }
 
@@ -247,8 +248,13 @@ public class AppGUI {
             viewPhoneNumbers();
             break;
 
-        // Approve words option
+        // View words option
         case 5:
+            viewWords();
+            break;
+
+        // Approve words option
+        case 6:
             approveWords();
             break;
 
@@ -442,6 +448,48 @@ public class AppGUI {
                 System.out.printf( "%s\t\t", sb.toString() );
             }
             System.out.println();
+        }
+
+        // Block until user press enter
+        System.out.println( "\nPress Enter to continue..." );
+        input.nextLine();
+    }
+
+    /*
+     * This method displays the words associated with a
+     * given phone number
+     */
+    private void viewWords() {
+        printHeader( "View Words" );
+
+        // Prompt for phone number
+        System.out.print( "Enter phone number: " );
+        String phoneNumber = input.nextLine().trim();
+
+        // Validate phone number
+        // List<String> errors = app.validatePhoneNumber( phoneNumber );
+        // if ( errors.size() > 0 ) {
+        //     printErrorMsgs( errors );
+        //     return;
+        // }
+
+        // Check that given phone number belongs to current's
+        // user company
+        // ** May use a set instead of list **
+        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
+        if ( !phoneNumbers.contains( phoneNumber ) ) {
+            printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
+            return;
+        }
+
+        // Retrieve words
+        List<Word> words = app.getWords( phoneNumber );
+        if ( words.size() == 0 ) {
+            printErrorMsgs( Arrays.asList( "No words found" ) );
+            return;
+        }
+        for ( Word word : words ) {
+            System.out.println( word.getWord() );
         }
 
         // Block until user press enter
