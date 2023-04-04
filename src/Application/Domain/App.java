@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Pattern;
+import static java.util.Map.entry;
 
 import Persistence.AppDataHandler;
 
@@ -17,11 +18,13 @@ public class App {
     public final int PW_CHAR_MAX = 128;
     public final int PW_CHAR_MIN = 6;
 
+    
     private User currentUser;
     private String phoneNumber;
     private boolean isUserLoggedIn;
     private SecureRandom rng;
     private Pattern emailPattern;
+    private Map<Character, char[]> numberToChars;
     private AppDataHandler appDataHandler;
 
     public App() {
@@ -31,6 +34,30 @@ public class App {
         // Used to generate password salts
         rng = new SecureRandom();
 
+        // Regex and pattern to check validity of email
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+        emailPattern = Pattern.compile( emailRegex );
+
+        // Initialize number to chars map
+        numberToChars = Map.ofEntries(
+            entry( '0', new char[] { '+' } ),
+            entry( '1', new char[] { '\0' } ), // Does 1 have a char associated with it?
+            entry( '2', new char[] { 'a', 'b', 'c' } ),
+            entry( '3', new char[] { 'd', 'e', 'f' } ),
+            entry( '4', new char[] { 'g', 'h', 'i' } ),
+            entry( '5', new char[] { 'j', 'k', 'l' } ),
+            entry( '6', new char[] { 'm', 'n', 'o' } ),
+            entry( '7', new char[] { 'p', 'q', 'r', 's' } ),
+            entry( '8', new char[] { 't', 'u', 'v' } ),
+            entry( '9', new char[] { 'w', 'x', 'y', 'z' } )
+        );
+    }
+
+    // Constructor for tests only
+    public App( boolean isTest ) {
         // Regex and pattern to check validity of email
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
                 "[a-zA-Z0-9_+&*-]+)*@" +
@@ -132,9 +159,20 @@ public class App {
     }
 
     /*
-     * Not implemented
+     * This method will generate valid english words
+     * for a given phone number
      */
     public List<Word> generateWords( String phoneNumber ) {
+        // Convert to char array
+
+        // Perform cartersian product on area code
+
+        // Perform cartersian product on prefix
+
+        // Perform cartersian product on suffix
+
+        // 
+
         return new LinkedList<Word>();
     }
 
@@ -277,10 +315,50 @@ public class App {
     }
 
     /*
-     * Not implemented
+     * This method validates a given phone number
      */
-    public boolean validatePhoneNumber( String phoneNumber ) {
-        return true;
+    public List<String> validatePhoneNumber( String phoneNumber ) {
+        List<String> errors = new LinkedList<String>();
+
+        // Check if phone number string is null
+        if ( phoneNumber == null ) {
+            errors.add( "Phone number cannot be null" );
+            return errors;
+        }
+
+        // Remove common special chars
+        phoneNumber = phoneNumber.replaceAll( "[\\s\\(\\)]", "" );
+
+        // Convert to char array for easier manipulation
+        char[] numbers = phoneNumber.toCharArray();
+
+        // Check if numbers is null or contains invalid number
+        // of characters
+        if ( numbers.length != 10 ) {
+            errors.add( "Invalid phone number length" );
+            return errors;
+        }
+
+        // Check if area code is valid
+        int areaCode = numbers[2] * 100 + numbers[1] * 10 + numbers[0];
+        if ( areaCode < 200 || areaCode > 999 || areaCode == 911 ) {
+            errors.add( "Invalid area code" );
+            return errors;
+        }
+
+        // Check if prefix is valid
+        if ( numbers[3] == 0 || numbers[3] == 1 ) {
+            errors.add( "Invalid prefix" );
+            return errors;
+        }
+
+        // Ensure is not duplicate
+        if ( appDataHandler.existsPhoneNumber( phoneNumber ) ) {
+            errors.add( "Phone number already in use" );
+            return errors;
+        }
+
+        return errors;
     }
 
     /*
