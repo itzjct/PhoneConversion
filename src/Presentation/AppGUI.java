@@ -36,17 +36,17 @@ public class AppGUI {
         isStartMenuRunning = true;
         isUserMenuRunning = true;
 
-        // Loop to handle start options
+        // Loop to handle start menu options
         while ( isStartMenuRunning ) {
 
             // Select a start option
             int selectedStartOption = selectOption( START_MENU );
 
             // Execute the selected start option
-            execStartOption( selectedStartOption );
+            // and determine if user menu should be displayed
+            isUserMenuRunning = execStartOption( selectedStartOption );
 
-            // Loop to handle user options
-            isUserMenuRunning = true;
+            // Loop to handle user menu options
             while ( isUserMenuRunning ) {
 
                 // Select a user (or admin) option
@@ -192,30 +192,32 @@ public class AppGUI {
 
     /*
      * This method executes the given start option
+     * 
+     * Returns:
+     * True: if operation successed
+     * False: if operation failed
      */
-    private void execStartOption( int option ) {
+    private boolean execStartOption( int option ) {
         switch ( option ) {
 
         // Login option
         case 1:
-            while ( !login() )
-                ;
-            break;
+            return login();
 
         // Register option
         case 2:
-            while ( !register() )
-                ;
-            break;
+            return register();
 
         // Exit option
         case 3:
             exit();
+            return false;
 
-            // Unknown option
+        // Unknown option
         default:
             System.out.println( "Invalid option parsed!" );
             exit();
+            return false;
         }
     }
 
@@ -228,28 +230,26 @@ public class AppGUI {
         // Exit option
         case 1:
             exit();
+            break;
 
-            // Logout option
+        // Logout option
         case 2:
             logout();
             break;
 
         // Generate words option
         case 3:
-            while ( !generateWords() )
-                ;
+            generateWords();
             break;
 
         // View phone numbers option
         case 4:
-            while ( !viewPhoneNumbers() )
-                ;
+            viewPhoneNumbers();
             break;
 
         // Approve words option
         case 5:
-            while ( !approveWords() )
-                ;
+            approveWords();
             break;
 
         // Unknown option
@@ -400,7 +400,7 @@ public class AppGUI {
     /*
      * Not implemented
      */
-    private boolean generateWords() {
+    private void generateWords() {
         printHeader( "Generate Words" );
         System.out.println( "NOT IMPLEMENTED" );
 
@@ -409,18 +409,13 @@ public class AppGUI {
         // Validate phone number
 
         // Generate words
-        return true;
     }
 
     /*
      * This method displays the phone numbers associated
      * with the current user's company
-     * 
-     * Returns:
-     * True: if operation successed
-     * False: if operation failed
      */
-    private boolean viewPhoneNumbers() {
+    private void viewPhoneNumbers() {
         printHeader( "View Phone Numbers" );
 
         // Set number of columns to display
@@ -430,7 +425,7 @@ public class AppGUI {
         List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
         if ( phoneNumbers == null ) {
             printErrorMsgs( Arrays.asList( "Could not retrieve phone numbers. Try again!" ) );
-            return false;
+            return;
         }
 
         // Format output
@@ -452,17 +447,14 @@ public class AppGUI {
         // Block until user press enter
         System.out.println( "\nPress Enter to continue..." );
         input.nextLine();
-
-        return true;
     }
 
     /*
      * Not implemented
      */
-    private boolean approveWords() {
+    private void approveWords() {
         printHeader( "Approve Words" );
         System.out.println( "NOT IMPLEMENTED" );
-        return true;
     }
 
     /*
