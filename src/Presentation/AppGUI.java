@@ -236,19 +236,19 @@ public class AppGUI {
 
         // Generate words option
         case 3:
-            while ( generateWords() )
+            while ( !generateWords() )
                 ;
             break;
 
         // View phone numbers option
         case 4:
-            while ( viewPhoneNumbers() )
+            while ( !viewPhoneNumbers() )
                 ;
             break;
 
         // Approve words option
         case 5:
-            while ( approveWords() )
+            while ( !approveWords() )
                 ;
             break;
 
@@ -403,16 +403,53 @@ public class AppGUI {
     private boolean generateWords() {
         printHeader( "Generate Words" );
         System.out.println( "NOT IMPLEMENTED" );
-        return false;
+
+        // Prompt for phone number
+
+        // Validate phone number
+
+        // Generate words
+        return true;
     }
 
     /*
-     * Not implemented
+     * This method displays the phone numbers associated
+     * with the current user's company
      */
     private boolean viewPhoneNumbers() {
         printHeader( "View Phone Numbers" );
-        System.out.println( "NOT IMPLEMENTED" );
-        return false;
+
+        // Set number of columns to display
+        double columnsToDisplay = 2.0;
+
+        // Retrieve phone numbers for a given company
+        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
+        if ( phoneNumbers == null ) {
+            printErrorMsgs( Arrays.asList( "Could not retrieve phone numbers. Try again!" ) );
+            return false;
+        }
+
+        // Format output
+        for ( int i = 0, c = 0; i < Math.ceil( phoneNumbers.size() / columnsToDisplay ); i++ ) {
+            for ( int j = 0; j < columnsToDisplay && c < phoneNumbers.size(); j++, c++ ) {
+                String phoneNumber = phoneNumbers.get( c );
+                StringBuilder sb = new StringBuilder();
+                sb.append( '(' );
+                sb.append( phoneNumber.substring( 0, 3 ) );
+                sb.append( ") " );
+                sb.append( phoneNumber.substring( 3, 6 ) );
+                sb.append( '-' );
+                sb.append( phoneNumber.substring( 6, 10 ) );
+                System.out.printf( "%s\t\t", sb.toString() );
+            }
+            System.out.println();
+        }
+
+        // Block until user press enter
+        System.out.println( "\nPress Enter to continue..." );
+        input.nextLine();
+
+        return true;
     }
 
     /*
@@ -421,7 +458,7 @@ public class AppGUI {
     private boolean approveWords() {
         printHeader( "Approve Words" );
         System.out.println( "NOT IMPLEMENTED" );
-        return false;
+        return true;
     }
 
     /*
