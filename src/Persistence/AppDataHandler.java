@@ -162,7 +162,7 @@ public class AppDataHandler {
         }
 
         // Retrieve phone numbers to words map
-        company.setPhoneNumbersToWords( getPhoneNumbers( company.getId() ) );
+        company.setPhoneNumbersToWords( getPhoneNumbersMap( company.getId() ) );
 
         return company;
     }
@@ -196,7 +196,7 @@ public class AppDataHandler {
         }
 
         // Retrieve phone numbers to words map
-        company.setPhoneNumbersToWords( getPhoneNumbers( companyId ) );
+        company.setPhoneNumbersToWords( getPhoneNumbersMap( companyId ) );
 
         return company;
     }
@@ -265,11 +265,30 @@ public class AppDataHandler {
         }
     }
 
+    public List<String> getPhoneNumbers( int companyId ) {
+        String query = "SELECT phone_number FROM phone_numbers WHERE company_id = ?;";
+        List<String> phoneNumbers = new LinkedList<String>();
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setInt( 1, companyId );
+            ResultSet result = stmt.executeQuery();
+            while ( result.next() ) {
+                phoneNumbers.add( result.getString( "phone_number" ) );
+            }
+            result.close();
+            return phoneNumbers;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return phoneNumbers;
+        }
+    }
+
     /*
      * This method retrieves the map from phone numbers to words for a given company
      * id
      */
-    public Map<String, List<Word>> getPhoneNumbers( int companyId ) {
+    public Map<String, List<Word>> getPhoneNumbersMap( int companyId ) {
         String query = "SELECT phone_numbers.phone_number, words.word_id, words.word, words.is_approved " +
                 "FROM phone_numbers " +
                 "INNER JOIN words ON phone_numbers.phone_number = words.phone_number " +
