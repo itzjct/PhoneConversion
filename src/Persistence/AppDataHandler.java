@@ -397,12 +397,15 @@ public class AppDataHandler {
             PreparedStatement stmt = null;
             ResultSet keys = null;
             for ( Word word : words ) {
-                stmt = conn.prepareStatement( word.getId() > 0 ? updateQuery : insertQuery );
+                boolean isUpdate = word.getId() > 0;
+                stmt = conn.prepareStatement( isUpdate ? updateQuery : insertQuery );
                 int index = 1;
                 stmt.setString( index++, word.getWord() );
                 stmt.setBoolean( index++, word.getIsApproved() );
                 stmt.setString( index++, phoneNumber );
-                stmt.setInt( index++, word.getId() );
+                if ( isUpdate ) {
+                    stmt.setInt( index++, word.getId() );
+                }
 
                 stmt.executeUpdate();
                 keys = stmt.getGeneratedKeys();
