@@ -170,9 +170,9 @@ public class AppGUI {
     private void printStartMenu() {
         printHeader( "Start Menu" );
         System.out.println( "Enter the corresponding option number:" );
-        System.out.println( "1: Login" );
-        System.out.println( "2: Register" );
-        System.out.println( "3: Exit" );
+        System.out.println( "1: Exit" );
+        System.out.println( "2: Login" );
+        System.out.println( "3: Register" );
     }
 
     /*
@@ -200,18 +200,18 @@ public class AppGUI {
     private boolean execStartOption( int option ) {
         switch ( option ) {
 
-        // Login option
+        // Exit option
         case 1:
+            exit();
+            return false;
+
+        // Login option
+        case 2:
             return login();
 
         // Register option
-        case 2:
-            return register();
-
-        // Exit option
         case 3:
-            exit();
-            return false;
+            return register();
 
         // Unknown option
         default:
