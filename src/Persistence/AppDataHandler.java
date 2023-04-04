@@ -361,11 +361,29 @@ public class AppDataHandler {
     }
 
     /*
-     * Not implemented
-     * May not be needed
+     * This method retrieves words for a given phone number
      */
     public List<Word> getWords( String phoneNumber ) {
-        return new LinkedList<Word>();
+        String query = "SELECT word_id, word, is_approved FROM words WHERE phone_number = ?;";
+        List<Word> words = new LinkedList<Word>();
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setString( 1, phoneNumber );
+            ResultSet result = stmt.executeQuery();
+            while ( result.next() ) {
+                Word word = new Word();
+                word.setId( result.getInt( "word_id" ) );
+                word.setWord( result.getString( "word" ) );
+                word.setIsApproved( result.getBoolean( "is_approved" ) );
+                words.add( word );
+            }
+            result.close();
+            return words;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return words;
+        }
     }
 
     /*
