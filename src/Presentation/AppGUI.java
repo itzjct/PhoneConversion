@@ -131,11 +131,11 @@ public class AppGUI {
 
         // User menu
         case USER_MENU:
-            return 4;
+            return 5;
 
         // User admin menu
         case ADMIN_MENU:
-            return 5;
+            return 6;
 
         // Invalid menu
         default:
@@ -463,22 +463,8 @@ public class AppGUI {
         printHeader( "View Words" );
 
         // Prompt for phone number
-        System.out.print( "Enter phone number: " );
-        String phoneNumber = input.nextLine().trim();
-
-        // Validate phone number
-        // List<String> errors = app.validatePhoneNumber( phoneNumber );
-        // if ( errors.size() > 0 ) {
-        //     printErrorMsgs( errors );
-        //     return;
-        // }
-
-        // Check that given phone number belongs to current's
-        // user company
-        // ** May use a set instead of list **
-        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
-        if ( !phoneNumbers.contains( phoneNumber ) ) {
-            printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
+        String phoneNumber = promptPhoneNumber();
+        if ( phoneNumber == null ) {
             return;
         }
 
@@ -488,21 +474,133 @@ public class AppGUI {
             printErrorMsgs( Arrays.asList( "No words found" ) );
             return;
         }
-        for ( Word word : words ) {
-            System.out.println( word.getWord() );
-        }
+
+        // Display words
+        displayWords( words );
 
         // Block until user press enter
-        System.out.println( "\nPress Enter to continue..." );
-        input.nextLine();
+        blockUntilEnter();
     }
 
     /*
-     * Not implemented
+     * This method approves selected words. Can only
+     * be accessed by an admin
      */
     private void approveWords() {
         printHeader( "Approve Words" );
-        System.out.println( "NOT IMPLEMENTED" );
+
+        // Prompt for phone number
+        String phoneNumber = promptPhoneNumber();
+        if ( phoneNumber == null ) {
+            return;
+        }
+
+        // Retrieve words
+        List<Word> words = app.getWords( phoneNumber );
+        if ( words.size() == 0 ) {
+            printErrorMsgs( Arrays.asList( "No words found" ) );
+            return;
+        }
+
+        // Display words
+        displayWords( words );
+
+        // Prompt user which words to approve/disapprove
+        System.out.println( "Select which words to approve/disapprove." +
+                "\nEnter integers corresponding to word separated by spaces:" );
+        String valuesStr = input.nextLine().trim();
+
+        // Parse input values
+        String[] temp = valuesStr.split( " " );
+        int[] values = new int[temp.length];
+        try {
+            for ( int i = 0; i < values.length; i++ ) {
+                values[i] = Integer.parseInt( temp[i] ) - 1;
+
+                // Check value is within bounds
+                if ( values[i] < 0 || values[i] >= words.size() ) {
+                    printErrorMsgs( Arrays.asList( "Invalid word index: " + ( values[i] + 1 ) ) );
+                    return;
+                }
+            }
+        }
+        catch ( Exception ex ) {
+            printErrorMsgs( Arrays.asList( ex.getMessage() ) );
+            return;
+        }
+
+        // Perform approve/disapproval
+        for ( int v : values ) {
+            Word word = words.get( v );
+            word.setIsApproved( !word.getIsApproved() );
+        }
+
+        // Store changes
+        app.storeWords( words, phoneNumber );
+
+        // Display changes
+        System.out.print( "Updated Words:" );
+        displayWords( words );
+
+        // Block until user press enter
+        blockUntilEnter();
+    }
+
+    /*
+     * This method prompts user for a phone number
+     * and returns it to caller
+     * 
+     * Returns:
+     * A String if phone number is valid.
+     * Null otherwise.
+     */
+    private String promptPhoneNumber() {
+
+        // Prompt for phone number
+        System.out.print( "Enter phone number: " );
+        String phoneNumber = input.nextLine().trim();
+
+        // Validate phone number
+        // List<String> errors = app.validatePhoneNumber( phoneNumber );
+        // if ( errors.size() > 0 ) {
+        // printErrorMsgs( errors );
+        // return null;
+        // }
+
+        // Check that given phone number belongs to current's
+        // user company
+        // ** May use a set instead of list **
+        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
+        if ( !phoneNumbers.contains( phoneNumber ) ) {
+            printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
+            return null;
+        }
+
+        return phoneNumber;
+    }
+
+    /*
+     * This method displays a list of words
+     */
+    private void displayWords( List<Word> words ) {
+        System.out.printf( "\n%5s%-20s%-10s\n", " ", "Word", "Approved" );
+        for ( int i = 0; i < 35; i++ ) {
+            System.out.print( '-' );
+        }
+        System.out.println();
+        for ( int i = 0; i < words.size(); i++ ) {
+            Word word = words.get( i );
+            System.out.printf( "%-5s%-20s%B\n", ( i + 1 ) + ": ", word.getWord(), word.getIsApproved() );
+        }
+    }
+
+    /*
+     * This method blocks execution until Enter
+     * key is pressed
+     */
+    private void blockUntilEnter() {
+        System.out.println( "\nPress Enter to continue..." );
+        input.nextLine();
     }
 
     /*
