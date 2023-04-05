@@ -561,11 +561,11 @@ public class AppGUI {
         String phoneNumber = input.nextLine().trim();
 
         // Validate phone number
-        // List<String> errors = app.validatePhoneNumber( phoneNumber );
-        // if ( errors.size() > 0 ) {
-        // printErrorMsgs( errors );
-        // return null;
-        // }
+        List<String> errors = app.validatePhoneNumber( phoneNumber );
+        if ( errors.size() > 0 ) {
+            printErrorMsgs( errors );
+            return null;
+        }
 
         // Check that given phone number belongs to current's
         // user company
