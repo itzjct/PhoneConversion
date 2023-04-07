@@ -1,6 +1,8 @@
 package Presentation;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
 import Application.Domain.*;
 
 public class AppGUI {
@@ -408,13 +410,38 @@ public class AppGUI {
      */
     private void generateWords() {
         printHeader( "Generate Words" );
-        System.out.println( "NOT IMPLEMENTED" );
 
         // Prompt for phone number
-
-        // Validate phone number
+        String phoneNumber = promptPhoneNumber();
+        if ( phoneNumber == null ) {
+            return;
+        }
 
         // Generate words
+        Map<String, List<Word>> wordsMap = app.generateWords( phoneNumber );
+
+        // Display words
+        List<String> colNames = wordsMap.keySet().stream().collect( Collectors.toList() );
+        for ( String colName : colNames ) {
+            System.out.printf( "%-10s\t", colName );
+        }
+        System.out.println();
+        int i = 0;
+        boolean[] reachedEnd = new boolean[3];
+        while ( !reachedEnd[0] || !reachedEnd[1] || !reachedEnd[2] ) {
+            for ( int j = 0; j < colNames.size(); j++ ) {
+                if ( i >= wordsMap.get( colNames.get( j ) ).size() ) {
+                    reachedEnd[j] = true;
+                    System.out.printf( "%-10s\t", "" );
+                }
+                else {
+                    System.out.printf( "%-10s\t", wordsMap.get( colNames.get( j ) ).get( i ).getWord() );
+                }
+            }
+            System.out.println();
+            i++;
+        }
+
     }
 
     /*

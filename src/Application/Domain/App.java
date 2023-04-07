@@ -6,6 +6,7 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Pattern;
 import static java.util.Map.entry;
+import java.util.stream.Collectors;
 
 import Persistence.AppDataHandler;
 
@@ -17,6 +18,8 @@ public class App {
     public final int EMAIL_CHAR_MAX = 128;
     public final int PW_CHAR_MAX = 128;
     public final int PW_CHAR_MIN = 6;
+
+    private Dictionary dic;
 
     private Map<Character, char[]> numberToChars = Map.ofEntries(
             entry( '0', new char[] { '+' } ),
@@ -30,6 +33,16 @@ public class App {
             entry( '8', new char[] { 't', 'u', 'v' } ),
             entry( '9', new char[] { 'w', 'x', 'y', 'z' } ) );
 
+    private static final Map<Character, List<Character>> DIGIT_LETTER_MAPPING = Map.of(
+            '2', List.of( 'A', 'B', 'C' ),
+            '3', List.of( 'D', 'E', 'F' ),
+            '4', List.of( 'G', 'H', 'I' ),
+            '5', List.of( 'J', 'K', 'L' ),
+            '6', List.of( 'M', 'N', 'O' ),
+            '7', List.of( 'P', 'Q', 'R', 'S' ),
+            '8', List.of( 'T', 'U', 'V' ),
+            '9', List.of( 'W', 'X', 'Y', 'Z' ) );
+
     private User currentUser;
     private String phoneNumber;
     private boolean isUserLoggedIn;
@@ -39,6 +52,13 @@ public class App {
 
     public App() {
         appDataHandler = new AppDataHandler();
+        try {
+            dic = new Dictionary(
+                    "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+        }
 
         // Create random number generator
         // Used to generate password salts
@@ -155,53 +175,111 @@ public class App {
         return errors;
     }
 
+    public static List<String> phoneNumberToWords( String phoneNumber ) {
+        List<List<Character>> letterGroups = phoneNumber.chars()
+                .mapToObj( c -> DIGIT_LETTER_MAPPING.get( ( char )c ) )
+                .filter( Objects::nonNull )
+                .collect( Collectors.toList() );
+
+        return cartesianProduct( letterGroups ).stream()
+                .map( list -> list.stream().map( String::valueOf ).collect( Collectors.joining() ) )
+                .collect( Collectors.toList() );
+    }
+
+    private static List<List<Character>> cartesianProduct( List<List<Character>> lists ) {
+        List<List<Character>> resultLists = new ArrayList<>();
+        if ( lists.isEmpty() ) {
+            resultLists.add( Collections.emptyList() );
+            return resultLists;
+        }
+        else {
+            List<Character> firstList = lists.get( 0 );
+            List<List<Character>> remainingLists = cartesianProduct( lists.subList( 1, lists.size() ) );
+            for ( Character condition : firstList ) {
+                for ( List<Character> remainingList : remainingLists ) {
+                    ArrayList<Character> resultList = new ArrayList<>();
+                    resultList.add( condition );
+                    resultList.addAll( remainingList );
+                    resultLists.add( resultList );
+                }
+            }
+            return resultLists;
+        }
+    }
+
+    private List<Word> convertToWord( List<String> listOfString ) {
+        List<Word> listOfWords = new LinkedList<>();
+        for ( String word : listOfString ) {
+            listOfWords.add( new Word( word ) );
+        }
+        return listOfWords;
+    }
+
     /*
      * This method will generate valid english words
      * for a given phone number
      * 
      * Not finished
      */
-    public List<Word> generateWords( String phoneNumber ) {
-        // Convert to char array
-        char[] numbers = phoneNumber.toCharArray();
+    public Map<String, List<Word>> generateWords( String phoneNumber ) {
+        String areaCode = phoneNumber.substring( 0, 3 );
+        String prefix = phoneNumber.substring( 3, 6 );
+        String sufix = phoneNumber.substring( 6, 10 );
 
-        // Perform cartersian product on area code
-        List<String> product1 = new LinkedList<String>();
-        for ( int first = 0; first < numberToChars.get( numbers[0] ).length; first++ ) {
-            for ( int second = 0; second < numberToChars.get( numbers[1] ).length; second++ ) {
-                for ( int third = 0; third < numberToChars.get( numbers[2] ).length; third++ ) {
-                    String word = "" + numberToChars.get( numbers[0] )[first] + numberToChars.get( numbers[1] )[second]
-                            + numberToChars.get( numbers[2] )[third];
-                    product1.add( word );
-                }
-            }
-        }
+        Map<String, List<Word>> wordMap = new TreeMap<>();
+
+        List<String> temp = phoneNumberToWords( areaCode );
+        temp = dic.filterValidWords( temp );
+        List<Word> areaCodeWords = convertToWord( temp );
+        wordMap.put( "AreaCode", areaCodeWords );
+
+        temp = phoneNumberToWords( prefix );
+        temp = dic.filterValidWords( temp );
+        List<Word> prefixWords = convertToWord( temp );
+        wordMap.put( "Prefix", prefixWords );
+
+        temp = phoneNumberToWords( sufix );
+        temp = dic.filterValidWords( temp );
+        List<Word> sufixWords = convertToWord( temp );
+        wordMap.put( "Sufix", sufixWords );
+
+        return wordMap;
 
         // Perform cartersian product on prefix
-        List<String> product2 = new LinkedList<String>();
-        for ( int first = 0; first < numberToChars.get( numbers[3] ).length; first++ ) {
-            for ( int second = 0; second < numberToChars.get( numbers[4] ).length; second++ ) {
-                for ( int third = 0; third < numberToChars.get( numbers[5] ).length; third++ ) {
-                    String word = "" + numberToChars.get( numbers[3] )[first] + numberToChars.get( numbers[4] )[second]
-                            + numberToChars.get( numbers[5] )[third];
-                    product2.add( word );
-                }
-            }
-        }
+        // List<String> product2 = new LinkedList<String>();for(
+        // int first = 0;first<numberToChars.get(numbers[3]).length;first++)
+        // {
+        // for ( int second = 0; second < numberToChars.get( numbers[4] ).length;
+        // second++ ) {
+        // for ( int third = 0; third < numberToChars.get( numbers[5] ).length; third++
+        // ) {
+        // String word = "" + numberToChars.get( numbers[3] )[first] +
+        // numberToChars.get( numbers[4] )[second]
+        // + numberToChars.get( numbers[5] )[third];
+        // product2.add( word );
+        // }
+        // }
+        // }
 
-        // Perform cartersian product on suffix
-        List<String> product3 = new LinkedList<String>();
-        for ( int first = 0; first < numberToChars.get( numbers[6] ).length; first++ ) {
-            for ( int second = 0; second < numberToChars.get( numbers[7] ).length; second++ ) {
-                for ( int third = 0; third < numberToChars.get( numbers[8] ).length; third++ ) {
-                    for ( int fourth = 0; fourth < numberToChars.get( numbers[9] ).length; fourth++ ) {
-                        String word = "" + numberToChars.get( numbers[6] )[first] + numberToChars.get( numbers[7] )[second]
-                                + numberToChars.get( numbers[8] )[third] + numberToChars.get( numbers[9] )[fourth];
-                        product3.add( word );
-                    }
-                }
-            }
-        }
+        // // Perform cartersian product on suffix
+        // List<String> product3 = new LinkedList<String>();for(
+        // int first = 0;first<numberToChars.get(numbers[6]).length;first++)
+        // {
+        // for ( int second = 0; second < numberToChars.get( numbers[7] ).length;
+        // second++ ) {
+        // for ( int third = 0; third < numberToChars.get( numbers[8] ).length; third++
+        // ) {
+        // for ( int fourth = 0; fourth < numberToChars.get( numbers[9] ).length;
+        // fourth++ ) {
+        // String word = "" + numberToChars.get( numbers[6] )[first] +
+        // numberToChars.get( numbers[7] )[second]
+        // + numberToChars.get( numbers[8] )[third] + numberToChars.get( numbers[9]
+        // )[fourth];
+        // product3.add( word );
+        // }
+        // }
+        // }
+        // }
 
         // Perform cartersian product on all parts of phone number
 
@@ -209,7 +287,7 @@ public class App {
 
         // Convert results from List of String to Word
 
-        return new LinkedList<Word>();
+        // return new LinkedList<Word>();
     }
 
     /*
@@ -386,25 +464,28 @@ public class App {
         // Remove common special chars
         phoneNumber = phoneNumber.replaceAll( "[\\s\\(\\)]", "" );
 
-        // Convert to char array for easier manipulation
-        char[] numbers = phoneNumber.toCharArray();
-
         // Check if numbers is null or contains invalid number
         // of characters
-        if ( numbers.length != 10 ) {
+        if ( phoneNumber.length() != 10 ) {
             errors.add( "Invalid phone number length" );
             return errors;
         }
 
         // Check if area code is valid
-        int areaCode = numbers[2] * 100 + numbers[1] * 10 + numbers[0];
-        if ( areaCode < 200 || areaCode > 999 || areaCode == 911 ) {
-            errors.add( "Invalid area code" );
+        try {
+            int areaCode = Integer.valueOf( phoneNumber.substring( 0, 3 ) );
+            if ( areaCode < 200 || areaCode > 999 || areaCode == 911 ) {
+                errors.add( "Invalid area code" );
+                return errors;
+            }
+        }
+        catch ( Exception ex ) {
+            errors.add( ex.getMessage() );
             return errors;
         }
 
         // Check if prefix is valid
-        if ( numbers[3] == 0 || numbers[3] == 1 ) {
+        if ( phoneNumber.charAt( 3 ) == '0' || phoneNumber.charAt( 3 ) == '1' ) {
             errors.add( "Invalid prefix" );
             return errors;
         }
