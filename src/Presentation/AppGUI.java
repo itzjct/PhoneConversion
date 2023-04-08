@@ -417,6 +417,15 @@ public class AppGUI {
             return;
         }
 
+        // Check that given phone number does not belong to
+        // another company
+        // ** May use a set instead of list **
+        Set<String> phoneNumbers = app.getNonUsablePhoneNumbers( app.getCurrentUser().getCompany().getId() );
+        if ( phoneNumbers.contains( phoneNumber ) ) {
+            printErrorMsgs( Arrays.asList( "Phone number already belongs to another company" ) );
+            return;
+        }
+
         // Generate words
         Map<String, List<Word>> wordsMap = app.generateWords( phoneNumber );
 
@@ -495,6 +504,15 @@ public class AppGUI {
             return;
         }
 
+        // Check that given phone number belongs to current's
+        // user company
+        // ** May use a set instead of list **
+        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
+        if ( !phoneNumbers.contains( phoneNumber ) ) {
+            printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
+            return;
+        }
+
         // Retrieve words
         List<Word> words = app.getWords( phoneNumber );
         if ( words.size() == 0 ) {
@@ -519,6 +537,15 @@ public class AppGUI {
         // Prompt for phone number
         String phoneNumber = promptPhoneNumber();
         if ( phoneNumber == null ) {
+            return;
+        }
+
+        // Check that given phone number belongs to current's
+        // user company
+        // ** May use a set instead of list **
+        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
+        if ( !phoneNumbers.contains( phoneNumber ) ) {
+            printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
             return;
         }
 
@@ -591,15 +618,6 @@ public class AppGUI {
         List<String> errors = app.validatePhoneNumber( phoneNumber );
         if ( errors.size() > 0 ) {
             printErrorMsgs( errors );
-            return null;
-        }
-
-        // Check that given phone number belongs to current's
-        // user company
-        // ** May use a set instead of list **
-        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
-        if ( !phoneNumbers.contains( phoneNumber ) ) {
-            printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
             return null;
         }
 

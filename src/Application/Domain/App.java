@@ -305,6 +305,16 @@ public class App {
     }
 
     /*
+     * This method retrieves all phone numbers that do not belong
+     * to the specified company
+     * 
+     * Returns a Set of String
+     */
+    public Set<String> getNonUsablePhoneNumbers( int companyId ) {
+        return appDataHandler.getNonUsablePhoneNumbers( companyId );
+    }
+
+    /*
      * This method retrieves the words associated with a
      * given phone number
      * 

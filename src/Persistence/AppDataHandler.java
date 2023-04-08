@@ -285,6 +285,29 @@ public class AppDataHandler {
     }
 
     /*
+     * This method retrieves all phone numbers that do not belong
+     * to the specified company
+     */
+    public Set<String> getNonUsablePhoneNumbers( int companyId ) {
+        String query = "SELECT phone_number FROM phone_numbers WHERE company_id IS NOT ?;";
+        Set<String> phoneNumbers = new HashSet<>();
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setInt( 1, companyId );
+            ResultSet result = stmt.executeQuery();
+            while ( result.next() ) {
+                phoneNumbers.add( result.getString( "phone_number" ) );
+            }
+            result.close();
+            return phoneNumbers;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return phoneNumbers;
+        }
+    }
+
+    /*
      * This method retrieves the map from phone numbers to words for a given company
      * id
      */
