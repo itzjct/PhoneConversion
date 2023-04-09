@@ -161,8 +161,8 @@ public class AppDataHandler {
             return null;
         }
 
-        // Retrieve phone numbers to words map
-        company.setPhoneNumbersToWords( getPhoneNumbersMap( company.getId() ) );
+        // Retrieve phone numbers
+        company.setPhoneNumbers( getPhoneNumbers( company.getId() ) );
 
         return company;
     }
@@ -195,8 +195,8 @@ public class AppDataHandler {
             return null;
         }
 
-        // Retrieve phone numbers to words map
-        company.setPhoneNumbersToWords( getPhoneNumbersMap( companyId ) );
+        // Retrieve phone numbers
+        company.setPhoneNumbers( getPhoneNumbers( companyId ) );
 
         return company;
     }
@@ -248,7 +248,7 @@ public class AppDataHandler {
      * This method checks if given phone number exists in db
      */
     public boolean existsPhoneNumber( String phoneNumber ) {
-        String query = "SELECT phone_number FROM phone_numbers WHERE phone_number = ?;";
+        String query = "SELECT phone_id FROM phone_numbers WHERE phone_number = ?;";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setString( 1, phoneNumber );
@@ -265,17 +265,25 @@ public class AppDataHandler {
         }
     }
 
-    public List<String> getPhoneNumbers( int companyId ) {
-        String query = "SELECT phone_number FROM phone_numbers WHERE company_id = ?;";
-        List<String> phoneNumbers = new LinkedList<String>();
+    public List<PhoneNumber> getPhoneNumbers( int companyId ) {
+        String query = "SELECT phone_id, phone_number FROM phone_numbers WHERE company_id = ?;";
+        List<PhoneNumber> phoneNumbers = new LinkedList<>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setInt( 1, companyId );
             ResultSet result = stmt.executeQuery();
             while ( result.next() ) {
-                phoneNumbers.add( result.getString( "phone_number" ) );
+                PhoneNumber phoneNumber = new PhoneNumber();
+                phoneNumber.setId( result.getInt( "phone_id" ) );
+                phoneNumber.setPhoneNumber( result.getString( "phone_number" ) );
+                phoneNumbers.add( phoneNumber );
             }
             result.close();
+
+            // Retrieve words for each phone number
+            for ( PhoneNumber phoneNumber : phoneNumbers ) {
+                phoneNumber.setWords( getWords( phoneNumber.getId() ) );
+            }
             return phoneNumbers;
         }
         catch ( Exception ex ) {
@@ -308,58 +316,32 @@ public class AppDataHandler {
     }
 
     /*
-     * This method retrieves the map from phone numbers to words for a given company
-     * id
-     * 
-     * ** UPDATE **
-     */
-    public Map<String, Map<Integer, List<Word>>> getPhoneNumbersMap( int companyId ) {
-        String query = "SELECT phone_numbers.phone_number, words.word_id, words.word, words.belongs_to " +
-                "FROM phone_numbers " +
-                "INNER JOIN words ON phone_numbers.phone_number = words.phone_number " +
-                "WHERE company_id = ?;";
-        Map<String, Map<Integer, List<Word>>> phoneToWords = new TreeMap<>();
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement( query )) {
-            stmt.setInt( 1, companyId );
-            ResultSet result = stmt.executeQuery();
-            while ( result.next() ) {
-                Word word = new Word();
-                word.setId( result.getInt( "word_id" ) );
-                word.setWord( result.getString( "word" ) );
-                word.setBelongsTo( result.getInt( "belongs_to" ) );
-
-                String phoneNumber = result.getString( "phone_number" );
-                if ( !phoneToWords.containsKey( phoneNumber ) ) {
-                    phoneToWords.put( phoneNumber, Word.getWordMap() );
-                }
-                phoneToWords.get( phoneNumber ).get( word.getBelongsTo() ).add( word );
-            }
-        }
-        catch ( Exception ex ) {
-            System.out.println( ex.getMessage() );
-            return phoneToWords;
-        }
-        return phoneToWords;
-    }
-
-    /*
      * This method stores the phone number to given company into db
      */
-    public boolean storePhoneNumber( String phoneNumber, int companyId ) {
-        String query = "INSERT INTO phone_numbers ( phone_number, company_id ) VALUES ( ?, ? );";
+    public int storePhoneNumber( PhoneNumber phoneNumber, int companyId ) {
+        String insertQuery = "INSERT INTO phone_numbers ( phone_number, company_id ) VALUES ( ?, ? );";
+        String updateQuery = "UPDATE phone_numbers SET phone_number = ?, company_id = ? WHERE phone_id = ?;";
+        boolean isUpdate = phoneNumber.getId() > 0;
+        int id = phoneNumber.getId();
         try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement( query )) {
+                PreparedStatement stmt = conn.prepareStatement( isUpdate ? updateQuery : insertQuery )) {
             int index = 1;
-            stmt.setString( index++, phoneNumber );
+            stmt.setString( index++, phoneNumber.getPhoneNumber() );
             stmt.setInt( index++, companyId );
-
+            if ( isUpdate ) {
+                stmt.setInt( index++, phoneNumber.getId() );
+            }
             stmt.executeUpdate();
-            return true;
+            ResultSet keys = stmt.getGeneratedKeys();
+            while ( keys.next() ) {
+                id = keys.getInt( 1 );
+            }
+            stmt.close();
+            return id;
         }
         catch ( Exception ex ) {
             System.out.println( ex.getMessage() );
-            return false;
+            return id;
         }
     }
 
@@ -384,12 +366,12 @@ public class AppDataHandler {
     /*
      * This method retrieves a map of words for a given phone number
      */
-    public Map<Integer, List<Word>> getWords( String phoneNumber ) {
-        String query = "SELECT word_id, word, belongs_to FROM words WHERE phone_number = ?;";
+    public Map<Integer, List<Word>> getWords( int phoneId ) {
+        String query = "SELECT word_id, word, belongs_to FROM words WHERE phone_id = ?;";
         Map<Integer, List<Word>> wordsMap = Word.getWordMap();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
-            stmt.setString( 1, phoneNumber );
+            stmt.setInt( 1, phoneId );
             ResultSet result = stmt.executeQuery();
             while ( result.next() ) {
                 Word word = new Word();
@@ -410,9 +392,9 @@ public class AppDataHandler {
     /*
      * This method stores words to given phone number into db
      */
-    public List<Integer> storeWords( Map<Integer, List<Word>> words, String phoneNumber ) {
-        String insertQuery = "INSERT INTO words ( word, belongs_to, phone_number ) VALUES ( ?, ?, ? );";
-        String updateQuery = "UPDATE words SET word = ?, belongs_to = ?, phone_number = ? WHERE word_id = ?;";
+    public List<Integer> storeWords( Map<Integer, List<Word>> words, int phoneId ) {
+        String insertQuery = "INSERT INTO words ( word, belongs_to, phone_id ) VALUES ( ?, ?, ? );";
+        String updateQuery = "UPDATE words SET word = ?, belongs_to = ?, phone_id = ? WHERE word_id = ?;";
         List<Integer> ids = new LinkedList<Integer>();
         try (Connection conn = getConnection()) {
             PreparedStatement stmt = null;
@@ -424,11 +406,11 @@ public class AppDataHandler {
                     int index = 1;
                     stmt.setString( index++, word.getWord() );
                     stmt.setInt( index++, word.getBelongsTo() );
-                    stmt.setString( index++, phoneNumber );
+                    stmt.setInt( index++, phoneId );
                     if ( isUpdate ) {
                         stmt.setInt( index++, word.getId() );
                     }
-    
+
                     stmt.executeUpdate();
                     keys = stmt.getGeneratedKeys();
                     while ( keys.next() ) {

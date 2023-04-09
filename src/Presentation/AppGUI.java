@@ -197,6 +197,10 @@ public class AppGUI {
         if ( isAdmin ) {
             System.out.println( "6: Approve Words" );
         }
+
+        // Update App object's state. Needed to keep
+        // phone numbers and words up to date.
+        app.updateState();
     }
 
     /*
@@ -418,8 +422,8 @@ public class AppGUI {
         printHeader( "Generate Words" );
 
         // Prompt for phone number
-        String phoneNumber = promptPhoneNumber();
-        if ( phoneNumber == null ) {
+        String phoneNumberStr = promptPhoneNumber();
+        if ( phoneNumberStr == null ) {
             return;
         }
 
@@ -427,17 +431,20 @@ public class AppGUI {
         // another company
         // ** May use a set instead of list **
         Set<String> phoneNumbers = app.getNonUsablePhoneNumbers( app.getCurrentUser().getCompany().getId() );
-        if ( phoneNumbers.contains( phoneNumber ) ) {
+        if ( phoneNumbers.contains( phoneNumberStr ) ) {
             printErrorMsgs( Arrays.asList( "Phone number already belongs to another company" ) );
             return;
         }
 
         // Set the current user's company as owner of given phone number
-        boolean success = app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
-        if ( !success ) {
+        PhoneNumber phoneNumber = new PhoneNumber( phoneNumberStr );
+        int id = app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
+        if ( id == 0 ) {
             printErrorMsgs( Arrays.asList(
                     "Failure to create link between entered phone number and " + app.getCurrentUser().getCompany().getName() ) );
+            return;
         }
+        phoneNumber.setId( id );
 
         // Generate words
         Map<Integer, List<Word>> wordsMap = app.generateWords( phoneNumber );
@@ -495,7 +502,7 @@ public class AppGUI {
         displayWords( wordChoices );
 
         // Store words to database
-        app.storeWords( wordChoices, phoneNumber );
+        app.storeWords( wordChoices, phoneNumber.getId() );
 
         // Block until user press enter
         blockUntilEnter();
@@ -512,7 +519,7 @@ public class AppGUI {
         double columnsToDisplay = 2.0;
 
         // Retrieve phone numbers for a given company
-        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
+        List<PhoneNumber> phoneNumbers = app.getCurrentUser().getCompany().getPhoneNumbers();
         if ( phoneNumbers == null ) {
             printErrorMsgs( Arrays.asList( "Could not retrieve phone numbers. Try again!" ) );
             return;
@@ -521,7 +528,7 @@ public class AppGUI {
         // Format output
         for ( int i = 0, c = 0; i < Math.ceil( phoneNumbers.size() / columnsToDisplay ); i++ ) {
             for ( int j = 0; j < columnsToDisplay && c < phoneNumbers.size(); j++, c++ ) {
-                String phoneNumber = phoneNumbers.get( c );
+                String phoneNumber = phoneNumbers.get( c ).getPhoneNumber();
                 StringBuilder sb = new StringBuilder();
                 sb.append( '(' );
                 sb.append( phoneNumber.substring( 0, 3 ) );
@@ -554,14 +561,17 @@ public class AppGUI {
         // Check that given phone number belongs to current's
         // user company
         // ** May use a set instead of list **
-        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
+        Set<String> phoneNumbers = app.getCurrentUser().getCompany().getPhoneNumbers().stream().map( x -> x.getPhoneNumber() )
+                .collect( Collectors.toSet() );
         if ( !phoneNumbers.contains( phoneNumber ) ) {
             printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
             return;
         }
 
         // Retrieve words
-        Map<Integer, List<Word>> words = app.getWords( phoneNumber );
+        Map<Integer, List<Word>> words = app.getCurrentUser().getCompany().getPhoneNumbers().stream()
+                .filter( x -> x.getPhoneNumber().equals( phoneNumber ) ).findFirst()
+                .get().getWords();
         int colsEmpty = 0;
         for ( int key : words.keySet() ) {
             if ( words.get( key ).size() == 0 ) {
@@ -596,7 +606,7 @@ public class AppGUI {
         // Check that given phone number belongs to current's
         // user company
         // ** May use a set instead of list **
-        List<String> phoneNumbers = app.getPhoneNumbers( app.getCurrentUser().getCompany() );
+        List<PhoneNumber> phoneNumbers = app.getCurrentUser().getCompany().getPhoneNumbers();
         if ( !phoneNumbers.contains( phoneNumber ) ) {
             printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
             return;

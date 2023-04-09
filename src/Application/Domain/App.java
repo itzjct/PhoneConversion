@@ -83,6 +83,10 @@ public class App {
         emailPattern = Pattern.compile( emailRegex );
     }
 
+    public void updateState() {
+        currentUser.setCompany( appDataHandler.getCompany( currentUser.getCompany().getId() ) );
+    }
+
     /*
      * This method authenticates a login
      */
@@ -220,10 +224,11 @@ public class App {
      * 
      * Not finished
      */
-    public Map<Integer, List<Word>> generateWords( String phoneNumber ) {
-        String areaCode = phoneNumber.substring( 0, 3 );
-        String prefix = phoneNumber.substring( 3, 6 );
-        String sufix = phoneNumber.substring( 6, 10 );
+    public Map<Integer, List<Word>> generateWords( PhoneNumber phoneNumber ) {
+        String phoneNumberStr = phoneNumber.getPhoneNumber();
+        String areaCode = phoneNumberStr.substring( 0, 3 );
+        String prefix = phoneNumberStr.substring( 3, 6 );
+        String sufix = phoneNumberStr.substring( 6, 10 );
 
         Map<Integer, List<Word>> wordMap = new TreeMap<>();
 
@@ -246,20 +251,6 @@ public class App {
     }
 
     /*
-     * This method retrieves the phone numbers associated with
-     * a given company
-     * 
-     * Returns null if Company object is null or if company has invalid id
-     */
-    public List<String> getPhoneNumbers( Company company ) {
-        if ( company == null || company.getId() == 0 ) {
-            return null;
-        }
-        List<String> phoneNumbers = appDataHandler.getPhoneNumbers( company.getId() );
-        return phoneNumbers;
-    }
-
-    /*
      * This method retrieves all phone numbers that do not belong
      * to the specified company
      * 
@@ -272,21 +263,8 @@ public class App {
     /*
      * This method stores the phone number to given company into db
      */
-    public boolean storePhoneNumber( String phoneNumber, int companyId ) {
+    public int storePhoneNumber( PhoneNumber phoneNumber, int companyId ) {
         return appDataHandler.storePhoneNumber( phoneNumber, companyId );
-    }
-
-    /*
-     * This method retrieves the words map associated with a
-     * given phone number
-     * 
-     * Returns null if phone number String is null
-     */
-    public Map<Integer, List<Word>> getWords( String phoneNumber ) {
-        if ( phoneNumber == null ) {
-            return null;
-        }
-        return appDataHandler.getWords( phoneNumber );
     }
 
     /*
@@ -295,8 +273,8 @@ public class App {
      * 
      * Returns true if operation succeeded and false otherwise
      */
-    public boolean storeWords( Map<Integer, List<Word>> words, String phoneNumber ) {
-        List<Integer> ids = appDataHandler.storeWords( words, phoneNumber );
+    public boolean storeWords( Map<Integer, List<Word>> words, int phoneId ) {
+        List<Integer> ids = appDataHandler.storeWords( words, phoneId );
 
         // If all words were successfully stored, the size of ids such
         // match the size of words
