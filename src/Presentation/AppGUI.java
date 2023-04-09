@@ -433,30 +433,35 @@ public class AppGUI {
         }
 
         // Generate words
-        Map<String, List<Word>> wordsMap = app.generateWords( phoneNumber );
+        Map<Integer, List<Word>> wordsMap = app.generateWords( phoneNumber );
 
         // Display words
-        List<String> colNames = wordsMap.keySet().stream().collect( Collectors.toList() );
-        for ( String colName : colNames ) {
-            System.out.printf( "%-10s\t", colName );
-        }
-        System.out.println();
-        int i = 0;
-        boolean[] reachedEnd = new boolean[3];
-        while ( !reachedEnd[0] || !reachedEnd[1] || !reachedEnd[2] ) {
-            for ( int j = 0; j < colNames.size(); j++ ) {
-                if ( i >= wordsMap.get( colNames.get( j ) ).size() ) {
-                    reachedEnd[j] = true;
-                    System.out.printf( "%-10s\t", "" );
-                }
-                else {
-                    System.out.printf( "%-10s\t", wordsMap.get( colNames.get( j ) ).get( i ).getWord() );
+        displayWords( wordsMap );
+
+        // Let user select words
+        Map<Integer, List<Word>> wordChoices = Word.getWordMap();
+        for ( int i = 0; i < COL_NAMES.length; i++ ) {
+            System.out.print( "For " + COL_NAMES[i] + " column enter row number(s) of desired word separated by spaces." +
+                    "\nEnter 0 to select none: " );
+            try {
+                String inputString = input.nextLine().trim();
+                String[] inputArr = inputString.split( " " );
+                for ( int j = 0; j < inputArr.length; j++ ) {
+                    int index = Integer.valueOf( inputArr[j] ) - 1;
+                    wordChoices.get( i ).add( wordsMap.get( i ).get( index ) );
                 }
             }
-            System.out.println();
-            i++;
+            catch ( Exception ex ) {
+                printErrorMsgs( Arrays.asList( ex.getMessage() ) );
+                return;
+            }
         }
 
+        // Display selected words
+        displayWords( wordChoices );
+
+        // Store words to database
+        app.storeWords( wordChoices, phoneNumber );
     }
 
     /*
@@ -649,21 +654,24 @@ public class AppGUI {
      * This method displays a list of words
      */
     private void displayWords( Map<Integer, List<Word>> words ) {
-        // Display words
+        System.out.printf( "%-5s", "" );
         for ( String colName : COL_NAMES ) {
-            System.out.printf( "%-10s\t", colName );
+            System.out.printf( "%-15s", colName );
         }
         System.out.println();
         int i = 0;
         boolean[] reachedEnd = new boolean[3];
         while ( !reachedEnd[0] || !reachedEnd[1] || !reachedEnd[2] ) {
+            System.out.printf( "%-5s", ( i + 1 ) + ": " );
             for ( int j = 0; j < COL_NAMES.length; j++ ) {
                 if ( i >= words.get( j ).size() ) {
-                    reachedEnd[j] = true;
-                    System.out.printf( "%-10s\t", "" );
+                    System.out.printf( "%-15s", "" );
                 }
                 else {
-                    System.out.printf( "%-10s\t", words.get( j ).get( i ).getWord() );
+                    if ( i >= words.get( j ).size() - 1 ) {
+                        reachedEnd[j] = true;
+                    }
+                    System.out.printf( "%-15s", words.get( j ).get( i ).getWord() );
                 }
             }
             System.out.println();

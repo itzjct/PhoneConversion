@@ -220,73 +220,29 @@ public class App {
      * 
      * Not finished
      */
-    public Map<String, List<Word>> generateWords( String phoneNumber ) {
+    public Map<Integer, List<Word>> generateWords( String phoneNumber ) {
         String areaCode = phoneNumber.substring( 0, 3 );
         String prefix = phoneNumber.substring( 3, 6 );
         String sufix = phoneNumber.substring( 6, 10 );
 
-        Map<String, List<Word>> wordMap = new TreeMap<>();
+        Map<Integer, List<Word>> wordMap = new TreeMap<>();
 
         List<String> temp = phoneNumberToWords( areaCode );
         temp = dic.filterValidWords( temp );
         List<Word> areaCodeWords = convertToWord( temp );
-        wordMap.put( "AreaCode", areaCodeWords );
+        wordMap.put( 0, areaCodeWords );
 
         temp = phoneNumberToWords( prefix );
         temp = dic.filterValidWords( temp );
         List<Word> prefixWords = convertToWord( temp );
-        wordMap.put( "Prefix", prefixWords );
+        wordMap.put( 1, prefixWords );
 
         temp = phoneNumberToWords( sufix );
         temp = dic.filterValidWords( temp );
         List<Word> sufixWords = convertToWord( temp );
-        wordMap.put( "Sufix", sufixWords );
+        wordMap.put( 2, sufixWords );
 
         return wordMap;
-
-        // Perform cartersian product on prefix
-        // List<String> product2 = new LinkedList<String>();for(
-        // int first = 0;first<numberToChars.get(numbers[3]).length;first++)
-        // {
-        // for ( int second = 0; second < numberToChars.get( numbers[4] ).length;
-        // second++ ) {
-        // for ( int third = 0; third < numberToChars.get( numbers[5] ).length; third++
-        // ) {
-        // String word = "" + numberToChars.get( numbers[3] )[first] +
-        // numberToChars.get( numbers[4] )[second]
-        // + numberToChars.get( numbers[5] )[third];
-        // product2.add( word );
-        // }
-        // }
-        // }
-
-        // // Perform cartersian product on suffix
-        // List<String> product3 = new LinkedList<String>();for(
-        // int first = 0;first<numberToChars.get(numbers[6]).length;first++)
-        // {
-        // for ( int second = 0; second < numberToChars.get( numbers[7] ).length;
-        // second++ ) {
-        // for ( int third = 0; third < numberToChars.get( numbers[8] ).length; third++
-        // ) {
-        // for ( int fourth = 0; fourth < numberToChars.get( numbers[9] ).length;
-        // fourth++ ) {
-        // String word = "" + numberToChars.get( numbers[6] )[first] +
-        // numberToChars.get( numbers[7] )[second]
-        // + numberToChars.get( numbers[8] )[third] + numberToChars.get( numbers[9]
-        // )[fourth];
-        // product3.add( word );
-        // }
-        // }
-        // }
-        // }
-
-        // Perform cartersian product on all parts of phone number
-
-        // Find valid english words
-
-        // Convert results from List of String to Word
-
-        // return new LinkedList<Word>();
     }
 
     /*
@@ -332,7 +288,7 @@ public class App {
      * 
      * Returns true if operation succeeded and false otherwise
      */
-    public boolean storeWords( List<Word> words, String phoneNumber ) {
+    public boolean storeWords( Map<Integer, List<Word>> words, String phoneNumber ) {
         List<Integer> ids = appDataHandler.storeWords( words, phoneNumber );
 
         // If all words were successfully stored, the size of ids such

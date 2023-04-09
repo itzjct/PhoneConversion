@@ -410,32 +410,34 @@ public class AppDataHandler {
     /*
      * This method stores words to given phone number into db
      */
-    public List<Integer> storeWords( List<Word> words, String phoneNumber ) {
+    public List<Integer> storeWords( Map<Integer, List<Word>> words, String phoneNumber ) {
         String insertQuery = "INSERT INTO words ( word, belongs_to, phone_number ) VALUES ( ?, ?, ? );";
         String updateQuery = "UPDATE words SET word = ?, belongs_to = ?, phone_number = ? WHERE word_id = ?;";
         List<Integer> ids = new LinkedList<Integer>();
         try (Connection conn = getConnection()) {
             PreparedStatement stmt = null;
             ResultSet keys = null;
-            for ( Word word : words ) {
-                boolean isUpdate = word.getId() > 0;
-                stmt = conn.prepareStatement( isUpdate ? updateQuery : insertQuery );
-                int index = 1;
-                stmt.setString( index++, word.getWord() );
-                stmt.setInt( index++, word.getBelongsTo() );
-                stmt.setString( index++, phoneNumber );
-                if ( isUpdate ) {
-                    stmt.setInt( index++, word.getId() );
+            for ( int key : words.keySet() ) {
+                for ( Word word : words.get( key ) ) {
+                    boolean isUpdate = word.getId() > 0;
+                    stmt = conn.prepareStatement( isUpdate ? updateQuery : insertQuery );
+                    int index = 1;
+                    stmt.setString( index++, word.getWord() );
+                    stmt.setInt( index++, word.getBelongsTo() );
+                    stmt.setString( index++, phoneNumber );
+                    if ( isUpdate ) {
+                        stmt.setInt( index++, word.getId() );
+                    }
+    
+                    stmt.executeUpdate();
+                    keys = stmt.getGeneratedKeys();
+                    while ( keys.next() ) {
+                        int id = keys.getInt( 1 );
+                        word.setId( id );
+                        ids.add( id );
+                    }
+                    stmt.clearParameters();
                 }
-
-                stmt.executeUpdate();
-                keys = stmt.getGeneratedKeys();
-                while ( keys.next() ) {
-                    int id = keys.getInt( 1 );
-                    word.setId( id );
-                    ids.add( id );
-                }
-                stmt.clearParameters();
             }
             return ids;
         }
