@@ -206,10 +206,10 @@ public class App {
         }
     }
 
-    private List<Word> convertToWord( List<String> listOfString ) {
+    private List<Word> convertToWord( List<String> listOfString, int belongsTo ) {
         List<Word> listOfWords = new LinkedList<>();
         for ( String word : listOfString ) {
-            listOfWords.add( new Word( word ) );
+            listOfWords.add( new Word( word, belongsTo ) );
         }
         return listOfWords;
     }
@@ -229,17 +229,17 @@ public class App {
 
         List<String> temp = phoneNumberToWords( areaCode );
         temp = dic.filterValidWords( temp );
-        List<Word> areaCodeWords = convertToWord( temp );
+        List<Word> areaCodeWords = convertToWord( temp, 0 );
         wordMap.put( 0, areaCodeWords );
 
         temp = phoneNumberToWords( prefix );
         temp = dic.filterValidWords( temp );
-        List<Word> prefixWords = convertToWord( temp );
+        List<Word> prefixWords = convertToWord( temp, 1 );
         wordMap.put( 1, prefixWords );
 
         temp = phoneNumberToWords( sufix );
         temp = dic.filterValidWords( temp );
-        List<Word> sufixWords = convertToWord( temp );
+        List<Word> sufixWords = convertToWord( temp, 2 );
         wordMap.put( 2, sufixWords );
 
         return wordMap;
@@ -267,6 +267,13 @@ public class App {
      */
     public Set<String> getNonUsablePhoneNumbers( int companyId ) {
         return appDataHandler.getNonUsablePhoneNumbers( companyId );
+    }
+
+    /*
+     * This method stores the phone number to given company into db
+     */
+    public boolean storePhoneNumber( String phoneNumber, int companyId ) {
+        return appDataHandler.storePhoneNumber( phoneNumber, companyId );
     }
 
     /*

@@ -432,6 +432,13 @@ public class AppGUI {
             return;
         }
 
+        // Set the current user's company as owner of given phone number
+        boolean success = app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
+        if ( !success ) {
+            printErrorMsgs( Arrays.asList(
+                    "Failure to create link between entered phone number and " + app.getCurrentUser().getCompany().getName() ) );
+        }
+
         // Generate words
         Map<Integer, List<Word>> wordsMap = app.generateWords( phoneNumber );
 
@@ -441,14 +448,41 @@ public class AppGUI {
         // Let user select words
         Map<Integer, List<Word>> wordChoices = Word.getWordMap();
         for ( int i = 0; i < COL_NAMES.length; i++ ) {
-            System.out.print( "For " + COL_NAMES[i] + " column enter row number(s) of desired word separated by spaces." +
-                    "\nEnter 0 to select none: " );
             try {
-                String inputString = input.nextLine().trim();
-                String[] inputArr = inputString.split( " " );
-                for ( int j = 0; j < inputArr.length; j++ ) {
-                    int index = Integer.valueOf( inputArr[j] ) - 1;
-                    wordChoices.get( i ).add( wordsMap.get( i ).get( index ) );
+                boolean isError = true;
+                while ( isError ) {
+                    System.out.print( "For " + COL_NAMES[i] + " column enter row number(s) of desired word separated by spaces." +
+                            "\nEnter 0 to select none: " );
+
+                    String inputString = input.nextLine().trim();
+                    String[] inputArr = inputString.split( " " );
+
+                    isError = false;
+                    for ( int j = 0; j < inputArr.length; j++ ) {
+                        int index = Integer.valueOf( inputArr[j] ) - 1;
+
+                        // Check if zero is found
+                        if ( index == -1 && inputArr.length > 1 ) {
+                            printErrorMsgs( Arrays.asList( "Cannot select 0 and other indices" ) );
+                            isError = true;
+                            break;
+                        }
+
+                        // Check index boundary
+                        if ( index >= wordsMap.get( i ).size() ) {
+                            printErrorMsgs( Arrays.asList( "Index " + ( index + 1 ) + " is out of bounds" ) );
+                            isError = true;
+                            break;
+                        }
+
+                        // Check for duplicates, simply skip
+                        if ( wordChoices.get( i ).contains( wordsMap.get( i ).get( index ) ) ) {
+                            break;
+                        }
+
+                        // Store choice
+                        wordChoices.get( i ).add( wordsMap.get( i ).get( index ) );
+                    }
                 }
             }
             catch ( Exception ex ) {
@@ -462,6 +496,9 @@ public class AppGUI {
 
         // Store words to database
         app.storeWords( wordChoices, phoneNumber );
+
+        // Block until user press enter
+        blockUntilEnter();
     }
 
     /*
@@ -498,8 +535,7 @@ public class AppGUI {
         }
 
         // Block until user press enter
-        System.out.println( "\nPress Enter to continue..." );
-        input.nextLine();
+        blockUntilEnter();
     }
 
     /*
