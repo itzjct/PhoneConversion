@@ -690,28 +690,29 @@ public class AppGUI {
      * This method displays a list of words
      */
     private void displayWords( Map<Integer, List<Word>> words ) {
+
+        // Print column headers
         System.out.printf( "%-5s", "" );
         for ( String colName : COL_NAMES ) {
             System.out.printf( "%-15s", colName );
         }
         System.out.println();
-        int i = 0;
-        boolean[] reachedEnd = new boolean[3];
-        while ( !reachedEnd[0] || !reachedEnd[1] || !reachedEnd[2] ) {
+
+        // Find size of longest word list
+        int size = 0;
+        for ( int i = 0; i < words.size(); i++ ) {
+            if ( words.get( i ).size() > size ) {
+                size = words.get( i ).size();
+            }
+        }
+
+        // Print words rows
+        for ( int i = 0; i < size; i++ ) {
             System.out.printf( "%-5s", ( i + 1 ) + ": " );
             for ( int j = 0; j < COL_NAMES.length; j++ ) {
-                if ( i >= words.get( j ).size() ) {
-                    System.out.printf( "%-15s", "" );
-                }
-                else {
-                    if ( i >= words.get( j ).size() - 1 ) {
-                        reachedEnd[j] = true;
-                    }
-                    System.out.printf( "%-15s", words.get( j ).get( i ).getWord() );
-                }
+                System.out.printf( "%-15s", i < words.get( j ).size() ? words.get( j ).get( i ).getWord() : "" );
             }
             System.out.println();
-            i++;
         }
     }
 
