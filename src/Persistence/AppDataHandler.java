@@ -310,13 +310,15 @@ public class AppDataHandler {
     /*
      * This method retrieves the map from phone numbers to words for a given company
      * id
+     * 
+     * ** UPDATE **
      */
-    public Map<String, List<Word>> getPhoneNumbersMap( int companyId ) {
-        String query = "SELECT phone_numbers.phone_number, words.word_id, words.word, words.is_approved " +
+    public Map<String, Map<Integer, List<Word>>> getPhoneNumbersMap( int companyId ) {
+        String query = "SELECT phone_numbers.phone_number, words.word_id, words.word, words.belongs_to " +
                 "FROM phone_numbers " +
                 "INNER JOIN words ON phone_numbers.phone_number = words.phone_number " +
                 "WHERE company_id = ?;";
-        TreeMap<String, List<Word>> phoneToWords = new TreeMap<String, List<Word>>();
+        Map<String, Map<Integer, List<Word>>> phoneToWords = new TreeMap<>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setInt( 1, companyId );
@@ -325,17 +327,13 @@ public class AppDataHandler {
                 Word word = new Word();
                 word.setId( result.getInt( "word_id" ) );
                 word.setWord( result.getString( "word" ) );
-                word.setIsApproved( result.getBoolean( "is_approved" ) );
+                word.setBelongsTo( result.getInt( "belongs_to" ) );
 
                 String phoneNumber = result.getString( "phone_number" );
-                if ( phoneToWords.containsKey( phoneNumber ) ) {
-                    phoneToWords.get( phoneNumber ).add( word );
+                if ( !phoneToWords.containsKey( phoneNumber ) ) {
+                    phoneToWords.put( phoneNumber, Word.getWordMap() );
                 }
-                else {
-                    List<Word> words = new LinkedList<Word>();
-                    words.add( word );
-                    phoneToWords.put( phoneNumber, words );
-                }
+                phoneToWords.get( phoneNumber ).get( word.getBelongsTo() ).add( word );
             }
         }
         catch ( Exception ex ) {
@@ -384,11 +382,11 @@ public class AppDataHandler {
     }
 
     /*
-     * This method retrieves words for a given phone number
+     * This method retrieves a map of words for a given phone number
      */
-    public List<Word> getWords( String phoneNumber ) {
-        String query = "SELECT word_id, word, is_approved FROM words WHERE phone_number = ?;";
-        List<Word> words = new LinkedList<Word>();
+    public Map<Integer, List<Word>> getWords( String phoneNumber ) {
+        String query = "SELECT word_id, word, belongs_to FROM words WHERE phone_number = ?;";
+        Map<Integer, List<Word>> wordsMap = Word.getWordMap();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setString( 1, phoneNumber );
@@ -397,15 +395,15 @@ public class AppDataHandler {
                 Word word = new Word();
                 word.setId( result.getInt( "word_id" ) );
                 word.setWord( result.getString( "word" ) );
-                word.setIsApproved( result.getBoolean( "is_approved" ) );
-                words.add( word );
+                word.setBelongsTo( result.getInt( "belongs_to" ) );
+                wordsMap.get( word.getBelongsTo() ).add( word );
             }
             result.close();
-            return words;
+            return wordsMap;
         }
         catch ( Exception ex ) {
             System.out.println( ex.getMessage() );
-            return words;
+            return wordsMap;
         }
     }
 
@@ -413,8 +411,8 @@ public class AppDataHandler {
      * This method stores words to given phone number into db
      */
     public List<Integer> storeWords( List<Word> words, String phoneNumber ) {
-        String insertQuery = "INSERT INTO words ( word, is_approved, phone_number ) VALUES ( ?, ?, ? );";
-        String updateQuery = "UPDATE words SET word = ?, is_approved = ?, phone_number = ? WHERE word_id = ?;";
+        String insertQuery = "INSERT INTO words ( word, belongs_to, phone_number ) VALUES ( ?, ?, ? );";
+        String updateQuery = "UPDATE words SET word = ?, belongs_to = ?, phone_number = ? WHERE word_id = ?;";
         List<Integer> ids = new LinkedList<Integer>();
         try (Connection conn = getConnection()) {
             PreparedStatement stmt = null;
@@ -424,7 +422,7 @@ public class AppDataHandler {
                 stmt = conn.prepareStatement( isUpdate ? updateQuery : insertQuery );
                 int index = 1;
                 stmt.setString( index++, word.getWord() );
-                stmt.setBoolean( index++, word.getIsApproved() );
+                stmt.setInt( index++, word.getBelongsTo() );
                 stmt.setString( index++, phoneNumber );
                 if ( isUpdate ) {
                     stmt.setInt( index++, word.getId() );

@@ -116,7 +116,6 @@ public class App {
         user.setPasswordString( null );
 
         // Capture current user
-        // User.copy( user, userFromDb );
         currentUser = userFromDb;
         isUserLoggedIn = true;
 
@@ -315,17 +314,16 @@ public class App {
     }
 
     /*
-     * This method retrieves the words associated with a
+     * This method retrieves the words map associated with a
      * given phone number
      * 
      * Returns null if phone number String is null
      */
-    public List<Word> getWords( String phoneNumber ) {
+    public Map<Integer, List<Word>> getWords( String phoneNumber ) {
         if ( phoneNumber == null ) {
             return null;
         }
-        List<Word> words = appDataHandler.getWords( phoneNumber );
-        return words;
+        return appDataHandler.getWords( phoneNumber );
     }
 
     /*

@@ -11,6 +11,12 @@ public class AppGUI {
     public final int USER_MENU = 1;
     public final int ADMIN_MENU = 2;
 
+    private final String[] COL_NAMES = {
+            "AreaCode",
+            "Prefix",
+            "Sufix"
+    };
+
     private App app;
     private Scanner input;
     private boolean isStartMenuRunning;
@@ -514,8 +520,14 @@ public class AppGUI {
         }
 
         // Retrieve words
-        List<Word> words = app.getWords( phoneNumber );
-        if ( words.size() == 0 ) {
+        Map<Integer, List<Word>> words = app.getWords( phoneNumber );
+        int colsEmpty = 0;
+        for ( int key : words.keySet() ) {
+            if ( words.get( key ).size() == 0 ) {
+                colsEmpty++;
+            }
+        }
+        if ( colsEmpty == 3 ) {
             printErrorMsgs( Arrays.asList( "No words found" ) );
             return;
         }
@@ -550,51 +562,52 @@ public class AppGUI {
         }
 
         // Retrieve words
-        List<Word> words = app.getWords( phoneNumber );
-        if ( words.size() == 0 ) {
-            printErrorMsgs( Arrays.asList( "No words found" ) );
-            return;
-        }
+        // List<Word> words = app.getWords( phoneNumber );
+        // if ( words.size() == 0 ) {
+        // printErrorMsgs( Arrays.asList( "No words found" ) );
+        // return;
+        // }
 
-        // Display words
-        displayWords( words );
+        // // Display words
+        // displayWords( words );
 
-        // Prompt user which words to approve/disapprove
-        System.out.println( "Select which words to approve/disapprove." +
-                "\nEnter integers corresponding to word separated by spaces:" );
-        String valuesStr = input.nextLine().trim();
+        // // Prompt user which words to approve/disapprove
+        // System.out.println( "Select which words to approve/disapprove." +
+        // "\nEnter integers corresponding to word separated by spaces:" );
+        // String valuesStr = input.nextLine().trim();
 
-        // Parse input values
-        String[] temp = valuesStr.split( " " );
-        int[] values = new int[temp.length];
-        try {
-            for ( int i = 0; i < values.length; i++ ) {
-                values[i] = Integer.parseInt( temp[i] ) - 1;
+        // // Parse input values
+        // String[] temp = valuesStr.split( " " );
+        // int[] values = new int[temp.length];
+        // try {
+        // for ( int i = 0; i < values.length; i++ ) {
+        // values[i] = Integer.parseInt( temp[i] ) - 1;
 
-                // Check value is within bounds
-                if ( values[i] < 0 || values[i] >= words.size() ) {
-                    printErrorMsgs( Arrays.asList( "Invalid word index: " + ( values[i] + 1 ) ) );
-                    return;
-                }
-            }
-        }
-        catch ( Exception ex ) {
-            printErrorMsgs( Arrays.asList( ex.getMessage() ) );
-            return;
-        }
+        // // Check value is within bounds
+        // if ( values[i] < 0 || values[i] >= words.size() ) {
+        // printErrorMsgs( Arrays.asList( "Invalid word index: " + ( values[i] + 1 ) )
+        // );
+        // return;
+        // }
+        // }
+        // }
+        // catch ( Exception ex ) {
+        // printErrorMsgs( Arrays.asList( ex.getMessage() ) );
+        // return;
+        // }
 
-        // Perform approve/disapproval
-        for ( int v : values ) {
-            Word word = words.get( v );
-            word.setIsApproved( !word.getIsApproved() );
-        }
+        // // Perform approve/disapproval
+        // for ( int v : values ) {
+        // Word word = words.get( v );
+        // word.setIsApproved( !word.getIsApproved() );
+        // }
 
-        // Store changes
-        app.storeWords( words, phoneNumber );
+        // // Store changes
+        // app.storeWords( words, phoneNumber );
 
-        // Display changes
-        System.out.print( "Updated Words:" );
-        displayWords( words );
+        // // Display changes
+        // System.out.print( "Updated Words:" );
+        // displayWords( words );
 
         // Block until user press enter
         blockUntilEnter();
@@ -612,7 +625,15 @@ public class AppGUI {
 
         // Prompt for phone number
         System.out.print( "Enter phone number: " );
-        String phoneNumber = input.nextLine().trim();
+        String phoneNumber = null;
+
+        try {
+            phoneNumber = input.nextLine().trim();
+        }
+        catch ( Exception ex ) {
+            printErrorMsgs( Arrays.asList( "No input found" ) );
+            return null;
+        }
 
         // Validate phone number
         List<String> errors = app.validatePhoneNumber( phoneNumber );
@@ -627,15 +648,26 @@ public class AppGUI {
     /*
      * This method displays a list of words
      */
-    private void displayWords( List<Word> words ) {
-        System.out.printf( "\n%5s%-20s%-10s\n", " ", "Word", "Approved" );
-        for ( int i = 0; i < 35; i++ ) {
-            System.out.print( '-' );
+    private void displayWords( Map<Integer, List<Word>> words ) {
+        // Display words
+        for ( String colName : COL_NAMES ) {
+            System.out.printf( "%-10s\t", colName );
         }
         System.out.println();
-        for ( int i = 0; i < words.size(); i++ ) {
-            Word word = words.get( i );
-            System.out.printf( "%-5s%-20s%B\n", ( i + 1 ) + ": ", word.getWord(), word.getIsApproved() );
+        int i = 0;
+        boolean[] reachedEnd = new boolean[3];
+        while ( !reachedEnd[0] || !reachedEnd[1] || !reachedEnd[2] ) {
+            for ( int j = 0; j < COL_NAMES.length; j++ ) {
+                if ( i >= words.get( j ).size() ) {
+                    reachedEnd[j] = true;
+                    System.out.printf( "%-10s\t", "" );
+                }
+                else {
+                    System.out.printf( "%-10s\t", words.get( j ).get( i ).getWord() );
+                }
+            }
+            System.out.println();
+            i++;
         }
     }
 

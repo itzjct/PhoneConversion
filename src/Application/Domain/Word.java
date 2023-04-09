@@ -1,9 +1,12 @@
 package Application.Domain;
 
+import java.util.*;
+import static java.util.Map.entry;
+
 public class Word {
     private int id;
     private String word;
-    private boolean isApproved;
+    private int belongsTo;
 
     public Word() {
     }
@@ -12,9 +15,9 @@ public class Word {
         this.word = word;
     }
 
-    public Word( String word, boolean isApproved ) {
+    public Word( String word, int belongsTo ) {
         this.word = word;
-        this.isApproved = isApproved;
+        this.belongsTo = belongsTo;
     }
 
     public int getId() {
@@ -33,15 +36,18 @@ public class Word {
         this.word = word;
     }
 
-    public boolean isIsApproved() {
-        return this.isApproved;
+    public int getBelongsTo() {
+        return this.belongsTo;
     }
 
-    public boolean getIsApproved() {
-        return this.isApproved;
+    public void setBelongsTo( int belongsTo ) {
+        this.belongsTo = belongsTo;
     }
 
-    public void setIsApproved( boolean isApproved ) {
-        this.isApproved = isApproved;
+    public static Map<Integer, List<Word>> getWordMap() {
+        return Map.ofEntries(
+                entry( 0, new LinkedList<Word>() ),
+                entry( 1, new LinkedList<Word>() ),
+                entry( 2, new LinkedList<Word>() ) );
     }
 }
