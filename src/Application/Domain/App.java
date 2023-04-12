@@ -21,14 +21,14 @@ public class App {
     private Map<Character, char[]> numberToChars = Map.ofEntries(
             entry( '0', new char[] { '+' } ),
             entry( '1', new char[] { '\0' } ), // Does 1 have a char associated with it?
-            entry( '2', new char[] { 'a', 'b', 'c' } ),
-            entry( '3', new char[] { 'd', 'e', 'f' } ),
-            entry( '4', new char[] { 'g', 'h', 'i' } ),
-            entry( '5', new char[] { 'j', 'k', 'l' } ),
-            entry( '6', new char[] { 'm', 'n', 'o' } ),
-            entry( '7', new char[] { 'p', 'q', 'r', 's' } ),
-            entry( '8', new char[] { 't', 'u', 'v' } ),
-            entry( '9', new char[] { 'w', 'x', 'y', 'z' } ) );
+            entry( '2', new char[] { 'A', 'B', 'C' } ),
+            entry( '3', new char[] { 'D', 'E', 'F' } ),
+            entry( '4', new char[] { 'G', 'H', 'I' } ),
+            entry( '5', new char[] { 'J', 'K', 'L' } ),
+            entry( '6', new char[] { 'M', 'N', 'O' } ),
+            entry( '7', new char[] { 'P', 'Q', 'R', 'S' } ),
+            entry( '8', new char[] { 'T', 'U', 'V' } ),
+            entry( '9', new char[] { 'W', 'X', 'Y', 'Z' } ) );
 
     private User currentUser;
     private String phoneNumber;
@@ -40,13 +40,8 @@ public class App {
 
     public App() {
         appDataHandler = new AppDataHandler();
-        try {
-            dic = new Dictionary(
-                    "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
-        }
-        catch ( Exception ex ) {
-            System.out.println( ex.getMessage() );
-        }
+        dic = new Dictionary(
+                "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
 
         // Create random number generator
         // Used to generate password salts
@@ -63,6 +58,8 @@ public class App {
     // Constructor for tests only
     public App( AppDataHandler appDataHandler ) {
         this.appDataHandler = appDataHandler;
+        dic = new Dictionary(
+                "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
         // Regex and pattern to check validity of email
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
                 "[a-zA-Z0-9_+&*-]+)*@" +
@@ -193,9 +190,13 @@ public class App {
                     if ( numbers.length == 4 ) {
                         for ( int fourth = 0; fourth < numberToChars.get( numbers[3] ).length; fourth++ ) {
                             sb.append( numberToChars.get( numbers[3] )[fourth] );
+                            result.add( sb.toString() );
+                            sb.deleteCharAt( 3 );
                         }
                     }
-                    result.add( sb.toString() );
+                    else {
+                        result.add( sb.toString() );
+                    }
                 }
             }
         }
