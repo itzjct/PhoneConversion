@@ -6,7 +6,6 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Pattern;
 import static java.util.Map.entry;
-import java.util.stream.Collectors;
 
 import Persistence.AppDataHandler;
 
@@ -18,8 +17,6 @@ public class App {
     public final int EMAIL_CHAR_MAX = 128;
     public final int PW_CHAR_MAX = 128;
     public final int PW_CHAR_MIN = 6;
-
-    private Dictionary dic;
 
     private Map<Character, char[]> numberToChars = Map.ofEntries(
             entry( '0', new char[] { '+' } ),
@@ -39,6 +36,7 @@ public class App {
     private SecureRandom rng;
     private Pattern emailPattern;
     private AppDataHandler appDataHandler;
+    private Dictionary dic;
 
     public App() {
         appDataHandler = new AppDataHandler();
@@ -168,7 +166,6 @@ public class App {
         return errors;
     }
 
- 
     private List<Word> convertToWord( List<String> listOfString, int belongsTo ) {
         List<Word> listOfWords = new LinkedList<>();
         for ( String word : listOfString ) {
@@ -226,23 +223,37 @@ public class App {
      * Not finished
      */
     public Map<Integer, List<Word>> generateWords( PhoneNumber phoneNumber ) {
+
         // Convert to char array
         char[] numbers = phoneNumber.getPhoneNumber().toCharArray();
-        Map<Integer, List<Word>> map = new TreeMap<>();
 
         // Perform cartersian product
-        List<String> productAreaCode = cartesianProduct( Arrays.copyOfRange( numbers, 0, 3 ) );
-        List<String> productPrefix = cartesianProduct( Arrays.copyOfRange( numbers, 3, 6 ) );
-        List<String> productSufix = cartesianProduct( Arrays.copyOfRange( numbers, 6, 10 ) );
+        List<String> areaCode = cartesianProduct( Arrays.copyOfRange( numbers, 0, 3 ) );
+        List<String> prefix = cartesianProduct( Arrays.copyOfRange( numbers, 3, 6 ) );
+        List<String> sufix = cartesianProduct( Arrays.copyOfRange( numbers, 6, 10 ) );
 
         // Perform cartersian product on all parts of phone number
-        List<String> productAreaCodeAndPrefix = cartesianProductWords( productAreaCode, productPrefix );
-        List<String> productPrefixAndSufix = cartesianProductWords( productPrefix, productSufix );
-        List<String> productAllParts = cartesianProductWords( productAreaCodeAndPrefix, productSufix );
+        List<String> areaCodeAndPrefix = cartesianProductWords( areaCode, prefix );
+        List<String> prefixAndSufix = cartesianProductWords( prefix, sufix );
+        List<String> all = cartesianProductWords( areaCodeAndPrefix, sufix );
 
         // Find valid english words
+        areaCode = dic.filterValidWords( areaCode );
+        prefix = dic.filterValidWords( prefix );
+        sufix = dic.filterValidWords( sufix );
+        areaCodeAndPrefix = dic.filterValidWords( areaCodeAndPrefix );
+        prefixAndSufix = dic.filterValidWords( prefixAndSufix );
+        all = dic.filterValidWords( all );
 
-        // Convert results from List of String to Word
+        // Convert results from List of String to List of Word
+        // and build map
+        Map<Integer, List<Word>> map = new TreeMap<>();
+        map.put( Word.BELONGS_AREA, convertToWord( areaCode, Word.BELONGS_AREA ) );
+        map.put( Word.BELONGS_PREFIX, convertToWord( prefix, Word.BELONGS_PREFIX ) );
+        map.put( Word.BELONGS_SUFIX, convertToWord( sufix, Word.BELONGS_SUFIX ) );
+        map.put( Word.BELONGS_AREA_PREFIX, convertToWord( areaCodeAndPrefix, Word.BELONGS_AREA_PREFIX ) );
+        map.put( Word.BELONGS_PREFIX_SUFIX, convertToWord( prefixAndSufix, Word.BELONGS_PREFIX_SUFIX ) );
+        map.put( Word.BELONGS_ALL, convertToWord( all, Word.BELONGS_ALL ) );
 
         return map;
     }
