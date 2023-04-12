@@ -33,16 +33,6 @@ public class App {
             entry( '8', new char[] { 't', 'u', 'v' } ),
             entry( '9', new char[] { 'w', 'x', 'y', 'z' } ) );
 
-    private static final Map<Character, List<Character>> DIGIT_LETTER_MAPPING = Map.of(
-            '2', List.of( 'A', 'B', 'C' ),
-            '3', List.of( 'D', 'E', 'F' ),
-            '4', List.of( 'G', 'H', 'I' ),
-            '5', List.of( 'J', 'K', 'L' ),
-            '6', List.of( 'M', 'N', 'O' ),
-            '7', List.of( 'P', 'Q', 'R', 'S' ),
-            '8', List.of( 'T', 'U', 'V' ),
-            '9', List.of( 'W', 'X', 'Y', 'Z' ) );
-
     private User currentUser;
     private String phoneNumber;
     private boolean isUserLoggedIn;
@@ -178,44 +168,55 @@ public class App {
         return errors;
     }
 
-    public static List<String> phoneNumberToWords( String phoneNumber ) {
-        List<List<Character>> letterGroups = phoneNumber.chars()
-                .mapToObj( c -> DIGIT_LETTER_MAPPING.get( ( char )c ) )
-                .filter( Objects::nonNull )
-                .collect( Collectors.toList() );
-
-        return cartesianProduct( letterGroups ).stream()
-                .map( list -> list.stream().map( String::valueOf ).collect( Collectors.joining() ) )
-                .collect( Collectors.toList() );
-    }
-
-    private static List<List<Character>> cartesianProduct( List<List<Character>> lists ) {
-        List<List<Character>> resultLists = new ArrayList<>();
-        if ( lists.isEmpty() ) {
-            resultLists.add( Collections.emptyList() );
-            return resultLists;
-        }
-        else {
-            List<Character> firstList = lists.get( 0 );
-            List<List<Character>> remainingLists = cartesianProduct( lists.subList( 1, lists.size() ) );
-            for ( Character condition : firstList ) {
-                for ( List<Character> remainingList : remainingLists ) {
-                    ArrayList<Character> resultList = new ArrayList<>();
-                    resultList.add( condition );
-                    resultList.addAll( remainingList );
-                    resultLists.add( resultList );
-                }
-            }
-            return resultLists;
-        }
-    }
-
+ 
     private List<Word> convertToWord( List<String> listOfString, int belongsTo ) {
         List<Word> listOfWords = new LinkedList<>();
         for ( String word : listOfString ) {
             listOfWords.add( new Word( word, belongsTo ) );
         }
         return listOfWords;
+    }
+
+    public List<String> cartesianProduct( char[] numbers ) {
+
+        // Check if char array is valid length
+        if ( numbers.length < 3 || numbers.length > 4 ) {
+            return null;
+        }
+
+        // Perform cartesian product
+        List<String> result = new LinkedList<>();
+        for ( int first = 0; first < numberToChars.get( numbers[0] ).length; first++ ) {
+            for ( int second = 0; second < numberToChars.get( numbers[1] ).length; second++ ) {
+                for ( int third = 0; third < numberToChars.get( numbers[2] ).length; third++ ) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append( numberToChars.get( numbers[0] )[first] );
+                    sb.append( numberToChars.get( numbers[1] )[second] );
+                    sb.append( numberToChars.get( numbers[2] )[third] );
+                    if ( numbers.length == 4 ) {
+                        for ( int fourth = 0; fourth < numberToChars.get( numbers[3] ).length; fourth++ ) {
+                            sb.append( numberToChars.get( numbers[3] )[fourth] );
+                        }
+                    }
+                    result.add( sb.toString() );
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<String> cartesianProductWords( List<String> l1, List<String> l2 ) {
+        List<String> result = new LinkedList<>();
+        for ( String s1 : l1 ) {
+            for ( String s2 : l2 ) {
+                StringBuilder sb = new StringBuilder();
+                sb.append( s1 );
+                sb.append( s2 );
+                result.add( sb.toString() );
+            }
+        }
+        return result;
     }
 
     /*
@@ -225,29 +226,25 @@ public class App {
      * Not finished
      */
     public Map<Integer, List<Word>> generateWords( PhoneNumber phoneNumber ) {
-        String phoneNumberStr = phoneNumber.getPhoneNumber();
-        String areaCode = phoneNumberStr.substring( 0, 3 );
-        String prefix = phoneNumberStr.substring( 3, 6 );
-        String sufix = phoneNumberStr.substring( 6, 10 );
+        // Convert to char array
+        char[] numbers = phoneNumber.getPhoneNumber().toCharArray();
+        Map<Integer, List<Word>> map = new TreeMap<>();
 
-        Map<Integer, List<Word>> wordMap = new TreeMap<>();
+        // Perform cartersian product
+        List<String> productAreaCode = cartesianProduct( Arrays.copyOfRange( numbers, 0, 3 ) );
+        List<String> productPrefix = cartesianProduct( Arrays.copyOfRange( numbers, 3, 6 ) );
+        List<String> productSufix = cartesianProduct( Arrays.copyOfRange( numbers, 6, 10 ) );
 
-        List<String> temp = phoneNumberToWords( areaCode );
-        temp = dic.filterValidWords( temp );
-        List<Word> areaCodeWords = convertToWord( temp, 0 );
-        wordMap.put( 0, areaCodeWords );
+        // Perform cartersian product on all parts of phone number
+        List<String> productAreaCodeAndPrefix = cartesianProductWords( productAreaCode, productPrefix );
+        List<String> productPrefixAndSufix = cartesianProductWords( productPrefix, productSufix );
+        List<String> productAllParts = cartesianProductWords( productAreaCodeAndPrefix, productSufix );
 
-        temp = phoneNumberToWords( prefix );
-        temp = dic.filterValidWords( temp );
-        List<Word> prefixWords = convertToWord( temp, 1 );
-        wordMap.put( 1, prefixWords );
+        // Find valid english words
 
-        temp = phoneNumberToWords( sufix );
-        temp = dic.filterValidWords( temp );
-        List<Word> sufixWords = convertToWord( temp, 2 );
-        wordMap.put( 2, sufixWords );
+        // Convert results from List of String to Word
 
-        return wordMap;
+        return map;
     }
 
     /*
