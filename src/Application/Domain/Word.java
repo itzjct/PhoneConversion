@@ -4,6 +4,13 @@ import java.util.*;
 import static java.util.Map.entry;
 
 public class Word {
+    public static final int BELONGS_AREA = 0;
+    public static final int BELONGS_PREFIX = 1;
+    public static final int BELONGS_SUFIX = 2;
+    public static final int BELONGS_AREA_PREFIX = 3;
+    public static final int BELONGS_PREFIX_SUFIX = 4;
+    public static final int BELONGS_ALL = 5;
+
     private int id;
     private String word;
     private int belongsTo;
