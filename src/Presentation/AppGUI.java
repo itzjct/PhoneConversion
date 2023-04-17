@@ -34,6 +34,10 @@ public class AppGUI {
         input = new Scanner( System.in );
     }
 
+    public AppGUI( boolean isTest ) {
+
+    }
+
     /*
      * This method handles the logic to start and monitor the
      * execution of the application
@@ -471,7 +475,7 @@ public class AppGUI {
             List<List<Word>> phrases = app.generatePhrases( selectedWord, words );
 
             // Display phrases
-            // displayPhrases( phrases );
+            displayPhrases( phrases, phoneNumberStr );
 
             // Prompt user to select phrase(s)
             boolean isError = true;
@@ -724,7 +728,16 @@ public class AppGUI {
      */
     public void displayPhrases( List<List<Word>> phrases, String phoneNumber ) {
         for ( int i = 0; i < phrases.size(); i++ ) {
-            System.out.printf( "%-4s %-12s\n", i + 1 + "", phrases.get( i ) );
+            List<Word> phrase = phrases.get( i );
+            int start = phrase.get( 0 ).getStartIndex();
+            int end = phrase.get( phrase.size() - 1 ).getEndIndex();
+            String numPrefix = phoneNumber.substring( 0, start );
+            String numSufix = phoneNumber.substring( end + 1, phoneNumber.length() );
+            System.out.printf( "%-5s%s", ( i + 1 ) + ":", numPrefix.length() > 0 ? numPrefix + " " : "" );
+            for ( Word w : phrase ) {
+                System.out.print( w.getWord() + " " );
+            }
+            System.out.println( numSufix );
         }
     }
 
