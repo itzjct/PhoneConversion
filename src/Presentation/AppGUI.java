@@ -728,22 +728,20 @@ public class AppGUI {
      */
     public void displayPhrases( List<List<Word>> phrases, String phoneNumber ) {
         for ( int i = 0; i < phrases.size(); i++ ) {
-            List<Word> phrase = phrases.get(i);
+            List<Word> phrase = phrases.get( i );
             StringBuilder sb = new StringBuilder();
-            for(int j = 0; j<phoneNumber.length(); j++){
-                int start = phrase.get(0).getStartIndex();
-                int end = phrase.get(phrase.size()-1).getEndIndex();
-                if(j<phrase.get(0).getStartIndex() || j>phrase.get(phrase.size()-1).getEndIndex()){
-                    sb.append(phoneNumber.charAt(j));
+            for ( int j = 0; j < phoneNumber.length(); j++ ) {
+                if ( j < phrase.get( 0 ).getStartIndex() || j > phrase.get( phrase.size() - 1 ).getEndIndex() ) {
+                    sb.append( phoneNumber.charAt( j ) );
                 }
-                else{
-                    for(int k = 0; k < phrase.size(); k++){
-                        sb.append(phrase.get(k).getWord());
+                else {
+                    for ( int k = 0; k < phrase.size(); k++ ) {
+                        sb.append( phrase.get( k ).getWord() );
                     }
-                    j = phrase.get(phrase.size()-1).getEndIndex();
+                    j = phrase.get( phrase.size() - 1 ).getEndIndex();
                 }
             }
-            System.out.printf( "%-4s %-12s\n", i + 1 + "", sb.toString());
+            System.out.printf( "%-4s %-12s\n", i + 1 + "", sb.toString() );
         }
     }
 
