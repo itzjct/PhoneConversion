@@ -447,62 +447,32 @@ public class AppGUI {
         phoneNumber.setId( id );
 
         // Generate words
-        Map<Integer, List<Word>> wordsMap = app.generateWords( phoneNumber );
+        Set<Word> words = app.generateWords( phoneNumber );
 
         // Display words
-        displayWords( wordsMap );
-
-        // Let user select words
-        Map<Integer, List<Word>> wordChoices = Word.getWordMap();
-        for ( int i = 0; i < COL_NAMES.length; i++ ) {
-            try {
-                boolean isError = true;
-                while ( isError ) {
-                    System.out.print( "For " + COL_NAMES[i] + " column enter row number(s) of desired word separated by spaces." +
-                            "\nEnter 0 to select none: " );
-
-                    String inputString = input.nextLine().trim();
-                    String[] inputArr = inputString.split( " " );
-
-                    isError = false;
-                    for ( int j = 0; j < inputArr.length; j++ ) {
-                        int index = Integer.valueOf( inputArr[j] ) - 1;
-
-                        // Check if zero is found
-                        if ( index == -1 && inputArr.length > 1 ) {
-                            printErrorMsgs( Arrays.asList( "Cannot select 0 and other indices" ) );
-                            isError = true;
-                            break;
-                        }
-
-                        // Check index boundary
-                        if ( index >= wordsMap.get( i ).size() ) {
-                            printErrorMsgs( Arrays.asList( "Index " + ( index + 1 ) + " is out of bounds" ) );
-                            isError = true;
-                            break;
-                        }
-
-                        // Check for duplicates, simply skip
-                        if ( wordChoices.get( i ).contains( wordsMap.get( i ).get( index ) ) ) {
-                            break;
-                        }
-
-                        // Store choice
-                        wordChoices.get( i ).add( wordsMap.get( i ).get( index ) );
-                    }
-                }
+        List<Word> wordsList = words.stream().collect( Collectors.toList() );
+        boolean isDone = false;
+        while ( !isDone ) {
+            displayWords( wordsList );
+            System.out.print( "Enter a word or 0 to finish:" );
+            String selection = input.nextLine().trim().toUpperCase();
+            if ( selection.equals( "0" ) ) {
+                break;
             }
-            catch ( Exception ex ) {
-                printErrorMsgs( Arrays.asList( ex.getMessage() ) );
-                return;
+            if ( !words.contains( new Word( selection ) ) ) {
+                printErrorMsgs( Arrays.asList( "Word not found. Try again" ) );
+                continue;
             }
+
+            // Filter out overlapping words
+            Word selectedWord = words.stream().filter( x -> x.getWord().equals( selection ) ).findFirst().get();
+            List<Word> notOverlap = words.stream().filter( x -> !x.overlaps( selectedWord ) ).toList();
+
+            // 
         }
 
-        // Display selected words
-        displayWords( wordChoices );
-
-        // Store words to database
-        app.storeWords( wordChoices, phoneNumber.getId() );
+        // // Store words to database
+        // app.storeWords( wordChoices, phoneNumber.getId() );
 
         // Block until user press enter
         blockUntilEnter();
@@ -569,22 +539,17 @@ public class AppGUI {
         }
 
         // Retrieve words
-        Map<Integer, List<Word>> words = app.getCurrentUser().getCompany().getPhoneNumbers().stream()
+        Set<Word> words = app.getCurrentUser().getCompany().getPhoneNumbers().stream()
                 .filter( x -> x.getPhoneNumber().equals( phoneNumber ) ).findFirst()
                 .get().getWords();
-        int colsEmpty = 0;
-        for ( int key : words.keySet() ) {
-            if ( words.get( key ).size() == 0 ) {
-                colsEmpty++;
-            }
-        }
-        if ( colsEmpty == 3 ) {
+
+        if ( words.size() == 0 ) {
             printErrorMsgs( Arrays.asList( "No words found" ) );
             return;
         }
 
         // Display words
-        displayWords( words );
+        // displayWords( words );
 
         // Block until user press enter
         blockUntilEnter();
@@ -699,28 +664,11 @@ public class AppGUI {
     /*
      * This method displays a list of words
      */
-    private void displayWords( Map<Integer, List<Word>> words ) {
-
-        // Print column headers
-        System.out.printf( "%-5s", "" );
-        for ( String colName : COL_NAMES ) {
-            System.out.printf( "%-15s", colName );
-        }
-        System.out.println();
-
-        // Find size of longest word list
-        int size = 0;
-        for ( int i = 0; i < words.size(); i++ ) {
-            if ( words.get( i ).size() > size ) {
-                size = words.get( i ).size();
-            }
-        }
-
-        // Print words rows
-        for ( int i = 0; i < size; i++ ) {
-            System.out.printf( "%-5s", ( i + 1 ) + ": " );
-            for ( int j = 0; j < COL_NAMES.length; j++ ) {
-                System.out.printf( "%-15s", i < words.get( j ).size() ? words.get( j ).get( i ).getWord() : "" );
+    private void displayWords( List<Word> words ) {
+        int cols = 4;
+        for ( int i = 0; i < words.size(); ) {
+            for ( int j = 0; j < cols && i < words.size(); j++, i++ ) {
+                System.out.printf( "%-15s", words.get( i ).getWord() );
             }
             System.out.println();
         }
