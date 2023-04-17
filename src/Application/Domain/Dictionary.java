@@ -24,4 +24,8 @@ public class Dictionary {
                 .filter( words::contains )
                 .collect( Collectors.toList() );
     }
+
+    public boolean contains( String word ) {
+        return words.contains( word );
+    }
 }

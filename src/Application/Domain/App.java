@@ -217,6 +217,23 @@ public class App {
         return result;
     }
 
+    public Set<String> findSubWords( List<String> words ) {
+        Set<String> result = new HashSet<>();
+
+        for ( String word : words ) {
+            for ( int length = 3; length <= word.length(); length++ ) {
+                for ( int start = 0, end = length - 1; end <= word.length(); start++, end++ ) {
+                    String subWord = word.substring( start, end );
+                    if ( dic.contains( subWord ) ) {
+                        result.add( subWord );
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     /*
      * This method will generate valid english words
      * for a given phone number
@@ -228,23 +245,15 @@ public class App {
         // Convert to char array
         char[] numbers = phoneNumber.getPhoneNumber().toCharArray();
 
-        // Perform cartersian product
+        // Perform cartersian product on all parts of phone number
         List<String> areaCode = cartesianProduct( Arrays.copyOfRange( numbers, 0, 3 ) );
         List<String> prefix = cartesianProduct( Arrays.copyOfRange( numbers, 3, 6 ) );
         List<String> sufix = cartesianProduct( Arrays.copyOfRange( numbers, 6, 10 ) );
-
-        // Perform cartersian product on all parts of phone number
         List<String> areaCodeAndPrefix = cartesianProductWords( areaCode, prefix );
-        List<String> prefixAndSufix = cartesianProductWords( prefix, sufix );
         List<String> all = cartesianProductWords( areaCodeAndPrefix, sufix );
 
         // Find valid english words
-        areaCode = dic.filterValidWords( areaCode );
-        prefix = dic.filterValidWords( prefix );
-        sufix = dic.filterValidWords( sufix );
-        areaCodeAndPrefix = dic.filterValidWords( areaCodeAndPrefix );
-        prefixAndSufix = dic.filterValidWords( prefixAndSufix );
-        all = dic.filterValidWords( all );
+        Set<String> allWords = findSubWords( all );
 
         // Convert results from List of String to List of Word
         // and build map
@@ -253,7 +262,8 @@ public class App {
         map.put( Word.BELONGS_PREFIX, convertToWord( prefix, Word.BELONGS_PREFIX ) );
         map.put( Word.BELONGS_SUFIX, convertToWord( sufix, Word.BELONGS_SUFIX ) );
         map.put( Word.BELONGS_AREA_PREFIX, convertToWord( areaCodeAndPrefix, Word.BELONGS_AREA_PREFIX ) );
-        map.put( Word.BELONGS_PREFIX_SUFIX, convertToWord( prefixAndSufix, Word.BELONGS_PREFIX_SUFIX ) );
+        // map.put( Word.BELONGS_PREFIX_SUFIX, convertToWord( prefixAndSufix,
+        // Word.BELONGS_PREFIX_SUFIX ) );
         map.put( Word.BELONGS_ALL, convertToWord( all, Word.BELONGS_ALL ) );
 
         return map;
