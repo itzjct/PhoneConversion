@@ -263,13 +263,9 @@ public class App {
         Set<String> toLeft = generatePhrases( word, words, "", false );
         toLeft.remove( "" );
 
-        StringBuilder sb = new StringBuilder();
         for ( String left : toLeft ) {
             for ( String right : toRight ) {
-                sb.append( left );
-                sb.append( right );
-                result.add( sb.toString() );
-                sb.setLength( 0 );
+                result.add( buildString( left, right ) );
             }
         }
         return result;
@@ -286,12 +282,21 @@ public class App {
             return result;
         }
         for ( Word currWord : nextWords ) {
-            String nextString = isRight ? currentString + " " + currWord.getWord() : currWord.getWord() + " " + currentString;
+            String nextString = isRight ? buildString( currentString, " ", currWord.getWord() )
+                    : buildString( currWord.getWord(), " ", currentString );
             Set<String> phrases = generatePhrases( currWord, words, nextString, isRight );
             result.addAll( phrases );
         }
 
         return result;
+    }
+
+    public String buildString( String... strings ) {
+        StringBuilder sb = new StringBuilder();
+        for ( String s : strings ) {
+            sb.append( s );
+        }
+        return sb.toString();
     }
 
     /*
