@@ -43,7 +43,19 @@ public class App {
 
     public App() {
         appDataHandler = new AppDataHandler();
-        new App( appDataHandler );
+        dic = new Dictionary(
+                "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
+
+        // Create random number generator
+        // Used to generate password salts
+        rng = new SecureRandom();
+
+        // Regex and pattern to check validity of email
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+        emailPattern = Pattern.compile( emailRegex );
     }
 
     // Constructor for tests only
@@ -250,8 +262,8 @@ public class App {
         return allWords;
     }
 
-    public Set<String> generatePhrases( Word word, Set<Word> words ) {
-        Set<String> result = new HashSet<>();
+    public List<String> generatePhrases( Word word, Set<Word> words ) {
+        List<String> result = new LinkedList<>();
         Set<String> toRight = generatePhrases( word, words, word.getWord(), true );
         Set<String> toLeft = generatePhrases( word, words, "", false );
         toLeft.remove( "" );
