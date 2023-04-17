@@ -55,9 +55,9 @@ public class Word {
         this.endIndex = endIndex;
     }
 
-    public boolean overlaps( Word other ) {
-        return this.startIndex <= other.endIndex && this.endIndex >= other.startIndex;
-    }
+    // public boolean overlaps( Word other ) {
+    //     return this.startIndex <= other.endIndex && this.endIndex >= other.startIndex;
+    // }
 
     @Override
     public boolean equals( Object other ) {

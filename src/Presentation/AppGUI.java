@@ -454,7 +454,7 @@ public class AppGUI {
         boolean isDone = false;
         while ( !isDone ) {
             displayWords( wordsList );
-            System.out.print( "Enter a word or 0 to finish:" );
+            System.out.print( "Enter a word or 0 to cancel: " );
             String selection = input.nextLine().trim().toUpperCase();
             if ( selection.equals( "0" ) ) {
                 break;
@@ -464,11 +464,56 @@ public class AppGUI {
                 continue;
             }
 
-            // Filter out overlapping words
+            // Find selected Word object
             Word selectedWord = words.stream().filter( x -> x.getWord().equals( selection ) ).findFirst().get();
-            Set<Word> notOverlap = words.stream().filter( x -> !x.overlaps( selectedWord ) ).collect( Collectors.toSet() );
 
-            // 
+            // Build possible phrases that include selected word
+            List<List<Word>> phrases = app.generatePhrases( selectedWord, words );
+
+            // Display phrases
+            // displayPhrases( phrases );
+
+            // Prompt user to select phrase(s)
+            boolean isError = true;
+            while ( isError ) {
+                System.out.print( "Enter indices of desired phrases or 0 to cancel: " );
+
+                // Read and parse input
+                String inputString = input.nextLine().trim();
+                String[] inputArr = inputString.split( " " );
+                Set<Integer> phraseChoices = new TreeSet<>();
+
+                // Validate input
+                isError = false;
+                for ( int j = 0; j < inputArr.length; j++ ) {
+                    int index = Integer.valueOf( inputArr[j] ) - 1;
+
+                    // Check if zero is found
+                    if ( index == -1 && inputArr.length > 1 ) {
+                        printErrorMsgs( Arrays.asList( "Cannot select 0 and other indices" ) );
+                        isError = true;
+                        break;
+                    }
+
+                    // Check index boundary
+                    if ( index < -1 || index >= phrases.size() ) {
+                        printErrorMsgs( Arrays.asList( "Index " + ( index + 1 ) + " is out of bounds" ) );
+                        isError = true;
+                        break;
+                    }
+
+                    // Store choice
+                    phraseChoices.add( index );
+                }
+
+            }
+
+            // Prompt user for different phrase selection
+            System.out.println( "Would you like to select phrases from a different word? (y/n): " );
+            String againSelection = input.nextLine().trim().toUpperCase();
+            if ( !againSelection.equals( "Y" ) ) {
+                isDone = true;
+            }
         }
 
         // // Store words to database
@@ -671,6 +716,15 @@ public class AppGUI {
                 System.out.printf( "%-15s", words.get( i ).getWord() );
             }
             System.out.println();
+        }
+    }
+
+    /*
+     * This method displays a list of phrases
+     */
+    public void displayPhrases( List<List<Word>> phrases, String phoneNumber ) {
+        for ( int i = 0; i < phrases.size(); i++ ) {
+            System.out.printf( "%-4s %-12s\n", i + 1 + "", phrases.get( i ) );
         }
     }
 

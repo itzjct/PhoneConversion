@@ -27,15 +27,22 @@ public class AppTests {
         PhoneNumber phoneNumber = new PhoneNumber( "8652255669" );
         Set<Word> words = app.generateWords( phoneNumber );
         // Word word = words.stream().filter( x -> x.getStartIndex() == 6 &&
-        //         x.getEndIndex() == 9 ).findFirst().get();
+        // x.getEndIndex() == 9 ).findFirst().get();
         Word word = words.stream().filter( x -> x.getStartIndex() == 3 &&
-        x.getEndIndex() == 5 ).findFirst().get();
+                x.getEndIndex() == 5 ).findFirst().get();
         // Word word = words.stream().filter( x -> x.getStartIndex() == 0 &&
         // x.getEndIndex() == 2 ).findFirst().get();
         // Word word = words.stream().filter( x -> x.getWord().equals( "CALL" )
         // ).findFirst().get();
 
-        Set<String> result = app.generatePhrases( word, words );
+        List<List<Word>> result = app.generatePhrases( word, words );
+
+        for ( List<Word> i : result ) {
+            for ( Word j : i ) {
+                System.out.print( j.getWord() + " " );
+            }
+            System.out.println();
+        }
 
         assertTrue( true );
     }
