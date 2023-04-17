@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -256,50 +257,38 @@ public class App {
         return allWords;
     }
 
-    public List<String> generatePhrases( Word word, Set<Word> words ) {
-        List<String> result = new LinkedList<>();
-        result.add( word.getWord() );
-        List<Word> toRight = words.stream().filter( x -> x.getStartIndex() == word.getEndIndex() + 1 )
-                .collect( Collectors.toList() );
-        List<Word> toLeft = words.stream().filter( x -> x.getEndIndex() == word.getStartIndex() - 1 )
-                .collect( Collectors.toList() );
-        for ( Word currWord : toRight ) {
-            List<String> phrases = generatePhrases( currWord, words, word.getWord() + " " + currWord.getWord(), true );
-            result.addAll( phrases );
-        }
-        for ( Word currWord : toLeft ) {
-            List<String> phrases = generatePhrases( currWord, words, currWord.getWord() + " " + word.getWord(), false );
-            result.addAll( phrases );
+    public Set<String> generatePhrases( Word word, Set<Word> words ) {
+        Set<String> result = new HashSet<>();
+        Set<String> toRight = generatePhrases( word, words, word.getWord(), true );
+        Set<String> toLeft = generatePhrases( word, words, "", false );
+        toLeft.remove( "" );
+
+        StringBuilder sb = new StringBuilder();
+        for ( String left : toLeft ) {
+            for ( String right : toRight ) {
+                sb.append( left );
+                sb.append( right );
+                result.add( sb.toString() );
+                sb.setLength( 0 );
+            }
         }
         return result;
     }
 
-    private List<String> generatePhrases( Word word, Set<Word> words, String currentString, boolean isRight ) {
-        List<String> result = new LinkedList<>();
+    private Set<String> generatePhrases( Word word, Set<Word> words, String currentString, boolean isRight ) {
+        Set<String> result = new HashSet<>();
         result.add( currentString );
 
-        if ( isRight ) {
-            List<Word> toRight = words.stream().filter( x -> x.getStartIndex() == word.getEndIndex() + 1 )
-                    .collect( Collectors.toList() );
-            if ( toRight.size() == 0 ) {
-                return result;
-            }
-            for ( Word currWord : toRight ) {
-                List<String> phrases = generatePhrases( currWord, words, currentString + " " + currWord.getWord(), true );
-                result.addAll( phrases );
-            }
+        Predicate<Word> filterCondition = x -> isRight ? x.getStartIndex() == word.getEndIndex() + 1
+                : x.getEndIndex() == word.getStartIndex() - 1;
+        Set<Word> nextWords = words.stream().filter( filterCondition ).collect( Collectors.toSet() );
+        if ( nextWords.isEmpty() ) {
+            return result;
         }
-
-        else {
-            List<Word> toLeft = words.stream().filter( x -> x.getEndIndex() == word.getStartIndex() - 1 )
-                    .collect( Collectors.toList() );
-            if ( toLeft.size() == 0 ) {
-                return result;
-            }
-            for ( Word currWord : toLeft ) {
-                List<String> phrases = generatePhrases( currWord, words, currWord.getWord() + " " + currentString, false );
-                result.addAll( phrases );
-            }
+        for ( Word currWord : nextWords ) {
+            String nextString = isRight ? currentString + " " + currWord.getWord() : currWord.getWord() + " " + currentString;
+            Set<String> phrases = generatePhrases( currWord, words, nextString, isRight );
+            result.addAll( phrases );
         }
 
         return result;
