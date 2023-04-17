@@ -262,35 +262,42 @@ public class App {
         return allWords;
     }
 
-    public List<String> generatePhrases( Word word, Set<Word> words ) {
-        List<String> result = new LinkedList<>();
-        Set<String> toRight = generatePhrases( word, words, word.getWord(), true );
-        Set<String> toLeft = generatePhrases( word, words, "", false );
-        toLeft.remove( "" );
+    public List<List<Word>> generatePhrases( Word word, Set<Word> words ) {
+        List<List<Word>> result = new LinkedList<>();
+        List<List<Word>> toRight = generatePhrases( word, words, Arrays.asList( word ), true );
+        List<List<Word>> toLeft = generatePhrases( word, words, new LinkedList<>(), false );
+        toLeft.remove( 0 );
         result.addAll( toRight );
 
-        for ( String left : toLeft ) {
-            for ( String right : toRight ) {
-                result.add( buildString( left, right ) );
+        for ( List<Word> left : toLeft ) {
+            for ( List<Word> right : toRight ) {
+                List<Word> temp = new LinkedList<>( left );
+                temp.addAll( right );
+                result.add( temp );
             }
         }
         return result;
     }
 
-    private Set<String> generatePhrases( Word word, Set<Word> words, String currentString, boolean isRight ) {
-        Set<String> result = new HashSet<>();
-        result.add( currentString );
+    private List<List<Word>> generatePhrases( Word word, Set<Word> words, List<Word> currentWords, boolean isRight ) {
+        List<List<Word>> result = new LinkedList<>();
+        result.add( currentWords );
 
         Predicate<Word> filterCondition = x -> isRight ? x.getStartIndex() == word.getEndIndex() + 1
                 : x.getEndIndex() == word.getStartIndex() - 1;
-        Set<Word> nextWords = words.stream().filter( filterCondition ).collect( Collectors.toSet() );
+        List<Word> nextWords = words.stream().filter( filterCondition ).collect( Collectors.toList() );
         if ( nextWords.isEmpty() ) {
             return result;
         }
         for ( Word currWord : nextWords ) {
-            String nextString = isRight ? buildString( currentString, " ", currWord.getWord() )
-                    : buildString( currWord.getWord(), " ", currentString );
-            Set<String> phrases = generatePhrases( currWord, words, nextString, isRight );
+            LinkedList<Word> newCurrentWords = new LinkedList<>( currentWords );
+            if ( isRight ) {
+                newCurrentWords.addLast( currWord );
+            }
+            else {
+                newCurrentWords.addFirst( currWord );
+            }
+            List<List<Word>> phrases = generatePhrases( currWord, words, newCurrentWords, isRight );
             result.addAll( phrases );
         }
 
