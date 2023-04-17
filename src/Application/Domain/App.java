@@ -262,6 +262,7 @@ public class App {
         Set<String> toRight = generatePhrases( word, words, word.getWord(), true );
         Set<String> toLeft = generatePhrases( word, words, "", false );
         toLeft.remove( "" );
+        result.addAll( toRight );
 
         for ( String left : toLeft ) {
             for ( String right : toRight ) {

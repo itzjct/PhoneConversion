@@ -466,7 +466,7 @@ public class AppGUI {
 
             // Filter out overlapping words
             Word selectedWord = words.stream().filter( x -> x.getWord().equals( selection ) ).findFirst().get();
-            List<Word> notOverlap = words.stream().filter( x -> !x.overlaps( selectedWord ) ).toList();
+            Set<Word> notOverlap = words.stream().filter( x -> !x.overlaps( selectedWord ) ).collect( Collectors.toSet() );
 
             // 
         }

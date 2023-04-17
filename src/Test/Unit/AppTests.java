@@ -15,9 +15,27 @@ public class AppTests {
 
     @Test
     public void generateWords_ValidPhoneNumber_ReturnsMapOfWord() {
-        PhoneNumber phoneNumber = new PhoneNumber( "8652222283" );
+        PhoneNumber phoneNumber = new PhoneNumber( "8652255669" );
 
-        Map<Integer, List<Word>> result = app.generateWords( phoneNumber );
+        Set<Word> result = app.generateWords( phoneNumber );
+
+        assertTrue( true );
+    }
+
+    @Test
+    public void test() {
+        PhoneNumber phoneNumber = new PhoneNumber( "8652255669" );
+        Set<Word> words = app.generateWords( phoneNumber );
+        // Word word = words.stream().filter( x -> x.getStartIndex() == 6 &&
+        //         x.getEndIndex() == 9 ).findFirst().get();
+        Word word = words.stream().filter( x -> x.getStartIndex() == 3 &&
+        x.getEndIndex() == 5 ).findFirst().get();
+        // Word word = words.stream().filter( x -> x.getStartIndex() == 0 &&
+        // x.getEndIndex() == 2 ).findFirst().get();
+        // Word word = words.stream().filter( x -> x.getWord().equals( "CALL" )
+        // ).findFirst().get();
+
+        Set<String> result = app.generatePhrases( word, words );
 
         assertTrue( true );
     }
