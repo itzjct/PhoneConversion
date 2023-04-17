@@ -5,7 +5,7 @@ import java.util.*;
 public class PhoneNumber {
     private int id;
     private String phoneNumber;
-    private Map<Integer, List<Word>> words;
+    private Set<Word> words;
 
     public PhoneNumber() {
 
@@ -31,11 +31,11 @@ public class PhoneNumber {
         this.phoneNumber = phoneNumber;
     }
 
-    public Map<Integer, List<Word>> getWords() {
+    public Set<Word> getWords() {
         return this.words;
     }
 
-    public void setWords( Map<Integer, List<Word>> words ) {
+    public void setWords( Set<Word> words ) {
         this.words = words;
     }
 }

@@ -4,16 +4,11 @@ import java.util.*;
 import static java.util.Map.entry;
 
 public class Word {
-    public static final int BELONGS_AREA = 0;
-    public static final int BELONGS_PREFIX = 1;
-    public static final int BELONGS_SUFIX = 2;
-    public static final int BELONGS_AREA_PREFIX = 3;
-    public static final int BELONGS_PREFIX_SUFIX = 4;
-    public static final int BELONGS_ALL = 5;
 
     private int id;
     private String word;
-    private int belongsTo;
+    private int startIndex;
+    private int endIndex;
 
     public Word() {
     }
@@ -22,9 +17,10 @@ public class Word {
         this.word = word;
     }
 
-    public Word( String word, int belongsTo ) {
+    public Word( String word, int startIndex, int endIndex ) {
         this.word = word;
-        this.belongsTo = belongsTo;
+        this.startIndex = startIndex;
+        this.endIndex = endIndex;
     }
 
     public int getId() {
@@ -43,18 +39,39 @@ public class Word {
         this.word = word;
     }
 
-    public int getBelongsTo() {
-        return this.belongsTo;
+    public int getStartIndex() {
+        return this.startIndex;
     }
 
-    public void setBelongsTo( int belongsTo ) {
-        this.belongsTo = belongsTo;
+    public void setStartIndex( int startIndex ) {
+        this.startIndex = startIndex;
     }
 
-    public static Map<Integer, List<Word>> getWordMap() {
-        return Map.ofEntries(
-                entry( 0, new LinkedList<Word>() ),
-                entry( 1, new LinkedList<Word>() ),
-                entry( 2, new LinkedList<Word>() ) );
+    public int getEndIndex() {
+        return this.endIndex;
+    }
+
+    public void setEndIndex( int endIndex ) {
+        this.endIndex = endIndex;
+    }
+
+    public boolean overlaps( Word other ) {
+        return this.startIndex <= other.endIndex && this.endIndex >= other.startIndex;
+    }
+
+    @Override
+    public boolean equals( Object other ) {
+        if ( other == null || !( other instanceof Word ) ) {
+            return false;
+        }
+
+        Word otherWord = ( Word )other;
+
+        return word.equals( otherWord.getWord() );
+    }
+
+    @Override
+    public int hashCode() {
+        return word.hashCode();
     }
 }

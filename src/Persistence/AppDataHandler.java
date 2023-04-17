@@ -366,9 +366,9 @@ public class AppDataHandler {
     /*
      * This method retrieves a map of words for a given phone number
      */
-    public Map<Integer, List<Word>> getWords( int phoneId ) {
-        String query = "SELECT word_id, word, belongs_to FROM words WHERE phone_id = ?;";
-        Map<Integer, List<Word>> wordsMap = Word.getWordMap();
+    public Set<Word> getWords( int phoneId ) {
+        String query = "SELECT word_id, word, start_index, end_index FROM words WHERE phone_id = ?;";
+        Set<Word> words = new HashSet<>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setInt( 1, phoneId );
@@ -377,15 +377,16 @@ public class AppDataHandler {
                 Word word = new Word();
                 word.setId( result.getInt( "word_id" ) );
                 word.setWord( result.getString( "word" ) );
-                word.setBelongsTo( result.getInt( "belongs_to" ) );
-                wordsMap.get( word.getBelongsTo() ).add( word );
+                word.setStartIndex( result.getInt( "start_index" ) );
+                word.setEndIndex( result.getInt( "end_index" ) );
+                words.add( word );
             }
             result.close();
-            return wordsMap;
+            return words;
         }
         catch ( Exception ex ) {
             System.out.println( ex.getMessage() );
-            return wordsMap;
+            return words;
         }
     }
 
@@ -393,8 +394,8 @@ public class AppDataHandler {
      * This method stores words to given phone number into db
      */
     public List<Integer> storeWords( Map<Integer, List<Word>> words, int phoneId ) {
-        String insertQuery = "INSERT INTO words ( word, belongs_to, phone_id ) VALUES ( ?, ?, ? );";
-        String updateQuery = "UPDATE words SET word = ?, belongs_to = ?, phone_id = ? WHERE word_id = ?;";
+        String insertQuery = "INSERT INTO words ( word, start_index, end_index, phone_id ) VALUES ( ?, ?, ?, ? );";
+        String updateQuery = "UPDATE words SET word = ?, start_index = ?, end_index = ?, phone_id = ? WHERE word_id = ?;";
         List<Integer> ids = new LinkedList<Integer>();
         try (Connection conn = getConnection()) {
             PreparedStatement stmt = null;
@@ -405,7 +406,8 @@ public class AppDataHandler {
                     stmt = conn.prepareStatement( isUpdate ? updateQuery : insertQuery );
                     int index = 1;
                     stmt.setString( index++, word.getWord() );
-                    stmt.setInt( index++, word.getBelongsTo() );
+                    stmt.setInt( index++, word.getStartIndex() );
+                    stmt.setInt( index++, word.getEndIndex() );
                     stmt.setInt( index++, phoneId );
                     if ( isUpdate ) {
                         stmt.setInt( index++, word.getId() );
