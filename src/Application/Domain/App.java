@@ -163,14 +163,6 @@ public class App {
         return errors;
     }
 
-    private List<Word> convertToWord( List<String> listOfString, int belongsTo ) {
-        List<Word> listOfWords = new LinkedList<>();
-        for ( String word : listOfString ) {
-            listOfWords.add( new Word( word, belongsTo ) );
-        }
-        return listOfWords;
-    }
-
     public List<String> cartesianProduct( char[] numbers ) {
 
         // Check if char array is valid length
@@ -217,15 +209,16 @@ public class App {
         return result;
     }
 
-    public Set<String> findSubWords( List<String> words ) {
-        Set<String> result = new HashSet<>();
+    public Set<Word> findSubWords( List<String> words ) {
+        Set<Word> result = new HashSet<>();
 
         for ( String word : words ) {
             for ( int length = 3; length <= word.length(); length++ ) {
-                for ( int start = 0, end = length - 1; end <= word.length(); start++, end++ ) {
+                for ( int start = 0, end = length; end <= word.length(); start++, end++ ) {
                     String subWord = word.substring( start, end );
                     if ( dic.contains( subWord ) ) {
-                        result.add( subWord );
+                        Word newWord = new Word( subWord, start, end - 1 );
+                        result.add( newWord );
                     }
                 }
             }
@@ -240,7 +233,7 @@ public class App {
      * 
      * Not finished
      */
-    public Map<Integer, List<Word>> generateWords( PhoneNumber phoneNumber ) {
+    public Set<Word> generateWords( PhoneNumber phoneNumber ) {
 
         // Convert to char array
         char[] numbers = phoneNumber.getPhoneNumber().toCharArray();
@@ -253,20 +246,12 @@ public class App {
         List<String> all = cartesianProductWords( areaCodeAndPrefix, sufix );
 
         // Find valid english words
-        Set<String> allWords = findSubWords( all );
+        Set<Word> allWords = findSubWords( all );
+        // for ( Word word : allWords ) {
+        //     System.out.println( word.getWord() );
+        // }
 
-        // Convert results from List of String to List of Word
-        // and build map
-        Map<Integer, List<Word>> map = new TreeMap<>();
-        map.put( Word.BELONGS_AREA, convertToWord( areaCode, Word.BELONGS_AREA ) );
-        map.put( Word.BELONGS_PREFIX, convertToWord( prefix, Word.BELONGS_PREFIX ) );
-        map.put( Word.BELONGS_SUFIX, convertToWord( sufix, Word.BELONGS_SUFIX ) );
-        map.put( Word.BELONGS_AREA_PREFIX, convertToWord( areaCodeAndPrefix, Word.BELONGS_AREA_PREFIX ) );
-        // map.put( Word.BELONGS_PREFIX_SUFIX, convertToWord( prefixAndSufix,
-        // Word.BELONGS_PREFIX_SUFIX ) );
-        map.put( Word.BELONGS_ALL, convertToWord( all, Word.BELONGS_ALL ) );
-
-        return map;
+        return allWords;
     }
 
     /*
