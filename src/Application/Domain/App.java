@@ -5,6 +5,8 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import static java.util.Map.entry;
 
 import Persistence.AppDataHandler;
@@ -248,10 +250,59 @@ public class App {
         // Find valid english words
         Set<Word> allWords = findSubWords( all );
         // for ( Word word : allWords ) {
-        //     System.out.println( word.getWord() );
+        // System.out.println( word.getWord() );
         // }
 
         return allWords;
+    }
+
+    public List<String> generatePhrases( Word word, Set<Word> words ) {
+        List<String> result = new LinkedList<>();
+        result.add( word.getWord() );
+        List<Word> toRight = words.stream().filter( x -> x.getStartIndex() == word.getEndIndex() + 1 )
+                .collect( Collectors.toList() );
+        List<Word> toLeft = words.stream().filter( x -> x.getEndIndex() == word.getStartIndex() - 1 )
+                .collect( Collectors.toList() );
+        for ( Word currWord : toRight ) {
+            List<String> phrases = generatePhrases( currWord, words, word.getWord() + " " + currWord.getWord(), true );
+            result.addAll( phrases );
+        }
+        for ( Word currWord : toLeft ) {
+            List<String> phrases = generatePhrases( currWord, words, currWord.getWord() + " " + word.getWord(), false );
+            result.addAll( phrases );
+        }
+        return result;
+    }
+
+    private List<String> generatePhrases( Word word, Set<Word> words, String currentString, boolean isRight ) {
+        List<String> result = new LinkedList<>();
+        result.add( currentString );
+
+        if ( isRight ) {
+            List<Word> toRight = words.stream().filter( x -> x.getStartIndex() == word.getEndIndex() + 1 )
+                    .collect( Collectors.toList() );
+            if ( toRight.size() == 0 ) {
+                return result;
+            }
+            for ( Word currWord : toRight ) {
+                List<String> phrases = generatePhrases( currWord, words, currentString + " " + currWord.getWord(), true );
+                result.addAll( phrases );
+            }
+        }
+
+        else {
+            List<Word> toLeft = words.stream().filter( x -> x.getEndIndex() == word.getStartIndex() - 1 )
+                    .collect( Collectors.toList() );
+            if ( toLeft.size() == 0 ) {
+                return result;
+            }
+            for ( Word currWord : toLeft ) {
+                List<String> phrases = generatePhrases( currWord, words, currWord.getWord() + " " + currentString, false );
+                result.addAll( phrases );
+            }
+        }
+
+        return result;
     }
 
     /*
