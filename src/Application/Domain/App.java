@@ -43,19 +43,7 @@ public class App {
 
     public App() {
         appDataHandler = new AppDataHandler();
-        dic = new Dictionary(
-                "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
-
-        // Create random number generator
-        // Used to generate password salts
-        rng = new SecureRandom();
-
-        // Regex and pattern to check validity of email
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
-                "[a-zA-Z0-9_+&*-]+)*@" +
-                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-                "A-Z]{2,7}$";
-        emailPattern = Pattern.compile( emailRegex );
+        new App( appDataHandler );
     }
 
     // Constructor for tests only
@@ -63,6 +51,11 @@ public class App {
         this.appDataHandler = appDataHandler;
         dic = new Dictionary(
                 "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
+
+        // Create random number generator
+        // Used to generate password salts
+        rng = new SecureRandom();
+
         // Regex and pattern to check validity of email
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
                 "[a-zA-Z0-9_+&*-]+)*@" +
