@@ -419,46 +419,9 @@ public class AppGUI {
         isUserMenuRunning = false;
     }
 
-    /*
-     * Not implemented
-     */
-    private void generateWords() {
-        printHeader( "Generate Words" );
-
-        // Prompt for phone number
-        String phoneNumberStr = promptPhoneNumber();
-        if ( phoneNumberStr == null ) {
-            return;
-        }
-
-        // Check that given phone number does not belong to
-        // another company
-        // ** May use a set instead of list **
-        Set<String> phoneNumbers = app.getNonUsablePhoneNumbers( app.getCurrentUser().getCompany().getId() );
-        if ( phoneNumbers.contains( phoneNumberStr ) ) {
-            printErrorMsgs( Arrays.asList( "Phone number already belongs to another company" ) );
-            return;
-        }
-
-        // Set the current user's company as owner of given phone number
-        PhoneNumber phoneNumber = app.getCurrentUser().getCompany().getPhoneNumber( phoneNumberStr );
-        if ( phoneNumber == null ) {
-            phoneNumber = new PhoneNumber( phoneNumberStr );
-            int id = app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
-            if ( id == 0 ) {
-                printErrorMsgs( Arrays.asList(
-                        "Failure to create link between entered phone number and "
-                                + app.getCurrentUser().getCompany().getName() ) );
-                return;
-            }
-            phoneNumber.setId( id );
-        }
-
-        // Generate words
-        Set<Word> words = app.generateWords( phoneNumber );
-
-        // Used to store phrases chosen
-        Set<String> phraseChoices = new TreeSet<>();
+    private Set<String> getPhrasesFromWords( Set<Word> words, PhoneNumber phoneNumber ) {
+        // Set to store chosen phrases
+        Set<String> phraseChoices = new HashSet<>();
 
         // Display words
         List<Word> wordsList = words.stream().collect( Collectors.toList() );
@@ -480,7 +443,7 @@ public class AppGUI {
 
             // Build possible phrases that include selected word
             List<List<Word>> phrases = app.generatePhrases( selectedWord, words );
-            List<String> numericPhrases = app.generateNumericPhrases( phrases, phoneNumberStr );
+            List<String> numericPhrases = app.generateNumericPhrases( phrases, phoneNumber.getPhoneNumber() );
 
             // Display phrases
             displayPhrases( numericPhrases );
@@ -542,6 +505,49 @@ public class AppGUI {
                 isDone = true;
             }
         }
+        return phraseChoices;
+    }
+
+    /*
+     * Not implemented
+     */
+    private void generateWords() {
+        printHeader( "Generate Words" );
+
+        // Prompt for phone number
+        String phoneNumberStr = promptPhoneNumber();
+        if ( phoneNumberStr == null ) {
+            return;
+        }
+
+        // Check that given phone number does not belong to
+        // another company
+        // ** May use a set instead of list **
+        Set<String> phoneNumbers = app.getNonUsablePhoneNumbers( app.getCurrentUser().getCompany().getId() );
+        if ( phoneNumbers.contains( phoneNumberStr ) ) {
+            printErrorMsgs( Arrays.asList( "Phone number already belongs to another company" ) );
+            return;
+        }
+
+        // Set the current user's company as owner of given phone number
+        PhoneNumber phoneNumber = app.getCurrentUser().getCompany().getPhoneNumber( phoneNumberStr );
+        if ( phoneNumber == null ) {
+            phoneNumber = new PhoneNumber( phoneNumberStr );
+            int id = app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
+            if ( id == 0 ) {
+                printErrorMsgs( Arrays.asList(
+                        "Failure to create link between entered phone number and "
+                                + app.getCurrentUser().getCompany().getName() ) );
+                return;
+            }
+            phoneNumber.setId( id );
+        }
+
+        // Generate words
+        Set<Word> words = app.generateWords( phoneNumber );
+
+        // Used to store phrases chosen
+        Set<String> phraseChoices = getPhrasesFromWords( words, phoneNumber );
 
         // Display phrases chosen
         System.out.println( "You've chosen: " );
