@@ -265,9 +265,9 @@ public class AppDataHandler {
         }
     }
 
-    public List<PhoneNumber> getPhoneNumbers( int companyId ) {
+    public Set<PhoneNumber> getPhoneNumbers( int companyId ) {
         String query = "SELECT phone_id, phone_number FROM phone_numbers WHERE company_id = ?;";
-        List<PhoneNumber> phoneNumbers = new LinkedList<>();
+        Set<PhoneNumber> phoneNumbers = new HashSet<>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setInt( 1, companyId );

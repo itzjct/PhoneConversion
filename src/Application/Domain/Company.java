@@ -5,7 +5,7 @@ import java.util.*;
 public class Company {
     private int id;
     private String name;
-    private List<PhoneNumber> phoneNumbers;
+    private Set<PhoneNumber> phoneNumbers;
 
     public int getId() {
         return this.id;
@@ -23,11 +23,18 @@ public class Company {
         this.name = name;
     }
 
-    public List<PhoneNumber> getPhoneNumbers() {
+    public Set<PhoneNumber> getPhoneNumbers() {
         return this.phoneNumbers;
     }
 
-    public void setPhoneNumbers( List<PhoneNumber> phoneNumbers ) {
+    public void setPhoneNumbers( Set<PhoneNumber> phoneNumbers ) {
         this.phoneNumbers = phoneNumbers;
+    }
+
+    public PhoneNumber getPhoneNumber( String phoneNumber ) {
+        if ( !phoneNumbers.contains( new PhoneNumber( phoneNumber ) ) ) {
+            return null;
+        }
+        return phoneNumbers.stream().filter( x -> x.getPhoneNumber().equals( phoneNumber ) ).findFirst().get();
     }
 }

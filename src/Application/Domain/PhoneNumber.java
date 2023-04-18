@@ -38,4 +38,20 @@ public class PhoneNumber {
     public void setWords( Set<Word> words ) {
         this.words = words;
     }
+
+    @Override
+    public boolean equals( Object other ) {
+        if ( other == null || !( other instanceof PhoneNumber ) ) {
+            return false;
+        }
+
+        PhoneNumber otherPhone = ( PhoneNumber )other;
+
+        return phoneNumber.equals( otherPhone.getPhoneNumber() );
+    }
+
+    @Override
+    public int hashCode() {
+        return phoneNumber.hashCode();
+    }
 }
