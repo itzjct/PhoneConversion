@@ -453,6 +453,9 @@ public class AppGUI {
         // Generate words
         Set<Word> words = app.generateWords( phoneNumber );
 
+        // Used to store phrases chosen
+        Set<String> phraseChoices = new TreeSet<>();
+
         // Display words
         List<Word> wordsList = words.stream().collect( Collectors.toList() );
         boolean isDone = false;
@@ -485,12 +488,13 @@ public class AppGUI {
                 // Read and parse input
                 String inputString = input.nextLine().trim();
                 String[] inputArr = inputString.split( " " );
-                Set<Integer> phraseChoices = new TreeSet<>();
+                Set<Integer> phraseChoicesIndices = new TreeSet<>();
 
                 // Validate input
                 isError = false;
+                int index = -1;
                 for ( int j = 0; j < inputArr.length; j++ ) {
-                    int index = Integer.valueOf( inputArr[j] ) - 1;
+                    index = Integer.valueOf( inputArr[j] ) - 1;
 
                     // Check if zero is found
                     if ( index == -1 && inputArr.length > 1 ) {
@@ -507,9 +511,28 @@ public class AppGUI {
                     }
 
                     // Store choice
-                    phraseChoices.add( index );
+                    phraseChoicesIndices.add( index );
                 }
 
+                // If error was found in input then restart while loop
+                if ( isError ) {
+                    continue;
+                }
+
+                // If user entered 0, then break out of while loop
+                if ( index == -1 ) {
+                    break;
+                }
+
+                // Retrieve phrases from chosen indices
+                for ( int i : phraseChoicesIndices ) {
+                    StringBuilder sb = new StringBuilder();
+                    for ( Word w : phrases.get( i ) ) {
+                        sb.append( w.getWord() );
+                        sb.append( ' ' );
+                    }
+                    phraseChoices.add( sb.toString().trim() );
+                }
             }
 
             // Prompt user for different phrase selection
@@ -518,6 +541,11 @@ public class AppGUI {
             if ( !againSelection.equals( "Y" ) ) {
                 isDone = true;
             }
+        }
+
+        // Display phrases chosen
+        for ( String s : phraseChoices ) {
+            System.out.println( s );
         }
 
         // // Store words to database
