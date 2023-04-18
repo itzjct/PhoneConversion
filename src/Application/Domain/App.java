@@ -304,12 +304,25 @@ public class App {
         return result;
     }
 
-    public String buildString( String... strings ) {
-        StringBuilder sb = new StringBuilder();
-        for ( String s : strings ) {
-            sb.append( s );
+    public List<String> generateNumericPhrases( List<List<Word>> phrases, String phoneNumber ) {
+        List<String> result = new LinkedList<>();
+        for ( int i = 0; i < phrases.size(); i++ ) {
+            List<Word> phrase = phrases.get( i );
+            StringBuilder sb = new StringBuilder();
+            for ( int j = 0; j < phoneNumber.length(); j++ ) {
+                if ( j < phrase.get( 0 ).getStartIndex() || j > phrase.get( phrase.size() - 1 ).getEndIndex() ) {
+                    sb.append( phoneNumber.charAt( j ) );
+                }
+                else {
+                    for ( int k = 0; k < phrase.size(); k++ ) {
+                        sb.append( phrase.get( k ).getWord() );
+                    }
+                    j = phrase.get( phrase.size() - 1 ).getEndIndex();
+                }
+            }
+            result.add( sb.toString() );
         }
-        return sb.toString();
+        return result;
     }
 
     /*

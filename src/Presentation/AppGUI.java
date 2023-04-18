@@ -476,9 +476,10 @@ public class AppGUI {
 
             // Build possible phrases that include selected word
             List<List<Word>> phrases = app.generatePhrases( selectedWord, words );
+            List<String> numericPhrases = app.generateNumericPhrases( phrases, phoneNumberStr );
 
             // Display phrases
-            displayPhrases( phrases, phoneNumberStr );
+            displayPhrases( numericPhrases );
 
             // Prompt user to select phrase(s)
             boolean isError = true;
@@ -526,12 +527,7 @@ public class AppGUI {
 
                 // Retrieve phrases from chosen indices
                 for ( int i : phraseChoicesIndices ) {
-                    StringBuilder sb = new StringBuilder();
-                    for ( Word w : phrases.get( i ) ) {
-                        sb.append( w.getWord() );
-                        sb.append( ' ' );
-                    }
-                    phraseChoices.add( sb.toString().trim() );
+                    phraseChoices.add( numericPhrases.get( i ) );
                 }
             }
 
@@ -544,9 +540,8 @@ public class AppGUI {
         }
 
         // Display phrases chosen
-        for ( String s : phraseChoices ) {
-            System.out.println( s );
-        }
+        System.out.println( "You've chosen: ");
+        displayPhrases( phraseChoices.stream().toList() );
 
         // // Store words to database
         // app.storeWords( wordChoices, phoneNumber.getId() );
@@ -754,22 +749,9 @@ public class AppGUI {
     /*
      * This method displays a list of phrases
      */
-    public void displayPhrases( List<List<Word>> phrases, String phoneNumber ) {
+    public void displayPhrases( List<String> phrases ) {
         for ( int i = 0; i < phrases.size(); i++ ) {
-            List<Word> phrase = phrases.get( i );
-            StringBuilder sb = new StringBuilder();
-            for ( int j = 0; j < phoneNumber.length(); j++ ) {
-                if ( j < phrase.get( 0 ).getStartIndex() || j > phrase.get( phrase.size() - 1 ).getEndIndex() ) {
-                    sb.append( phoneNumber.charAt( j ) );
-                }
-                else {
-                    for ( int k = 0; k < phrase.size(); k++ ) {
-                        sb.append( phrase.get( k ).getWord() );
-                    }
-                    j = phrase.get( phrase.size() - 1 ).getEndIndex();
-                }
-            }
-            System.out.printf( "%-4s %-12s\n", i + 1 + "", sb.toString() );
+            System.out.printf( "%-6s%s\n", i + 1 + ":", phrases.get( i ) );
         }
     }
 
