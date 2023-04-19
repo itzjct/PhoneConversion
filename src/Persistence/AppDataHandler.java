@@ -12,8 +12,7 @@ import java.util.*;
 public class AppDataHandler {
     private String connectionString;
 
-    public AppDataHandler() {
-        ConfigService configService = new ConfigService();
+    public AppDataHandler( ConfigService configService ) {
         Properties properties = configService.getProperties();
         String base = properties.getProperty( ConfigService.DB_BASE );
         String path = properties.getProperty( ConfigService.DB_PATH );

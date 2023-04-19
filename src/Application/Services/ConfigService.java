@@ -6,6 +6,7 @@ import java.util.*;
 public class ConfigService {
     public static final String DB_BASE = "DB_BASE";
     public static final String DB_PATH = "DB_PATH";
+    public static final String DICTIONARY_PATH = "DICTIONARY_PATH";
 
     private Properties properties;
 

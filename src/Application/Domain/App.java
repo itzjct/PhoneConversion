@@ -7,9 +7,9 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import static java.util.Map.entry;
 
+import Application.Services.ConfigService;
 import Persistence.AppDataHandler;
 
 public class App {
@@ -42,9 +42,16 @@ public class App {
     private Dictionary dic;
 
     public App() {
-        appDataHandler = new AppDataHandler();
-        dic = new Dictionary(
-                "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
+
+        // Load config service
+        ConfigService configService = new ConfigService();
+
+        // Create instance of data handler
+        appDataHandler = new AppDataHandler( configService );
+
+        // Load dictionary file path from config file
+        String dictionaryPath = configService.getProperties().getProperty( ConfigService.DICTIONARY_PATH );
+        dic = new Dictionary( dictionaryPath );
 
         // Create random number generator
         // Used to generate password salts
@@ -59,22 +66,22 @@ public class App {
     }
 
     // Constructor for tests only
-    public App( AppDataHandler appDataHandler ) {
-        this.appDataHandler = appDataHandler;
-        dic = new Dictionary(
-                "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
+    // public App( AppDataHandler appDataHandler ) {
+    //     this.appDataHandler = appDataHandler;
+    //     dic = new Dictionary(
+    //             "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
 
-        // Create random number generator
-        // Used to generate password salts
-        rng = new SecureRandom();
+    //     // Create random number generator
+    //     // Used to generate password salts
+    //     rng = new SecureRandom();
 
-        // Regex and pattern to check validity of email
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
-                "[a-zA-Z0-9_+&*-]+)*@" +
-                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-                "A-Z]{2,7}$";
-        emailPattern = Pattern.compile( emailRegex );
-    }
+    //     // Regex and pattern to check validity of email
+    //     String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
+    //             "[a-zA-Z0-9_+&*-]+)*@" +
+    //             "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+    //             "A-Z]{2,7}$";
+    //     emailPattern = Pattern.compile( emailRegex );
+    // }
 
     public void updateState() {
         currentUser.setCompany( appDataHandler.getCompany( currentUser.getCompany().getId() ) );
