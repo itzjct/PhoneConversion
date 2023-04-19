@@ -419,7 +419,7 @@ public class AppGUI {
         isUserMenuRunning = false;
     }
 
-    private Set<String> getPhrasesFromWords( Set<Word> words, PhoneNumber phoneNumber ) {
+    private Set<String> selectPhrases( Set<Word> words, PhoneNumber phoneNumber ) {
         // Set to store chosen phrases
         Set<String> phraseChoices = new HashSet<>();
 
@@ -547,7 +547,7 @@ public class AppGUI {
         Set<Word> words = app.generateWords( phoneNumber );
 
         // Used to store phrases chosen
-        Set<String> phraseChoices = getPhrasesFromWords( words, phoneNumber );
+        Set<String> phraseChoices = selectPhrases( words, phoneNumber );
 
         // Display phrases chosen
         System.out.println( "You've chosen: " );
