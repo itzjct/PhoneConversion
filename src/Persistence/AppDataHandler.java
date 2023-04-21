@@ -362,4 +362,80 @@ public class AppDataHandler {
         }
     }
 
+    /*
+     * This method retrives a set of phrases for a given phone number
+     */
+    public Set<String> getPhrases( PhoneNumber phoneNumber ) {
+        String query = "SELECT id, phrase FROM phrases WHERE phone_id = ?;";
+        Set<String> phrases = new HashSet<>();
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement( query )) {
+            stmt.setInt( 1, phoneNumber.getId() );
+            ResultSet result = stmt.executeQuery();
+            while ( result.next() ) {
+                phrases.add( result.getString( "phrase" ) );
+            }
+            result.close();
+            return phrases;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return phrases;
+        }
+    }
+
+    /*
+     * This method stores a set of phrases into database
+     */
+    public List<Integer> storePhrases( Iterable<String> phrases, PhoneNumber phoneNumber ) {
+        String query = "INSERT INTO phrases ( phrase, phone_id ) VALUES ( ?, ? );";
+        List<Integer> ids = new LinkedList<>();
+        try (Connection conn = getConnection()) {
+            PreparedStatement stmt = null;
+            ResultSet keys = null;
+            for ( String phrase : phrases ) {
+                stmt = conn.prepareStatement( query );
+                int index = 1;
+                stmt.setString( index++, query );
+                stmt.setInt( index, phoneNumber.getId() );
+                stmt.executeUpdate();
+
+                // Get ids
+                keys = stmt.getGeneratedKeys();
+                while ( keys.next() ) {
+                    ids.add( keys.getInt( 1 ) );
+                }
+                stmt.clearParameters();
+            }
+            stmt.close();
+            keys.close();
+            return ids;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return ids;
+        }
+    }
+
+    /*
+     * This method deletes a list of phrases from database
+     */
+    public boolean deletePhrases( Iterable<String> phrases ) {
+        String query = "DELETE FROM phrases WHERE phrase = ?;";
+        try (Connection conn = getConnection()) {
+            PreparedStatement stmt = null;
+            for ( String phrase : phrases ) {
+                stmt = conn.prepareStatement( query );
+                stmt.setString( 1, phrase );
+                stmt.executeUpdate();
+                stmt.clearParameters();
+            }
+            stmt.close();
+            return true;
+        }
+        catch ( Exception ex ) {
+            System.out.println( ex.getMessage() );
+            return false;
+        }
+    }
 }
