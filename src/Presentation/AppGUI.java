@@ -11,12 +11,6 @@ public class AppGUI {
     public final int USER_MENU = 1;
     public final int ADMIN_MENU = 2;
 
-    private final String[] COL_NAMES = {
-            "AreaCode",
-            "Prefix",
-            "Sufix"
-    };
-
     private App app;
     private Scanner input;
     private boolean isStartMenuRunning;
@@ -143,11 +137,11 @@ public class AppGUI {
 
         // User menu
         case USER_MENU:
-            return 5;
+            return 4;
 
         // User admin menu
         case ADMIN_MENU:
-            return 6;
+            return 5;
 
         // Invalid menu
         default:
@@ -197,9 +191,8 @@ public class AppGUI {
         System.out.println( "2: Logout" );
         System.out.println( "3: Generate Words" );
         System.out.println( "4: View Company Phone Numbers" );
-        System.out.println( "5: View Words" );
         if ( isAdmin ) {
-            System.out.println( "6: Approve Words" );
+            System.out.println( "5: Approve Words" );
         }
 
         // Update App object's state. Needed to keep
@@ -264,13 +257,8 @@ public class AppGUI {
             viewPhoneNumbers();
             break;
 
-        // View words option
-        case 5:
-            viewWords();
-            break;
-
         // Approve words option
-        case 6:
+        case 5:
             approvePhrases();
             break;
 
@@ -683,6 +671,7 @@ public class AppGUI {
             else {
                 selectedPhrase.add( temp[choice - 1] );
                 done = false;
+
             }
         }
 
