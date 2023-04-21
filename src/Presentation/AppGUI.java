@@ -676,6 +676,7 @@ public class AppGUI {
         while ( done ) {
             System.out.println( "Enter the line number of the Phrase you would like to approve: " );
             int choice = input.nextInt();
+            input.nextLine();
             if ( choice < 1 || choice > phoneNumber.getPhrases().size() ) {
                 System.out.printf( "Enter a valid number, between 1 and %d\n", phoneNumber.getPhrases().size() );
             }
