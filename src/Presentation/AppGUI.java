@@ -271,7 +271,7 @@ public class AppGUI {
 
         // Approve words option
         case 6:
-            approveWords();
+            approvePhrases();
             break;
 
         // Unknown option
@@ -554,7 +554,7 @@ public class AppGUI {
         displayPhrases( phraseChoices.stream().toList() );
 
         // // Store words to database
-        // app.storeWords( wordChoices, phoneNumber.getId() );
+        app.storePhrases( phraseChoices, phoneNumber );
 
         // Block until user press enter
         blockUntilEnter();
@@ -598,11 +598,11 @@ public class AppGUI {
     }
 
     /*
-     * This method approves selected words. Can only
-     * be accessed by an admin
+     * This method displays the words associated with a
+     * given phone number
      */
-    private void approveWords() {
-        printHeader( "Approve Words" );
+    private void viewWords() {
+        printHeader( "View Words" );
 
         // Prompt for phone number
         String phoneNumber = promptPhoneNumber();
@@ -613,61 +613,83 @@ public class AppGUI {
         // Check that given phone number belongs to current's
         // user company
         // ** May use a set instead of list **
-        Set<PhoneNumber> phoneNumbers = app.getCurrentUser().getCompany().getPhoneNumbers();
-        if ( !phoneNumbers.contains( phoneNumber ) ) {
-            printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
-            return;
-        }
+        // Set<String> phoneNumbers =
+        // app.getCurrentUser().getCompany().getPhoneNumbers().stream().map( x ->
+        // x.getPhoneNumber() )
+        // .collect( Collectors.toSet() );
+        // if ( !phoneNumbers.contains( phoneNumber ) ) {
+        // printErrorMsgs( Arrays.asList( "Phone number does not belong to " +
+        // app.getCurrentUser().getCompany().getName() ) );
+        // return;
+        // }
 
-        // Retrieve words
-        // List<Word> words = app.getWords( phoneNumber );
+        // // Retrieve words
+        // Set<Word> words =
+        // app.getCurrentUser().getCompany().getPhoneNumbers().stream()
+        // .filter( x -> x.getPhoneNumber().equals( phoneNumber ) ).findFirst()
+        // .get().getWords();
+
         // if ( words.size() == 0 ) {
         // printErrorMsgs( Arrays.asList( "No words found" ) );
         // return;
         // }
 
-        // // Display words
-        // displayWords( words );
-
-        // // Prompt user which words to approve/disapprove
-        // System.out.println( "Select which words to approve/disapprove." +
-        // "\nEnter integers corresponding to word separated by spaces:" );
-        // String valuesStr = input.nextLine().trim();
-
-        // // Parse input values
-        // String[] temp = valuesStr.split( " " );
-        // int[] values = new int[temp.length];
-        // try {
-        // for ( int i = 0; i < values.length; i++ ) {
-        // values[i] = Integer.parseInt( temp[i] ) - 1;
-
-        // // Check value is within bounds
-        // if ( values[i] < 0 || values[i] >= words.size() ) {
-        // printErrorMsgs( Arrays.asList( "Invalid word index: " + ( values[i] + 1 ) )
-        // );
-        // return;
-        // }
-        // }
-        // }
-        // catch ( Exception ex ) {
-        // printErrorMsgs( Arrays.asList( ex.getMessage() ) );
-        // return;
-        // }
-
-        // // Perform approve/disapproval
-        // for ( int v : values ) {
-        // Word word = words.get( v );
-        // word.setIsApproved( !word.getIsApproved() );
-        // }
-
-        // // Store changes
-        // app.storeWords( words, phoneNumber );
-
-        // // Display changes
-        // System.out.print( "Updated Words:" );
+        // Display words
         // displayWords( words );
 
         // Block until user press enter
+        blockUntilEnter();
+    }
+
+    /*
+     * This method approves selected words. Can only
+     * be accessed by an admin
+     */
+    private void approvePhrases() {
+        printHeader( "Approve Phrases" );
+        List<String> selectedPhrase = new LinkedList<>();
+        int lineno = 1;
+        boolean done = true;
+        // Prompt for phone number
+        String phoneString = promptPhoneNumber();
+        if ( phoneString == null ) {
+            return;
+        }
+
+        // Check that given phone number belongs to current's
+        // user company
+        // May use a set instead of list
+        PhoneNumber phoneNumber = app.getCurrentUser().getCompany().getPhoneNumber( phoneString );
+
+        if ( phoneNumber == null ) {
+            printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
+            return;
+        }
+
+        String[] temp = new String[phoneNumber.getPhrases().size()];
+
+        for ( String phrase : phoneNumber.getPhrases() ) {
+            System.out.printf( "%-4d %s\n", lineno, phrase );
+            temp[lineno - 1] = phrase;
+            lineno++;
+        }
+        while ( done ) {
+            System.out.println( "Enter the line number of the Phrase you would like to approve: " );
+            int choice = input.nextInt();
+            if ( choice < 1 || choice > phoneNumber.getPhrases().size() ) {
+                System.out.printf( "Enter a valid number, between 1 and %d\n", phoneNumber.getPhrases().size() );
+            }
+            else {
+                selectedPhrase.add( temp[choice - 1] );
+                done = false;
+            }
+        }
+
+        System.out.print( "You've chosen: " + selectedPhrase.get( 0 ) );
+
+        app.deletePhrases( phoneNumber.getPhrases() );
+        app.storePhrases( selectedPhrase, phoneNumber );
+
         blockUntilEnter();
     }
 
