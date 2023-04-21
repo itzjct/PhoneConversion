@@ -281,7 +281,7 @@ public class AppDataHandler {
 
             // Retrieve words for each phone number
             for ( PhoneNumber phoneNumber : phoneNumbers ) {
-                phoneNumber.setWords( getWords( phoneNumber.getId() ) );
+                phoneNumber.setPhrases( getPhrases( phoneNumber ) );
             }
             return phoneNumbers;
         }
