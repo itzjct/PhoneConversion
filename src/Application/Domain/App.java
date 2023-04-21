@@ -361,6 +361,17 @@ public class App {
     }
 
     /*
+     * This method deletes a list of phrases
+     * 
+     * Returns:
+     * True: if the operation succeed
+     * False: otherwise
+     */
+    public boolean deletePhrases( Iterable<String> phrases ) {
+        return appDataHandler.deletePhrases( phrases );
+    }
+
+    /*
      * This method logs out current user
      */
     public void logout() {
