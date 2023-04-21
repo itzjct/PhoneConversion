@@ -598,46 +598,6 @@ public class AppGUI {
     }
 
     /*
-     * This method displays the words associated with a
-     * given phone number
-     */
-    private void viewWords() {
-        printHeader( "View Words" );
-
-        // Prompt for phone number
-        String phoneNumber = promptPhoneNumber();
-        if ( phoneNumber == null ) {
-            return;
-        }
-
-        // Check that given phone number belongs to current's
-        // user company
-        // ** May use a set instead of list **
-        Set<String> phoneNumbers = app.getCurrentUser().getCompany().getPhoneNumbers().stream().map( x -> x.getPhoneNumber() )
-                .collect( Collectors.toSet() );
-        if ( !phoneNumbers.contains( phoneNumber ) ) {
-            printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
-            return;
-        }
-
-        // Retrieve words
-        Set<Word> words = app.getCurrentUser().getCompany().getPhoneNumbers().stream()
-                .filter( x -> x.getPhoneNumber().equals( phoneNumber ) ).findFirst()
-                .get().getWords();
-
-        if ( words.size() == 0 ) {
-            printErrorMsgs( Arrays.asList( "No words found" ) );
-            return;
-        }
-
-        // Display words
-        // displayWords( words );
-
-        // Block until user press enter
-        blockUntilEnter();
-    }
-
-    /*
      * This method approves selected words. Can only
      * be accessed by an admin
      */
