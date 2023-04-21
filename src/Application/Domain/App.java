@@ -67,20 +67,21 @@ public class App {
 
     // Constructor for tests only
     // public App( AppDataHandler appDataHandler ) {
-    //     this.appDataHandler = appDataHandler;
-    //     dic = new Dictionary(
-    //             "C:\\Users\\Julian\\Desktop\\School\\Software Engineering\\Project\\db\\dictionary.txt" );
+    // this.appDataHandler = appDataHandler;
+    // dic = new Dictionary(
+    // "C:\\Users\\Julian\\Desktop\\School\\Software
+    // Engineering\\Project\\db\\dictionary.txt" );
 
-    //     // Create random number generator
-    //     // Used to generate password salts
-    //     rng = new SecureRandom();
+    // // Create random number generator
+    // // Used to generate password salts
+    // rng = new SecureRandom();
 
-    //     // Regex and pattern to check validity of email
-    //     String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
-    //             "[a-zA-Z0-9_+&*-]+)*@" +
-    //             "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-    //             "A-Z]{2,7}$";
-    //     emailPattern = Pattern.compile( emailRegex );
+    // // Regex and pattern to check validity of email
+    // String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\." +
+    // "[a-zA-Z0-9_+&*-]+)*@" +
+    // "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+    // "A-Z]{2,7}$";
+    // emailPattern = Pattern.compile( emailRegex );
     // }
 
     public void updateState() {
@@ -350,17 +351,13 @@ public class App {
     }
 
     /*
-     * This method stores list of words associated with a given
+     * This method stores list of phrases associated with a given
      * phone number
      * 
-     * Returns true if operation succeeded and false otherwise
+     * Returns a List of int representing id of newly created phrases
      */
-    public boolean storeWords( Map<Integer, List<Word>> words, int phoneId ) {
-        List<Integer> ids = appDataHandler.storeWords( words, phoneId );
-
-        // If all words were successfully stored, the size of ids such
-        // match the size of words
-        return ids.size() == words.size();
+    public List<Integer> storePhrases( Iterable<String> phrases, PhoneNumber phoneNumber ) {
+        return appDataHandler.storePhrases( phrases, phoneNumber );
     }
 
     /*
