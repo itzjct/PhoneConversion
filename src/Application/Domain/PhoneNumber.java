@@ -5,10 +5,10 @@ import java.util.*;
 public class PhoneNumber {
     private int id;
     private String phoneNumber;
-    private Set<Word> words;
+    // private Set<Word> words;
+    private Set<String> phrases;
 
     public PhoneNumber() {
-
     }
 
     public PhoneNumber( String phoneNumber ) {
@@ -31,12 +31,12 @@ public class PhoneNumber {
         this.phoneNumber = phoneNumber;
     }
 
-    public Set<Word> getWords() {
-        return this.words;
+    public Set<String> getPhrases() {
+        return this.phrases;
     }
 
-    public void setWords( Set<Word> words ) {
-        this.words = words;
+    public void setPhrases( Set<String> phrases ) {
+        this.phrases = phrases;
     }
 
     @Override
