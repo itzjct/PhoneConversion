@@ -546,7 +546,7 @@ public class AppGUI {
         // Generate words
         Set<Word> words = app.generateWords( phoneNumber );
 
-        // Used to store phrases chosen
+        // Select phrases from generated words
         Set<String> phraseChoices = selectPhrases( words, phoneNumber );
 
         // Display phrases chosen
