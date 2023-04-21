@@ -396,7 +396,7 @@ public class AppDataHandler {
             for ( String phrase : phrases ) {
                 stmt = conn.prepareStatement( query );
                 int index = 1;
-                stmt.setString( index++, query );
+                stmt.setString( index++, phrase );
                 stmt.setInt( index, phoneNumber.getId() );
                 stmt.executeUpdate();
 
