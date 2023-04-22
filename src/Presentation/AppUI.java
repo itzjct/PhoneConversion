@@ -16,7 +16,7 @@ import Application.Domain.*;
  * @version 1.0
  */
 
-public class AppGUI {
+public class AppUI {
 
     // Constants specifying different menu types
     // displayed
@@ -43,7 +43,7 @@ public class AppGUI {
     public static void main( String[] args ) {
 
         // Run app
-        AppGUI app = new AppGUI();
+        AppUI app = new AppUI();
         app.start();
     }
 
@@ -51,7 +51,7 @@ public class AppGUI {
      * This constructor handles initialization of needed
      * application-related logic.
      */
-    public AppGUI() {
+    public AppUI() {
         app = new App();
         input = new Scanner( System.in );
     }
