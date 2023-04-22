@@ -670,10 +670,17 @@ public class AppGUI {
 
         // Display phone number along with approved phrase
         // for each item
-        System.out.printf( "%-15S%-15S\n", "Phone Number", "Phrase" );
-        System.out.println( "-".repeat( 30 ) );
+        System.out.printf( "%-25S%-15S\n", "Phone Number", "Phrase" );
+        System.out.println( "-".repeat( 40 ) );
         for ( PhoneNumber phoneNumber : phoneNumbers ) {
-            System.out.printf( "%-15S%-15S\n", phoneNumber.getPhoneNumber(),
+            StringBuilder sb = new StringBuilder();
+            sb.append( '(' );
+            sb.append( phoneNumber.getPhoneNumber().substring( 0, 3 ) );
+            sb.append( ") " );
+            sb.append( phoneNumber.getPhoneNumber().substring( 3, 6 ) );
+            sb.append( '-' );
+            sb.append( phoneNumber.getPhoneNumber().substring( 6, 10 ) );
+            System.out.printf( "%-25S%-15S\n", sb.toString(),
                     phoneNumber.getPhrases().stream().toList().get( 0 ) );
         }
 
