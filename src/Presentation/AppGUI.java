@@ -28,10 +28,6 @@ public class AppGUI {
         input = new Scanner( System.in );
     }
 
-    public AppGUI( boolean isTest ) {
-
-    }
-
     /*
      * This method handles the logic to start and monitor the
      * execution of the application
