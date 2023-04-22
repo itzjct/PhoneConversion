@@ -533,11 +533,17 @@ public class AppGUI {
         // Select phrases from generated words
         Set<String> phraseChoices = selectPhrases( words, phoneNumber );
 
+        // If an existing phone number has a phrase already approved,
+        // disapprove the phrase flag, since new candidate phrases
+        // were generated
+        phoneNumber.setIsApproved( false );
+
         // Display phrases chosen
         System.out.println( "You've chosen: " );
         displayPhrases( phraseChoices.stream().toList() );
 
-        // // Store words to database
+        // Persist changes
+        app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
         app.storePhrases( phraseChoices, phoneNumber );
 
         // Block until user press enter
@@ -598,21 +604,21 @@ public class AppGUI {
 
         // Check that given phone number belongs to current's
         // user company
-        // May use a set instead of list
         PhoneNumber phoneNumber = app.getCurrentUser().getCompany().getPhoneNumber( phoneString );
-
         if ( phoneNumber == null ) {
             printErrorMsgs( Arrays.asList( "Phone number does not belong to " + app.getCurrentUser().getCompany().getName() ) );
             return;
         }
 
+        // Display candidate phrases
         String[] temp = new String[phoneNumber.getPhrases().size()];
-
         for ( String phrase : phoneNumber.getPhrases() ) {
             System.out.printf( "%-4d %s\n", lineno, phrase );
             temp[lineno - 1] = phrase;
             lineno++;
         }
+
+        // Prompt user to select one phrase
         while ( done ) {
             System.out.println( "Enter the line number of the Phrase you would like to approve: " );
             int choice = input.nextInt();
@@ -626,13 +632,26 @@ public class AppGUI {
 
             }
         }
-
         System.out.print( "You've chosen: " + selectedPhrase.get( 0 ) );
 
+        // Set flag to show phone number has an approved phrase
+        phoneNumber.setIsApproved( true );
+
+        // Persist changes
         app.deletePhrases( phoneNumber.getPhrases() );
         app.storePhrases( selectedPhrase, phoneNumber );
+        app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
 
         blockUntilEnter();
+    }
+
+    /*
+     * This method displays approved phrases for
+     * the current user's company phone numbers
+     */
+    private void viewApprovedPhrases() {
+
+        // Get
     }
 
     /*
