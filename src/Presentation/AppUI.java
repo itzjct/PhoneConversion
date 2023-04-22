@@ -572,7 +572,7 @@ public class AppUI {
         // Check that given phone number does not belong to
         // another company
         // ** May use a set instead of list **
-        Set<String> phoneNumbers = app.getNonUsablePhoneNumbers( app.getCurrentUser().getCompany().getId() );
+        Set<String> phoneNumbers = app.getNonUsablePhoneNumbers( app.getCurrentUser().getCompany() );
         if ( phoneNumbers.contains( phoneNumberStr ) ) {
             printErrorMsgs( Arrays.asList( "Phone number already belongs to another company" ) );
             return;
@@ -582,7 +582,7 @@ public class AppUI {
         PhoneNumber phoneNumber = app.getCurrentUser().getCompany().getPhoneNumber( phoneNumberStr );
         if ( phoneNumber == null ) {
             phoneNumber = new PhoneNumber( phoneNumberStr );
-            int id = app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
+            int id = app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany() );
             if ( id == 0 ) {
                 printErrorMsgs( Arrays.asList(
                         "Failure to create link between entered phone number and "
@@ -608,7 +608,7 @@ public class AppUI {
         displayPhrases( phraseChoices.stream().toList() );
 
         // Persist changes
-        app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
+        app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany() );
         app.storePhrases( phraseChoices, phoneNumber );
 
         // Block until user press enter
@@ -705,7 +705,7 @@ public class AppUI {
         // Persist changes
         app.deletePhrases( phoneNumber.getPhrases() );
         app.storePhrases( selectedPhrase, phoneNumber );
-        app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany().getId() );
+        app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany() );
 
         blockUntilEnter();
     }

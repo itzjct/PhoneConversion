@@ -522,11 +522,11 @@ public class App {
      * This method calls data handler to retrieve all phone numbers
      * that do not belong to the specified company.
      * 
-     * @param companyId An int representing a company's id.
+     * @param companyId A Company object.
      * @return A Set of String.
      */
-    public Set<String> getNonUsablePhoneNumbers( int companyId ) {
-        return appDataHandler.getNonUsablePhoneNumbers( companyId );
+    public Set<String> getNonUsablePhoneNumbers( Company company ) {
+        return appDataHandler.getNonUsablePhoneNumbers( company );
     }
 
     /**
@@ -534,11 +534,11 @@ public class App {
      * with the specified company.
      * 
      * @param phoneNumber A PhoneNumber object.
-     * @param companyId   An int representing a company's id.
+     * @param companyId   An Company object.
      * @return An int representing the id of the stored phone number.
      */
-    public int storePhoneNumber( PhoneNumber phoneNumber, int companyId ) {
-        return appDataHandler.storePhoneNumber( phoneNumber, companyId );
+    public int storePhoneNumber( PhoneNumber phoneNumber, Company company ) {
+        return appDataHandler.storePhoneNumber( phoneNumber, company );
     }
 
     /**
