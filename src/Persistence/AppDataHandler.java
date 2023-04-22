@@ -161,7 +161,7 @@ public class AppDataHandler {
         }
 
         // Retrieve phone numbers
-        company.setPhoneNumbers( getPhoneNumbers( company.getId() ) );
+        company.setPhoneNumbers( getPhoneNumbers( company ) );
 
         return company;
     }
@@ -195,7 +195,7 @@ public class AppDataHandler {
         }
 
         // Retrieve phone numbers
-        company.setPhoneNumbers( getPhoneNumbers( companyId ) );
+        company.setPhoneNumbers( getPhoneNumbers( company ) );
 
         return company;
     }
@@ -264,12 +264,12 @@ public class AppDataHandler {
         }
     }
 
-    public Set<PhoneNumber> getPhoneNumbers( int companyId ) {
+    public Set<PhoneNumber> getPhoneNumbers( Company company ) {
         String query = "SELECT phone_id, phone_number, is_approved FROM phone_numbers WHERE company_id = ?;";
         Set<PhoneNumber> phoneNumbers = new HashSet<>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
-            stmt.setInt( 1, companyId );
+            stmt.setInt( 1, company.getId() );
             ResultSet result = stmt.executeQuery();
             while ( result.next() ) {
                 PhoneNumber phoneNumber = new PhoneNumber();
@@ -296,12 +296,12 @@ public class AppDataHandler {
      * This method retrieves all phone numbers that do not belong
      * to the specified company
      */
-    public Set<String> getNonUsablePhoneNumbers( int companyId ) {
+    public Set<String> getNonUsablePhoneNumbers( Company company ) {
         String query = "SELECT phone_number FROM phone_numbers WHERE company_id IS NOT ?;";
         Set<String> phoneNumbers = new HashSet<>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
-            stmt.setInt( 1, companyId );
+            stmt.setInt( 1, company.getId() );
             ResultSet result = stmt.executeQuery();
             while ( result.next() ) {
                 phoneNumbers.add( result.getString( "phone_number" ) );
@@ -318,7 +318,7 @@ public class AppDataHandler {
     /*
      * This method stores the phone number to given company into db
      */
-    public int storePhoneNumber( PhoneNumber phoneNumber, int companyId ) {
+    public int storePhoneNumber( PhoneNumber phoneNumber, Company company ) {
         String insertQuery = "INSERT INTO phone_numbers ( phone_number, is_approved, company_id ) VALUES ( ?, ?, ? );";
         String updateQuery = "UPDATE phone_numbers SET phone_number = ?, is_approved = ?, company_id = ? WHERE phone_id = ?;";
         boolean isUpdate = phoneNumber.getId() > 0;
