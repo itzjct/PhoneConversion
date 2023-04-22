@@ -9,9 +9,28 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
 
+/**
+ * AppDataHandler is the class responsible for interacting with
+ * the selected database.
+ * 
+ * @author Julian Ceja
+ * @author Nathan Ha
+ * @author Jacob Osbourne
+ * @author Matt Munsinger
+ * @version 1.0
+ */
+
 public class AppDataHandler {
+
+    // String used to connect to database
     private String connectionString;
 
+    /**
+     * This constructor handles initialization of needed
+     * application-related logic.
+     * 
+     * @param configService A ConfigService object.
+     */
     public AppDataHandler( ConfigService configService ) {
         Properties properties = configService.getProperties();
         String base = properties.getProperty( ConfigService.DB_BASE );
@@ -19,14 +38,23 @@ public class AppDataHandler {
         connectionString = base + path;
     }
 
-    /*
-     * This constructor initializes object with a given connection string
-     * USED ONLY FOR TESTS
+    /**
+     * This constructor handles initialization of needed
+     * application-related logic.
+     * ** FOR TESTS ONLY **
+     * 
+     * @param connectionString A String used to connected to database.
      */
     public AppDataHandler( String connectionString ) {
         this.connectionString = connectionString;
     }
 
+    /**
+     * This method is used to retrieve a new database
+     * connection object.
+     * 
+     * @return A Connection object.
+     */
     private Connection getConnection() {
         Connection conn = null;
         try {
@@ -38,8 +66,12 @@ public class AppDataHandler {
         return conn;
     }
 
-    /*
-     * This method retrieves user from db with given email
+    /**
+     * This method retrieves user from database with given email.
+     * 
+     * @param email A String representing an email address.
+     * @return A User object if exists in database.
+     *         Null otherwise.
      */
     public User getUser( String email ) {
         String query = "SELECT user_id, first_name, last_name, email, password, password_salt, is_admin, company_id " +
@@ -80,8 +112,12 @@ public class AppDataHandler {
         return user;
     }
 
-    /*
-     * This method stores given user into db
+    /**
+     * This method stores given user into database.
+     * 
+     * @param user A User object to be stored.
+     * @return An int representing the id of the stored User.
+     *         If it's zero then store operation failed.
      */
     public int storeUser( User user ) {
         String query = "INSERT INTO users " +
@@ -113,8 +149,12 @@ public class AppDataHandler {
         }
     }
 
-    /*
-     * This methods deletes given user from db
+    /**
+     * This methods deletes given user from database.
+     * 
+     * @param user A User object to be deleted.
+     * @return An int representing id of the deleted user.
+     *         If it's zero then store operation failed.
      */
     public int deleteUser( User user ) {
         String query = "DELETE FROM users WHERE email = ?;";
@@ -132,8 +172,13 @@ public class AppDataHandler {
         }
     }
 
-    /*
-     * This method retrieves company from db with given name
+    /**
+     * This method retrieves company from database
+     * with given name.
+     * 
+     * @param name A String representing a company name.
+     * @return A Company object if exists in database.
+     *         Null otherwise.
      */
     public Company getCompany( String name ) {
         String query = "SELECT company_id, company_name FROM companies WHERE company_name = ?;";
@@ -166,8 +211,13 @@ public class AppDataHandler {
         return company;
     }
 
-    /*
-     * This method retrieves company from db with given id
+    /**
+     * This method retrieves company from database
+     * with given id.
+     * 
+     * @param companyId An int representing a company's database id.
+     * @return A Company object if exists in database.
+     *         Null otherwise.
      */
     public Company getCompany( int companyId ) {
         String query = "SELECT company_id, company_name FROM companies WHERE company_id = ?;";
@@ -200,8 +250,12 @@ public class AppDataHandler {
         return company;
     }
 
-    /*
-     * This method stores given company into db
+    /**
+     * This method stores given company into database.
+     * 
+     * @param company A Company to be stored.
+     * @return An int representing id of stored company.
+     *         If it's zero then store operation failed.
      */
     public int storeCompany( Company company ) {
         String query = "INSERT INTO companies ( company_name ) VALUES ( ? );";
@@ -224,8 +278,12 @@ public class AppDataHandler {
         }
     }
 
-    /*
-     * This method deletes given company from db
+    /**
+     * This method deletes given company from database.
+     * 
+     * @param company A Company object to be deleted.
+     * @return An int representing id of the company deleted.
+     *         If it's zero then operation delete failed.
      */
     public int deleteCompany( Company company ) {
         String query = "DELETE FROM companies WHERE company_name = ?;";
@@ -243,8 +301,12 @@ public class AppDataHandler {
         }
     }
 
-    /*
-     * This method checks if given phone number exists in db
+    /**
+     * This method checks if given phone number exists in database.
+     * 
+     * @param phoneNumber A String representing a phone number.
+     * @return True if phone number exists in database.
+     *         False otherwise.
      */
     public boolean existsPhoneNumber( String phoneNumber ) {
         String query = "SELECT phone_id FROM phone_numbers WHERE phone_number = ?;";
@@ -264,6 +326,13 @@ public class AppDataHandler {
         }
     }
 
+    /**
+     * This method retrieves the phone numbers from database
+     * for a given company.
+     * 
+     * @param company A Company object.
+     * @return A Set of PhoneNumber.
+     */
     public Set<PhoneNumber> getPhoneNumbers( Company company ) {
         String query = "SELECT phone_id, phone_number, is_approved FROM phone_numbers WHERE company_id = ?;";
         Set<PhoneNumber> phoneNumbers = new HashSet<>();
@@ -292,9 +361,12 @@ public class AppDataHandler {
         }
     }
 
-    /*
-     * This method retrieves all phone numbers that do not belong
-     * to the specified company
+    /**
+     * This method retrieves all phone numbers from database
+     * that do not belong to the specified company.
+     * 
+     * @param company A Company object.
+     * @return A Set of String.
      */
     public Set<String> getNonUsablePhoneNumbers( Company company ) {
         String query = "SELECT phone_number FROM phone_numbers WHERE company_id IS NOT ?;";
@@ -315,8 +387,13 @@ public class AppDataHandler {
         }
     }
 
-    /*
-     * This method stores the phone number to given company into db
+    /**
+     * This method stores the phone number to given
+     * company into database.
+     * 
+     * @param phoneNumber A PhoneNumber object to be stored.
+     * @param company     A Company object.
+     * @return An int representing id of stored phone number.
      */
     public int storePhoneNumber( PhoneNumber phoneNumber, Company company ) {
         String insertQuery = "INSERT INTO phone_numbers ( phone_number, is_approved, company_id ) VALUES ( ?, ?, ? );";
@@ -346,8 +423,12 @@ public class AppDataHandler {
         }
     }
 
-    /*
-     * This method deletes given phone number from db
+    /**
+     * This method deletes given phone number from database.
+     * 
+     * @param phoneNumber A String representing a phone number.
+     * @return True if delete operation succeed.
+     *         False otherwise.
      */
     public boolean deletePhoneNumber( String phoneNumber ) {
         String query = "DELETE FROM phone_numbers WHERE phone_number = ?;";
@@ -364,8 +445,12 @@ public class AppDataHandler {
         }
     }
 
-    /*
-     * This method retrives a set of phrases for a given phone number
+    /**
+     * This method retrives a set of phrases from database
+     * for a given phone number.
+     * 
+     * @param phoneNumber A PhoneNumber object.
+     * @return A Set of String.
      */
     public Set<String> getPhrases( PhoneNumber phoneNumber ) {
         String query = "SELECT id, phrase FROM phrases WHERE phone_id = ?;";
@@ -386,8 +471,13 @@ public class AppDataHandler {
         }
     }
 
-    /*
+    /**
      * This method stores a set of phrases into database
+     * under a given phone number.
+     * 
+     * @param phrases     An Iterable of phrases to be stored.
+     * @param phoneNumber A PhoneNumber object.
+     * @return A List of Integer representing the ids of stored phrases.
      */
     public List<Integer> storePhrases( Iterable<String> phrases, PhoneNumber phoneNumber ) {
         String query = "INSERT INTO phrases ( phrase, phone_id ) VALUES ( ?, ? );";
@@ -419,8 +509,12 @@ public class AppDataHandler {
         }
     }
 
-    /*
-     * This method deletes a list of phrases from database
+    /**
+     * This method deletes a list of phrases from database.
+     * 
+     * @param phrases An Iterable of phrases to be deleted.
+     * @return True if the delete operation succeeded.
+     *         False otherwise.
      */
     public boolean deletePhrases( Iterable<String> phrases ) {
         String query = "DELETE FROM phrases WHERE phrase = ?;";
