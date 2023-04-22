@@ -5,7 +5,12 @@ import java.util.*;
 public class PhoneNumber {
     private int id;
     private String phoneNumber;
-    // private Set<Word> words;
+    private boolean isApproved;
+
+    public void setIsApproved( boolean isApproved ) {
+        this.isApproved = isApproved;
+    }
+
     private Set<String> phrases;
 
     public PhoneNumber() {
@@ -29,6 +34,14 @@ public class PhoneNumber {
 
     public void setPhoneNumber( String phoneNumber ) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public boolean isIsApproved() {
+        return this.isApproved;
+    }
+
+    public boolean getIsApproved() {
+        return this.isApproved;
     }
 
     public Set<String> getPhrases() {

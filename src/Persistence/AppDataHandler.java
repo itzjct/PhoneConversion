@@ -265,7 +265,7 @@ public class AppDataHandler {
     }
 
     public Set<PhoneNumber> getPhoneNumbers( int companyId ) {
-        String query = "SELECT phone_id, phone_number FROM phone_numbers WHERE company_id = ?;";
+        String query = "SELECT phone_id, phone_number, is_approved FROM phone_numbers WHERE company_id = ?;";
         Set<PhoneNumber> phoneNumbers = new HashSet<>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
@@ -275,6 +275,7 @@ public class AppDataHandler {
                 PhoneNumber phoneNumber = new PhoneNumber();
                 phoneNumber.setId( result.getInt( "phone_id" ) );
                 phoneNumber.setPhoneNumber( result.getString( "phone_number" ) );
+                phoneNumber.setIsApproved( result.getBoolean( "is_approved" ) );
                 phoneNumbers.add( phoneNumber );
             }
             result.close();
@@ -318,14 +319,15 @@ public class AppDataHandler {
      * This method stores the phone number to given company into db
      */
     public int storePhoneNumber( PhoneNumber phoneNumber, int companyId ) {
-        String insertQuery = "INSERT INTO phone_numbers ( phone_number, company_id ) VALUES ( ?, ? );";
-        String updateQuery = "UPDATE phone_numbers SET phone_number = ?, company_id = ? WHERE phone_id = ?;";
+        String insertQuery = "INSERT INTO phone_numbers ( phone_number, is_approved, company_id ) VALUES ( ?, ?, ? );";
+        String updateQuery = "UPDATE phone_numbers SET phone_number = ?, is_approved = ?, company_id = ? WHERE phone_id = ?;";
         boolean isUpdate = phoneNumber.getId() > 0;
         int id = phoneNumber.getId();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( isUpdate ? updateQuery : insertQuery )) {
             int index = 1;
             stmt.setString( index++, phoneNumber.getPhoneNumber() );
+            stmt.setBoolean( index++, phoneNumber.getIsApproved() );
             stmt.setInt( index++, companyId );
             if ( isUpdate ) {
                 stmt.setInt( index++, phoneNumber.getId() );
