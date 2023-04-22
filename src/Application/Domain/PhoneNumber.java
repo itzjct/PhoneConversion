@@ -120,7 +120,7 @@ public class PhoneNumber {
      * 
      * @param other An Object.
      * @return True if equal.
-     *         False if null or not equal.
+     *         False if other null or not equal.
      */
     @Override
     public boolean equals( Object other ) {
