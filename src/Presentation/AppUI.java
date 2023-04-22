@@ -12,7 +12,7 @@ import Application.Domain.*;
  * @author Julian Ceja
  * @author Nathan Ha
  * @author Jacob Osbourne
- * @author Matt
+ * @author Matt Munsinger
  * @version 1.0
  */
 
