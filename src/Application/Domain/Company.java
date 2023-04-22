@@ -1,6 +1,7 @@
 package Application.Domain;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Company {
     private int id;
@@ -36,5 +37,9 @@ public class Company {
             return null;
         }
         return phoneNumbers.stream().filter( x -> x.getPhoneNumber().equals( phoneNumber ) ).findFirst().get();
+    }
+
+    public Set<PhoneNumber> getApprovedPhoneNumbers() {
+        return phoneNumbers.stream().filter( x -> x.getIsApproved() ).collect( Collectors.toSet() );
     }
 }
