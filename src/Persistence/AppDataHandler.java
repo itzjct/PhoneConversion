@@ -328,7 +328,7 @@ public class AppDataHandler {
             int index = 1;
             stmt.setString( index++, phoneNumber.getPhoneNumber() );
             stmt.setBoolean( index++, phoneNumber.getIsApproved() );
-            stmt.setInt( index++, companyId );
+            stmt.setInt( index++, company.getId() );
             if ( isUpdate ) {
                 stmt.setInt( index++, phoneNumber.getId() );
             }
