@@ -5,17 +5,41 @@ import java.util.stream.Collectors;
 
 import Application.Domain.*;
 
+/**
+ * AppUI is the class responsible for interacting with
+ * user in the current project.
+ * 
+ * @author Julian Ceja
+ * @author Nathan Ha
+ * @author Jacob Osbourne
+ * @author Matt
+ * @version 1.0
+ */
+
 public class AppGUI {
 
+    // Constants specifying different menu types
+    // displayed
     public final int START_MENU = 0;
     public final int USER_MENU = 1;
     public final int ADMIN_MENU = 2;
 
+    // App object responsible for executing
+    // business logic
     private App app;
+
+    // Scanner object used to read user input
     private Scanner input;
+
+    // Flag used to control start menu loop
     private boolean isStartMenuRunning;
+
+    // Flag used to control user menu loop
     private boolean isUserMenuRunning;
 
+    /**
+     * Main driver.
+     */
     public static void main( String[] args ) {
 
         // Run app
@@ -23,14 +47,18 @@ public class AppGUI {
         app.start();
     }
 
+    /**
+     * This constructor handles initialization of needed
+     * application-related logic.
+     */
     public AppGUI() {
         app = new App();
         input = new Scanner( System.in );
     }
 
-    /*
+    /**
      * This method handles the logic to start and monitor the
-     * execution of the application
+     * execution of the application.
      */
     public void start() {
 
@@ -61,11 +89,12 @@ public class AppGUI {
         }
     }
 
-    /*
+    /**
      * This method handles logic to allow the selection
-     * of a menu option
+     * of a menu option.
      * 
-     * Return: int representing a menu option
+     * @param menuType An int representing the menu type.
+     * @return An int representing a menu option.
      */
     private int selectOption( int menuType ) {
 
@@ -120,10 +149,13 @@ public class AppGUI {
         return selectedOption;
     }
 
-    /*
+    /**
      * This method returns the number of options for
      * a given menu type. Used to determine boundaries
-     * when user is selecting an option
+     * when user is selecting an option.
+     * 
+     * @param menuType An int representing the menu type.
+     * @return An int representing the number of menu options.
      */
     private int getMenuOptionsNumber( int menuType ) {
         switch ( menuType ) {
@@ -146,9 +178,11 @@ public class AppGUI {
         }
     }
 
-    /*
+    /**
      * This method prints out the corresponding menu options
-     * from a given menu type
+     * from a given menu type.
+     * 
+     * @param menuType An int representing the menu type.
      */
     private void printMenu( int menuType ) {
         switch ( menuType ) {
@@ -166,8 +200,8 @@ public class AppGUI {
         }
     }
 
-    /*
-     * This method displays the start menu
+    /**
+     * This method displays the start menu.
      */
     private void printStartMenu() {
         printHeader( "Start Menu" );
@@ -177,8 +211,11 @@ public class AppGUI {
         System.out.println( "3: Register" );
     }
 
-    /*
-     * This method displays the user menu
+    /**
+     * This method displays the user/admin menu.
+     * 
+     * @param isAdmin A boolean specifying if current
+     *                user possess admin role.
      */
     private void printUserMenu( boolean isAdmin ) {
         printHeader( "User Menu" );
@@ -197,12 +234,13 @@ public class AppGUI {
         app.updateState();
     }
 
-    /*
-     * This method executes the given start option
+    /**
+     * This method executes the given start option.
      * 
-     * Returns:
-     * True: if operation successed
-     * False: if operation failed
+     * @param option An int representing the menu
+     *               option to execute
+     * @return True if operation successed.
+     *         False if operation failed.
      */
     private boolean execStartOption( int option ) {
         switch ( option ) {
@@ -228,8 +266,11 @@ public class AppGUI {
         }
     }
 
-    /*
-     * This method executes the given user option
+    /**
+     * This method executes the given user option.
+     * 
+     * @param option An int representing the menu
+     *               option to execute
      */
     private void execUserOption( int option ) {
         switch ( option ) {
@@ -271,17 +312,19 @@ public class AppGUI {
         }
     }
 
-    /*
-     * This method handles login user logic
+    /**
+     * This method handles login user logic.
      * 
-     * Returns:
-     * True: if operation successed
-     * False: if operation failed
+     * @return True if operation successed.
+     *         False if operation failed.
      */
     private boolean login() {
         printHeader( "Login" );
 
+        // Flag used to detect errors in loop
         boolean isError = false;
+
+        // Max number of login tries
         int numOfTries = 5;
 
         // Temporary objects to store input
@@ -328,17 +371,19 @@ public class AppGUI {
         return true;
     }
 
-    /*
-     * This method handles register user logic
+    /**
+     * This method handles register user logic.
      * 
-     * Returns:
-     * True: if operation successed
-     * False: if operation failed
+     * @return True if operation successed.
+     *         False if operation failed.
      */
     private boolean register() {
         printHeader( "Register" );
 
+        // Flag used to detect errors in loop
         boolean isError = false;
+
+        // Max number of login tries
         int numOfTries = 5;
 
         // Temporary objects to store input
@@ -401,14 +446,25 @@ public class AppGUI {
         return true;
     }
 
-    /*
-     * This method logs out the current user
+    /**
+     * This method logs out the current user and
+     * returns to start menu.
      */
     private void logout() {
         app.logout();
         isUserMenuRunning = false;
     }
 
+    /**
+     * This method displays possibles phrases built from a set of words.
+     * It then has the user select zero or more candidate phrases to be
+     * approved later.
+     * 
+     * @param words       A Set of Word
+     * @param phoneNumber A PhoneNumber object
+     * @return A Set of String representing the user's
+     *         selected phrases
+     */
     private Set<String> selectPhrases( Set<Word> words, PhoneNumber phoneNumber ) {
         // Set to store chosen phrases
         Set<String> phraseChoices = new HashSet<>();
@@ -498,8 +554,11 @@ public class AppGUI {
         return phraseChoices;
     }
 
-    /*
-     * Not implemented
+    /**
+     * This method displays a list of generates words from a
+     * given phone number. It then calls support method selectPhrases()
+     * to display possible phrase combinations built from these
+     * words.
      */
     private void generateWords() {
         printHeader( "Generate Words" );
@@ -556,9 +615,9 @@ public class AppGUI {
         blockUntilEnter();
     }
 
-    /*
+    /**
      * This method displays the phone numbers associated
-     * with the current user's company
+     * with the current user's company.
      */
     private void viewPhoneNumbers() {
         printHeader( "View Phone Numbers" );
@@ -593,9 +652,9 @@ public class AppGUI {
         blockUntilEnter();
     }
 
-    /*
+    /**
      * This method approves selected words. Can only
-     * be accessed by an admin
+     * be accessed by an admin.
      */
     private void approvePhrases() {
         printHeader( "Approve Phrases" );
@@ -651,9 +710,9 @@ public class AppGUI {
         blockUntilEnter();
     }
 
-    /*
+    /**
      * This method displays approved phrases for
-     * the current user's company phone numbers
+     * the current user's company phone numbers.
      */
     private void viewApprovedPhrases() {
         printHeader( "View Approved Phrases" );
@@ -687,9 +746,9 @@ public class AppGUI {
         blockUntilEnter();
     }
 
-    /*
+    /**
      * This method prompts user for a phone number
-     * and returns it to caller
+     * and returns it to caller.
      * 
      * Returns:
      * A String if phone number is valid.
@@ -719,8 +778,8 @@ public class AppGUI {
         return phoneNumber;
     }
 
-    /*
-     * This method displays a list of words
+    /**
+     * This method displays a list of words.
      */
     private void displayWords( List<Word> words ) {
         int cols = 4;
@@ -732,8 +791,8 @@ public class AppGUI {
         }
     }
 
-    /*
-     * This method displays a list of phrases
+    /**
+     * This method displays a list of phrases.
      */
     public void displayPhrases( List<String> phrases ) {
         for ( int i = 0; i < phrases.size(); i++ ) {
@@ -741,17 +800,17 @@ public class AppGUI {
         }
     }
 
-    /*
+    /**
      * This method blocks execution until Enter
-     * key is pressed
+     * key is pressed.
      */
     private void blockUntilEnter() {
         System.out.println( "\nPress Enter to continue..." );
         input.nextLine();
     }
 
-    /*
-     * This method prints a list of error messages to console
+    /**
+     * This method prints a list of error messages to console.
      */
     private void printErrorMsgs( List<String> errors ) {
         for ( String msg : errors ) {
@@ -759,22 +818,22 @@ public class AppGUI {
         }
     }
 
-    /*
-     * This method ensures a value is within given a range
+    /**
+     * This method ensures a value is within given a range.
      */
     private boolean isValidRange( int n, int lo, int hi ) {
         return lo > hi ? n >= hi && n <= lo : n >= lo && n <= hi;
     }
 
-    /*
-     * This method prints a header
+    /**
+     * This method prints a header.
      */
     private void printHeader( String title ) {
         System.out.println( "\n========== " + title + " ==========" );
     }
 
-    /*
-     * This method gracefully exits application
+    /**
+     * This method gracefully exits application.
      */
     private void exit() {
         input.close();
