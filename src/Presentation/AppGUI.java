@@ -133,11 +133,11 @@ public class AppGUI {
 
         // User menu
         case USER_MENU:
-            return 4;
+            return 5;
 
         // User admin menu
         case ADMIN_MENU:
-            return 5;
+            return 6;
 
         // Invalid menu
         default:
@@ -187,8 +187,9 @@ public class AppGUI {
         System.out.println( "2: Logout" );
         System.out.println( "3: Generate Words" );
         System.out.println( "4: View Company Phone Numbers" );
+        System.out.println( "5: View Approved Phrases" );
         if ( isAdmin ) {
-            System.out.println( "5: Approve Words" );
+            System.out.println( "6: Approve Phrases" );
         }
 
         // Update App object's state. Needed to keep
@@ -253,8 +254,13 @@ public class AppGUI {
             viewPhoneNumbers();
             break;
 
-        // Approve words option
+        // View approved phrases
         case 5:
+            viewApprovedPhrases();
+            break;
+
+        // Approve phrases option
+        case 6:
             approvePhrases();
             break;
 
@@ -650,8 +656,28 @@ public class AppGUI {
      * the current user's company phone numbers
      */
     private void viewApprovedPhrases() {
+        printHeader( "View Approved Phrases" );
 
-        // Get
+        // Get set of phone numbers that have an approved phrase
+        // from the current user' company
+        Set<PhoneNumber> phoneNumbers = app.getCurrentUser().getCompany().getApprovedPhoneNumbers();
+
+        // If set is empty display message
+        if ( phoneNumbers.size() == 0 ) {
+            printErrorMsgs( Arrays.asList( "No phone numbers with approved phrases!" ) );
+            return;
+        }
+
+        // Display phone number along with approved phrase
+        // for each item
+        System.out.printf( "%-15S%-15S\n", "Phone Number", "Phrase" );
+        System.out.println( "-".repeat( 30 ) );
+        for ( PhoneNumber phoneNumber : phoneNumbers ) {
+            System.out.printf( "%-15S%-15S\n", phoneNumber.getPhoneNumber(),
+                    phoneNumber.getPhrases().stream().toList().get( 0 ) );
+        }
+
+        blockUntilEnter();
     }
 
     /*
