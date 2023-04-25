@@ -4,9 +4,13 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import Application.Domain.App;
+import Application.Domain.*;
+import Presentation.*;
 
 public class LoginView {
+
+    private final int WIDTH = 400;
+    private final int HEIGHT = 200;
 
     App app;
     JFrame frame;
@@ -27,13 +31,13 @@ public class LoginView {
         backBtn.setAlignmentX( Component.CENTER_ALIGNMENT );
         submitBtn.setAlignmentX( Component.CENTER_ALIGNMENT );
 
-        btnPanel.setMaximumSize( new Dimension( 200, 30 ) );
+        btnPanel.setMaximumSize( new Dimension( 200, AppGUI.LINE_HEIGHT ) );
         btnPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
         btnPanel.add( backBtn );
         btnPanel.add( submitBtn );
 
         JPanel formPanel = new JPanel( new GridLayout( 2, 2, 5, 5 ) );
-        formPanel.setMaximumSize( new Dimension( 500, 100 ) );
+        formPanel.setMaximumSize( new Dimension( 500, AppGUI.LINE_HEIGHT * 2 ) );
         formPanel.add( emailLb );
         formPanel.add( emailTxt );
         formPanel.add( passwordLb );
@@ -53,7 +57,7 @@ public class LoginView {
 
         addActionListeners();
 
-        frame.setSize( 500, 220 );
+        frame.setSize( WIDTH, HEIGHT );
         frame.setVisible( true );
     }
 

@@ -9,6 +9,8 @@ import Presentation.Views.*;
 
 public class AppGUI {
 
+    public static final int LINE_HEIGHT = 35;
+
     public static void main( String[] args ) {
         start();
     }

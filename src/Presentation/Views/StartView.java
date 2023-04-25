@@ -1,12 +1,16 @@
 package Presentation.Views;
 
 import Application.Domain.App;
+import Presentation.AppGUI;
 
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class StartView {
+
+    private final int WIDTH = 400;
+    private final int HEIGHT = 150;
 
     App app;
     JFrame frame;
@@ -24,7 +28,7 @@ public class StartView {
         loginBtn.setAlignmentX( Container.CENTER_ALIGNMENT );
         registerBtn.setAlignmentX( Container.CENTER_ALIGNMENT );
 
-        btnPanel.setMaximumSize( new Dimension( 200, 30 ) );
+        btnPanel.setMaximumSize( new Dimension( 200, AppGUI.LINE_HEIGHT ) );
         btnPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
         btnPanel.add( loginBtn );
         btnPanel.add( registerBtn );
@@ -43,7 +47,7 @@ public class StartView {
 
         addActionListeners();
 
-        frame.setSize( 400, 150 );
+        frame.setSize( WIDTH, HEIGHT );
         frame.setVisible( true );
     }
 

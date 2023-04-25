@@ -5,8 +5,12 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import Application.Domain.App;
+import Presentation.*;
 
 public class RegisterView {
+
+    private final int WIDTH = 400;
+    private final int HEIGHT = 375;
 
     App app;
     JFrame frame;
@@ -47,13 +51,12 @@ public class RegisterView {
         submitBtn.setAlignmentX( Component.CENTER_ALIGNMENT );
 
         btnPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
-        btnPanel.setMaximumSize( new Dimension( 200, 30 ) );
+        btnPanel.setMaximumSize( new Dimension( 200, AppGUI.LINE_HEIGHT ) );
         btnPanel.add( backBtn );
         btnPanel.add( submitBtn );
 
         JPanel formPanel = new JPanel( new GridLayout( 7, 2, 5, 5 ) );
-        formPanel.setMaximumSize( new Dimension( 500, 350 ) );
-        // formPanel.setBorder( new EmptyBorder( 10, 0, 10, 0 ) );
+        formPanel.setMaximumSize( new Dimension( 500, AppGUI.LINE_HEIGHT * 7 ) );
         formPanel.add( firstNameLb );
         formPanel.add( firstNameTxt );
         formPanel.add( lastNameLb );
@@ -83,7 +86,7 @@ public class RegisterView {
 
         addActionListeners();
 
-        frame.setSize( 500, 470 );
+        frame.setSize( WIDTH, HEIGHT );
         frame.setVisible( true );
     }
 
