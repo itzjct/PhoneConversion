@@ -1,6 +1,11 @@
 package Presentation.Views;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
@@ -14,6 +19,7 @@ public class LoginView {
 
     App app;
     JFrame frame;
+    JPanel errorPanel = new JPanel( new GridLayout( 0, 1 ) );
     JPanel contentPanel = new JPanel();
     JPanel btnPanel = new JPanel( new GridLayout( 1, 2, 5, 0 ) );
     JLabel header = new JLabel( "Login" );
@@ -50,8 +56,11 @@ public class LoginView {
 
         header.setAlignmentX( Container.CENTER_ALIGNMENT );
 
+        errorPanel.setVisible( false );
+
         Container mainPanel = frame.getContentPane();
         mainPanel.add( header );
+        mainPanel.add( errorPanel );
         mainPanel.add( contentPanel );
         mainPanel.add( btnPanel );
 
@@ -72,6 +81,24 @@ public class LoginView {
     }
 
     public void onSubmitClick() {
+        clearErrorMessages();
+    }
 
+    private void displayErrorMessages( List<String> errors ) {
+        for ( String error : errors ) {
+            JLabel label = new JLabel( error );
+            label.setForeground( Color.RED );
+            label.setHorizontalAlignment( JLabel.CENTER );
+            errorPanel.add( label );
+        }
+
+        errorPanel.setMaximumSize( new Dimension( WIDTH, errors.size() * 20 ) );
+        frame.setSize( WIDTH, HEIGHT + errors.size() * 20 );
+        errorPanel.setVisible( true );
+    }
+
+    private void clearErrorMessages() {
+        errorPanel.setVisible( false );
+        frame.setSize( WIDTH, HEIGHT );
     }
 }
