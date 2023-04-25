@@ -125,6 +125,7 @@ public class RegisterView {
     }
 
     private void clearErrorMessages() {
+        errorPanel.removeAll();
         errorPanel.setVisible( false );
         frame.setSize( WIDTH, HEIGHT );
     }

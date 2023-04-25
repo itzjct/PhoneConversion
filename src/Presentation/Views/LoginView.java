@@ -70,18 +70,42 @@ public class LoginView {
         frame.setVisible( true );
     }
 
-    public void addActionListeners() {
+    private void addActionListeners() {
         backBtn.addActionListener( x -> onBackClick() );
         submitBtn.addActionListener( x -> onSubmitClick() );
     }
 
-    public void onBackClick() {
+    private void onBackClick() {
         frame.getContentPane().removeAll();
         StartMenuView startMenu = new StartMenuView( frame, app );
     }
 
-    public void onSubmitClick() {
+    private void onSubmitClick() {
         clearErrorMessages();
+        if ( login() ) {
+            frame.getContentPane().removeAll();
+            UserMenuView umv = new UserMenuView( frame, app );
+        }
+    }
+
+    private boolean login() {
+        User user = new User();
+        user.setEmail( emailTxt.getText().toUpperCase().trim() );
+        user.setPasswordString( String.valueOf( passwordTxt.getPassword() ).trim() );
+
+        List<String> errors = app.validateLogin( user );
+        if ( errors.size() > 0 ) {
+            displayErrorMessages( errors );
+            return false;
+        }
+
+        errors = app.login( user );
+        if ( errors.size() > 0 ) {
+            displayErrorMessages( errors );
+            return false;
+        }
+
+        return true;
     }
 
     private void displayErrorMessages( List<String> errors ) {
@@ -92,12 +116,13 @@ public class LoginView {
             errorPanel.add( label );
         }
 
-        errorPanel.setMaximumSize( new Dimension( WIDTH, errors.size() * 20 ) );
-        frame.setSize( WIDTH, HEIGHT + errors.size() * 20 );
+        errorPanel.setMaximumSize( new Dimension( WIDTH, errors.size() * 25 ) );
+        frame.setSize( WIDTH, HEIGHT + errors.size() * 25 );
         errorPanel.setVisible( true );
     }
 
     private void clearErrorMessages() {
+        errorPanel.removeAll();
         errorPanel.setVisible( false );
         frame.setSize( WIDTH, HEIGHT );
     }
