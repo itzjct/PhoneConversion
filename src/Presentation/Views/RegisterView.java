@@ -9,7 +9,7 @@ import java.awt.GridLayout;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import Application.Domain.App;
+import Application.Domain.*;
 import Presentation.*;
 
 public class RegisterView {
@@ -36,6 +36,7 @@ public class RegisterView {
     JPasswordField passwordTxt = new JPasswordField();
     JPasswordField passwordConfirmTxt = new JPasswordField();
     JTextField companyTxt = new JTextField();
+    ButtonGroup roleGroup = new ButtonGroup();
     JRadioButton normalRb = new JRadioButton( "Normal" );
     JRadioButton adminRb = new JRadioButton( "Admin" );
     JButton backBtn = new JButton( "Back" );
@@ -45,7 +46,6 @@ public class RegisterView {
         app = passedApp;
         frame = passedFrame;
 
-        ButtonGroup roleGroup = new ButtonGroup();
         roleGroup.add( normalRb );
         roleGroup.add( adminRb );
 
@@ -89,6 +89,7 @@ public class RegisterView {
 
         Container mainPanel = frame.getContentPane();
         mainPanel.add( header );
+        mainPanel.add( errorPanel );
         mainPanel.add( contentPanel );
         mainPanel.add( btnPanel );
 
@@ -98,18 +99,66 @@ public class RegisterView {
         frame.setVisible( true );
     }
 
-    public void addActionListeners() {
+    private void addActionListeners() {
         backBtn.addActionListener( x -> onBackClick() );
         submitBtn.addActionListener( x -> onSubmitClick() );
     }
 
-    public void onBackClick() {
+    private void onBackClick() {
         frame.getContentPane().removeAll();
         StartMenuView startMenu = new StartMenuView( frame, app );
     }
 
-    public void onSubmitClick() {
+    private void onSubmitClick() {
         clearErrorMessages();
+        if ( register() ) {
+            frame.getContentPane().removeAll();
+            UserMenuView umv = new UserMenuView( frame, app );
+        }
+    }
+
+    private boolean register() {
+        List<String> errors = new LinkedList<>();
+
+        String role = getSelectedButtonText();
+        if ( role == null ) {
+            errors.add( "Role cannot be empty" );
+            displayErrorMessages( errors );
+            return false;
+        }
+
+        User user = new User();
+        user.setFirstName( firstNameTxt.getText().toUpperCase().trim() );
+        user.setLastName( lastNameTxt.getText().toUpperCase().trim() );
+        user.setEmail( emailTxt.getText().toUpperCase().trim() );
+        user.setPasswordString( String.valueOf( passwordTxt.getPassword() ) );
+        user.setIsAdmin( role.equals( "Admin" ) );
+        user.getCompany().setName( companyTxt.getText().toUpperCase().trim() );
+
+        errors = app.validateUser( user );
+        if ( errors.size() > 0 ) {
+            displayErrorMessages( errors );
+            return false;
+        }
+
+        errors = app.validateCompany( user.getCompany() );
+        if ( errors.size() > 0 ) {
+            displayErrorMessages( errors );
+            return false;
+        }
+
+        if ( !Arrays.equals( passwordTxt.getPassword(), passwordConfirmTxt.getPassword() ) ) {
+            displayErrorMessages( Arrays.asList( "Passwords do not match" ) );
+            return false;
+        }
+
+        errors = app.register( user );
+        if ( errors.size() > 0 ) {
+            displayErrorMessages( errors );
+            return false;
+        }
+
+        return true;
     }
 
     private void displayErrorMessages( List<String> errors ) {
@@ -119,8 +168,8 @@ public class RegisterView {
             label.setHorizontalAlignment( JLabel.CENTER );
             errorPanel.add( label );
         }
-        errorPanel.setMaximumSize( new Dimension( WIDTH, errors.size() * 20 ) );
-        frame.setSize( WIDTH, HEIGHT + errors.size() * 20 );
+        errorPanel.setMaximumSize( new Dimension( WIDTH, errors.size() * 25 ) );
+        frame.setSize( WIDTH, HEIGHT + errors.size() * 25 );
         errorPanel.setVisible( true );
     }
 
@@ -128,5 +177,17 @@ public class RegisterView {
         errorPanel.removeAll();
         errorPanel.setVisible( false );
         frame.setSize( WIDTH, HEIGHT );
+    }
+
+    private String getSelectedButtonText() {
+        for ( Enumeration<AbstractButton> buttons = roleGroup.getElements(); buttons.hasMoreElements(); ) {
+            AbstractButton button = buttons.nextElement();
+
+            if ( button.isSelected() ) {
+                return button.getText();
+            }
+        }
+
+        return null;
     }
 }
