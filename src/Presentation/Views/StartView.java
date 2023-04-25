@@ -22,9 +22,6 @@ public class StartView {
         loginBtn.setAlignmentX( Container.CENTER_ALIGNMENT );
         registerBtn.setAlignmentX( Container.CENTER_ALIGNMENT );
 
-        registerBtn.addActionListener( x -> displayRegisterView() );
-        loginBtn.addActionListener( x -> displayLoginView() );
-
         contentPanel.setLayout( new BoxLayout( contentPanel, BoxLayout.X_AXIS ) );
         contentPanel.setAlignmentX( Component.CENTER_ALIGNMENT );
         contentPanel.add( loginBtn );
@@ -34,16 +31,23 @@ public class StartView {
         mainPanel.add( header );
         mainPanel.add( contentPanel );
 
+        addActionListeners();
+
         frame.setSize( 400, 100 );
         frame.setVisible( true );
     }
 
-    private void displayRegisterView() {
+    private void addActionListeners() {
+        registerBtn.addActionListener( x -> onRegisterClick() );
+        loginBtn.addActionListener( x -> onLoginClick() );
+    }
+
+    private void onLoginClick() {
         frame.getContentPane().removeAll();
         RegisterView registerView = new RegisterView( frame, app );
     }
 
-    private void displayLoginView() {
+    private void onRegisterClick() {
         frame.getContentPane().removeAll();
         LoginView loginView = new LoginView( frame, app );
     }

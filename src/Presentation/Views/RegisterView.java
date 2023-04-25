@@ -77,7 +77,23 @@ public class RegisterView {
         mainPanel.add( header );
         mainPanel.add( contentPanel );
 
+        addActionListeners();
+
         frame.setSize( 500, 470 );
         frame.setVisible( true );
+    }
+
+    public void addActionListeners() {
+        backBtn.addActionListener( x -> onBackClick() );
+        submitBtn.addActionListener( x -> onSubmitClick() );
+    }
+
+    public void onBackClick() {
+        frame.getContentPane().removeAll();
+        StartView startMenu = new StartView( frame, app );
+    }
+
+    public void onSubmitClick() {
+
     }
 }

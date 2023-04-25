@@ -25,8 +25,8 @@ public class AppGUI {
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         frame.setContentPane( panel );
 
-        // StartView startView = new StartView( frame, app );
+        StartView startView = new StartView( frame, app );
         // RegisterView registerView = new RegisterView( frame, app );
-        LoginView loginView = new LoginView( frame, app );
+        // LoginView loginView = new LoginView( frame, app );
     }
 }
