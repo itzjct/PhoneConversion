@@ -59,7 +59,13 @@ public class UserMenuView {
         frame.setVisible( true );
     }
 
-    public void addActionListeners() {
+    private void addActionListeners() {
+        logoutBtn.addActionListener( x -> onLogoutClick() );
+    }
 
+    private void onLogoutClick() {
+        app.logout();
+        frame.getContentPane().removeAll();
+        StartMenuView smv = new StartMenuView( frame, app );
     }
 }
