@@ -61,11 +61,17 @@ public class UserMenuView {
 
     private void addActionListeners() {
         logoutBtn.addActionListener( x -> onLogoutClick() );
+        accountBtn.addActionListener( x -> onAccountClick() );
     }
 
     private void onLogoutClick() {
         app.logout();
         frame.getContentPane().removeAll();
         StartMenuView smv = new StartMenuView( frame, app );
+    }
+
+    private void onAccountClick() {
+        frame.getContentPane().removeAll();
+        AccountView av = new AccountView( frame, app );
     }
 }
