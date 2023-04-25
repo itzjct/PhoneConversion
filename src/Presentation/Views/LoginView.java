@@ -68,7 +68,7 @@ public class LoginView {
 
     public void onBackClick() {
         frame.getContentPane().removeAll();
-        StartView startMenu = new StartView( frame, app );
+        StartMenuView startMenu = new StartMenuView( frame, app );
     }
 
     public void onSubmitClick() {
