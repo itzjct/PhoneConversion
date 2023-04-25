@@ -11,6 +11,7 @@ public class RegisterView {
     App app;
     JFrame frame;
     JPanel contentPanel = new JPanel();
+    JPanel btnPanel = new JPanel( new GridLayout( 1, 2, 5, 0 ) );
     JLabel header = new JLabel( "Register" );
     JLabel firstNameLb = new JLabel( "First Name:" );
     JLabel lastNameLb = new JLabel( "Last Name:" );
@@ -45,14 +46,14 @@ public class RegisterView {
         backBtn.setAlignmentX( Component.CENTER_ALIGNMENT );
         submitBtn.setAlignmentX( Component.CENTER_ALIGNMENT );
 
-        JPanel btnPanel = new JPanel( new GridLayout( 1, 2, 5, 0 ) );
+        btnPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
         btnPanel.setMaximumSize( new Dimension( 200, 30 ) );
         btnPanel.add( backBtn );
         btnPanel.add( submitBtn );
 
         JPanel formPanel = new JPanel( new GridLayout( 7, 2, 5, 5 ) );
         formPanel.setMaximumSize( new Dimension( 500, 350 ) );
-        formPanel.setBorder( new EmptyBorder( 10, 0, 10, 0 ) );
+        // formPanel.setBorder( new EmptyBorder( 10, 0, 10, 0 ) );
         formPanel.add( firstNameLb );
         formPanel.add( firstNameTxt );
         formPanel.add( lastNameLb );
@@ -70,12 +71,15 @@ public class RegisterView {
 
         contentPanel.setLayout( new BoxLayout( contentPanel, BoxLayout.Y_AXIS ) );
         contentPanel.setAlignmentX( Component.CENTER_ALIGNMENT );
+        contentPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
         contentPanel.add( formPanel );
-        contentPanel.add( btnPanel );
+
+        header.setAlignmentX( Container.CENTER_ALIGNMENT );
 
         Container mainPanel = frame.getContentPane();
         mainPanel.add( header );
         mainPanel.add( contentPanel );
+        mainPanel.add( btnPanel );
 
         addActionListeners();
 

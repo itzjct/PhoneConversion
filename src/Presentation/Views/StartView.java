@@ -2,38 +2,48 @@ package Presentation.Views;
 
 import Application.Domain.App;
 
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class StartView {
 
     App app;
     JFrame frame;
     JPanel contentPanel = new JPanel();
+    JPanel btnPanel = new JPanel( new GridLayout( 1, 2, 5, 0 ) );
     JLabel header = new JLabel( "Start Menu" );
     JButton loginBtn = new JButton( "Login" );
     JButton registerBtn = new JButton( "Register" );
+    JLabel messageLb = new JLabel( "Select an option to begin" );
 
     public StartView( JFrame passedFrame, App passedApp ) {
         app = passedApp;
         frame = passedFrame;
 
-        header.setAlignmentX( Container.CENTER_ALIGNMENT );
         loginBtn.setAlignmentX( Container.CENTER_ALIGNMENT );
         registerBtn.setAlignmentX( Container.CENTER_ALIGNMENT );
 
-        contentPanel.setLayout( new BoxLayout( contentPanel, BoxLayout.X_AXIS ) );
+        btnPanel.setMaximumSize( new Dimension( 200, 30 ) );
+        btnPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
+        btnPanel.add( loginBtn );
+        btnPanel.add( registerBtn );
+
+        contentPanel.setLayout( new BoxLayout( contentPanel, BoxLayout.Y_AXIS ) );
         contentPanel.setAlignmentX( Component.CENTER_ALIGNMENT );
-        contentPanel.add( loginBtn );
-        contentPanel.add( registerBtn );
+        contentPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
+        contentPanel.add( messageLb );
+
+        header.setAlignmentX( Container.CENTER_ALIGNMENT );
 
         Container mainPanel = frame.getContentPane();
         mainPanel.add( header );
         mainPanel.add( contentPanel );
+        mainPanel.add( btnPanel );
 
         addActionListeners();
 
-        frame.setSize( 400, 100 );
+        frame.setSize( 400, 150 );
         frame.setVisible( true );
     }
 
