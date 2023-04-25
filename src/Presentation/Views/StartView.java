@@ -42,12 +42,12 @@ public class StartView {
         loginBtn.addActionListener( x -> onLoginClick() );
     }
 
-    private void onLoginClick() {
+    private void onRegisterClick() {
         frame.getContentPane().removeAll();
         RegisterView registerView = new RegisterView( frame, app );
     }
 
-    private void onRegisterClick() {
+    private void onLoginClick() {
         frame.getContentPane().removeAll();
         LoginView loginView = new LoginView( frame, app );
     }
