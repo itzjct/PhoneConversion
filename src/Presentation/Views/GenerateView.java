@@ -126,6 +126,7 @@ public class GenerateView {
         clearBtn.addActionListener( x -> onClearClick() );
         deleteBtn.addActionListener( x -> onDeleteClick() );
         saveBtn.addActionListener( x -> onSaveClick() );
+        backBtn.addActionListener( x -> onBackClick() );
     }
 
     private void onBackClick() {
@@ -135,7 +136,7 @@ public class GenerateView {
 
     private void onSaveClick() {
         clearErrorMessages();
-        
+
         if ( selectedPhrases.isEmpty() || phoneNumber == null ) {
             displayErrorMessages( Arrays.asList( "No phrases to save" ) );
             return;
