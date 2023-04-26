@@ -40,7 +40,7 @@ public class GenerateView {
     JList<String> wordList = new JList<>();
     JList<String> phrasesList = new JList<>();
     JList<String> selectedPhrasesList = new JList<>();
-    PhoneNumber phoneNumber = new PhoneNumber();
+    PhoneNumber phoneNumber;
     Word selecteWord = new Word();
     Set<Word> words = new HashSet<>();
     List<String> phrases = new LinkedList<>();
@@ -62,13 +62,10 @@ public class GenerateView {
 
         wordList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
         wordList.setLayoutOrientation( JList.HORIZONTAL_WRAP );
-        // wordList.setVisibleRowCount( -1 );
         phrasesList.setSelectionMode( ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
         phrasesList.setLayoutOrientation( JList.VERTICAL_WRAP );
-        // phrasesList.setVisibleRowCount( -1 );
         selectedPhrasesList.setSelectionMode( ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
         selectedPhrasesList.setLayoutOrientation( JList.VERTICAL_WRAP );
-        // selectedPhrasesList.setVisibleRowCount( -1 );
 
         JPanel phonePanel = new JPanel();
         phonePanel.setLayout( new BoxLayout( phonePanel, BoxLayout.X_AXIS ) );
@@ -128,6 +125,18 @@ public class GenerateView {
         addBtn.addActionListener( x -> onAddClick() );
         clearBtn.addActionListener( x -> onClearClick() );
         deleteBtn.addActionListener( x -> onDeleteClick() );
+        saveBtn.addActionListener( x -> onSaveClick() );
+    }
+
+    private void onSaveClick() {
+        if ( selectedPhrases.isEmpty() || phoneNumber == null ) {
+            return;
+        }
+
+        phoneNumber.setIsApproved( false );
+
+        app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany() );
+        app.storePhrases( selectedPhrases, phoneNumber );
     }
 
     private void onDeleteClick() {
