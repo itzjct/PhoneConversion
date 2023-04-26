@@ -18,7 +18,7 @@ public class AppGUI {
     public static void start() {
         App app = new App();
 
-        UIManager.put( "OptionPane.minimumSize", new Dimension( 150, 50 ) );
+        UIManager.put( "OptionPane.minimumSize", new Dimension( 250, 100 ) );
 
         JPanel panel = new JPanel();
         panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
@@ -34,5 +34,6 @@ public class AppGUI {
         // LoginView loginView = new LoginView( frame, app );
         // UserMenuView umv = new UserMenuView( frame, app );
         GenerateView gv = new GenerateView( frame, app );
+        // ApproveView av = new ApproveView( frame, app );
     }
 }
