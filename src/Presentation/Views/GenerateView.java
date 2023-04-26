@@ -128,8 +128,16 @@ public class GenerateView {
         saveBtn.addActionListener( x -> onSaveClick() );
     }
 
+    private void onBackClick() {
+        frame.getContentPane().removeAll();
+        UserMenuView umv = new UserMenuView( frame, app );
+    }
+
     private void onSaveClick() {
+        clearErrorMessages();
+        
         if ( selectedPhrases.isEmpty() || phoneNumber == null ) {
+            displayErrorMessages( Arrays.asList( "No phrases to save" ) );
             return;
         }
 
@@ -137,6 +145,9 @@ public class GenerateView {
 
         app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany() );
         app.storePhrases( selectedPhrases, phoneNumber );
+
+        clearView();
+        JOptionPane.showMessageDialog( frame, "Success", "Information", JOptionPane.INFORMATION_MESSAGE );
     }
 
     private void onDeleteClick() {
@@ -244,6 +255,16 @@ public class GenerateView {
         Arrays.sort( selectedPhrasesArr );
         selectedPhrasesList = new JList<>( selectedPhrasesArr );
         selectedScroll.setViewportView( selectedPhrasesList );
+    }
+
+    private void clearView() {
+        phoneTxt.setText( "" );
+        words.clear();
+        phrases.clear();
+        selectedPhrases.clear();
+        populateWordsScroll();
+        populatePhrasesScroll();
+        populateSelectedPhrasesScroll();
     }
 
     private void displayErrorMessages( List<String> errors ) {

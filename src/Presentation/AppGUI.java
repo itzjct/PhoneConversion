@@ -18,6 +18,8 @@ public class AppGUI {
     public static void start() {
         App app = new App();
 
+        UIManager.put( "OptionPane.minimumSize", new Dimension( 150, 50 ) );
+
         JPanel panel = new JPanel();
         panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
         panel.setAlignmentX( Container.CENTER_ALIGNMENT );
