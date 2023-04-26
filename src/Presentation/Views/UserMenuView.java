@@ -62,6 +62,10 @@ public class UserMenuView {
     private void addActionListeners() {
         logoutBtn.addActionListener( x -> onLogoutClick() );
         accountBtn.addActionListener( x -> onAccountClick() );
+        generatePhrasesBtn.addActionListener( x -> onGeneratePhrasesClick() );
+        viewPhoneNumbersBtn.addActionListener( x -> onViewPhoneNumbersClick() );
+        viewPhrasesBtn.addActionListener( x -> onViewApprovedPhrasesClick() );
+        approvePhrasesBtn.addActionListener( x -> onApprovePhrasesClick() );
     }
 
     private void onLogoutClick() {
@@ -73,5 +77,25 @@ public class UserMenuView {
     private void onAccountClick() {
         frame.getContentPane().removeAll();
         AccountView av = new AccountView( frame, app );
+    }
+
+    private void onGeneratePhrasesClick() {
+        frame.getContentPane().removeAll();
+        GenerateView gv = new GenerateView( frame, app );
+    }
+
+    private void onViewPhoneNumbersClick() {
+        frame.getContentPane().removeAll();
+        PhonesView pv = new PhonesView( frame, app );
+    }
+
+    private void onViewApprovedPhrasesClick() {
+        frame.getContentPane().removeAll();
+        ApprovedPhrasesView apv = new ApprovedPhrasesView( frame, app );
+    }
+
+    private void onApprovePhrasesClick() {
+        frame.getContentPane().removeAll();
+        ApproveView av = new ApproveView( frame, app );
     }
 }
