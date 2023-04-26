@@ -33,7 +33,7 @@ public class ApproveView {
     JList<String> phrasesList = new JList<>();
     JButton backBtn = new JButton( "Back" );
     JButton saveBtn = new JButton( "Save" );
-    Set<String> phrases = new TreeSet<>();
+    List<String> phrases = new LinkedList<>();
     Set<PhoneNumber> phoneNumbers;
     PhoneNumber selectedPhoneNumber;
 
@@ -99,7 +99,7 @@ public class ApproveView {
             return;
         }
 
-        // Set flag to show phone number has an approved phrase
+        // Approve phrase
         selectedPhoneNumber.setIsApproved( true );
 
         // Persist changes

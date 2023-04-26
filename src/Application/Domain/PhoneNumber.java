@@ -24,7 +24,7 @@ public class PhoneNumber {
     private boolean isApproved;
 
     // Used to store phrases relating to this phone number
-    private Set<String> phrases;
+    private List<String> phrases;
 
     /**
      * Empty constructor
@@ -99,18 +99,18 @@ public class PhoneNumber {
     /**
      * This method is used to access phrases field.
      * 
-     * @return A Set of String.
+     * @return A List of String.
      */
-    public Set<String> getPhrases() {
+    public List<String> getPhrases() {
         return this.phrases;
     }
 
     /**
      * This method is used to update phrases field.
      * 
-     * @param phrases A Set of String.
+     * @param phrases A List of String.
      */
-    public void setPhrases( Set<String> phrases ) {
+    public void setPhrases( List<String> phrases ) {
         this.phrases = phrases;
     }
 

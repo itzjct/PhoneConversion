@@ -446,15 +446,15 @@ public class AppDataHandler {
     }
 
     /**
-     * This method retrives a set of phrases from database
+     * This method retrives a list of phrases from database
      * for a given phone number.
      * 
      * @param phoneNumber A PhoneNumber object.
-     * @return A Set of String.
+     * @return A List of String.
      */
-    public Set<String> getPhrases( PhoneNumber phoneNumber ) {
+    public List<String> getPhrases( PhoneNumber phoneNumber ) {
         String query = "SELECT id, phrase FROM phrases WHERE phone_id = ?;";
-        Set<String> phrases = new HashSet<>();
+        List<String> phrases = new LinkedList<>();
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement( query )) {
             stmt.setInt( 1, phoneNumber.getId() );
