@@ -10,7 +10,7 @@ import javax.swing.border.EmptyBorder;
 public class StartMenuView {
 
     private final int WIDTH = 400;
-    private final int HEIGHT = 170;
+    private final int HEIGHT = 190;
 
     App app;
     JFrame frame;

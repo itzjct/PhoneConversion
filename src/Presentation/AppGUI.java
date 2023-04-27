@@ -20,12 +20,13 @@ public class AppGUI {
 
         UIManager.put( "OptionPane.minimumSize", new Dimension( 250, 100 ) );
         UIManager.put( "Panel.background", Color.WHITE );
+        UIManager.put( "RadioButton.background", Color.WHITE );
         UIManager.put( "Button.background", Color.LIGHT_GRAY );
 
         JPanel panel = new JPanel();
         panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
         panel.setAlignmentX( Container.CENTER_ALIGNMENT );
-        panel.setBorder( new EmptyBorder( 10, 20, 10, 20 ) );
+        panel.setBorder( new EmptyBorder( 20, 20, 20, 20 ) );
         // panel.setBackground( Color.WHITE );
 
         JFrame frame = new JFrame( "Phone Conversion" );
