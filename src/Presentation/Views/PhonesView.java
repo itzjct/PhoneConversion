@@ -1,6 +1,5 @@
 package Presentation.Views;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -8,6 +7,7 @@ import java.awt.GridLayout;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
 
 import Application.Domain.*;
 import Presentation.*;
@@ -23,8 +23,9 @@ public class PhonesView {
     JPanel errorPanel = new JPanel( new GridLayout( 0, 1 ) );
     JPanel btnPanel = new JPanel( new GridLayout( 1, 2, 5, 0 ) );
     JLabel header = new JLabel( "Company Phone Numbers" );
-    JScrollPane phonesScroll = new JScrollPane();
-    JList<String> phonesList = new JList<>();
+    DefaultTableModel phonesModel = new DefaultTableModel();
+    JTable phonesTable = new JTable( phonesModel );
+    JScrollPane phonesScroll = new JScrollPane( phonesTable );
     JButton backBtn = new JButton( "Back" );
     Set<PhoneNumber> phoneNumbers;
 
@@ -69,33 +70,16 @@ public class PhonesView {
 
     private void onInit() {
         phoneNumbers = app.getCurrentUser().getCompany().getPhoneNumbers();
-        populatePhonesScroll();
+        populatePhonesTable();
     }
 
-    private void populatePhonesScroll() {
+    private void populatePhonesTable() {
         String[] phoneNumbersArr = phoneNumbers.stream().map( x -> x.getPhoneNumber() )
                 .toArray( String[]::new );
         Arrays.sort( phoneNumbersArr );
-        phonesList = new JList<>( phoneNumbersArr );
-        phonesScroll.setViewportView( phonesList );
-    }
-
-    private void displayErrorMessages( List<String> errors ) {
-        for ( String error : errors ) {
-            JLabel label = new JLabel( error );
-            label.setForeground( Color.RED );
-            label.setHorizontalAlignment( JLabel.CENTER );
-            errorPanel.add( label );
+        phonesModel.addColumn( "Phone Numbers" );
+        for ( String phoneNumber : phoneNumbersArr ) {
+            phonesModel.addRow( new Object[] { phoneNumber } );
         }
-
-        errorPanel.setMaximumSize( new Dimension( WIDTH, errors.size() * 25 ) );
-        frame.setSize( WIDTH, HEIGHT + errors.size() * 25 );
-        errorPanel.setVisible( true );
-    }
-
-    private void clearErrorMessages() {
-        errorPanel.removeAll();
-        errorPanel.setVisible( false );
-        frame.setSize( WIDTH, HEIGHT );
     }
 }
