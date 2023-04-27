@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.*;
 import javax.swing.*;
@@ -55,6 +56,7 @@ public class LoginView {
         contentPanel.add( formPanel );
 
         header.setAlignmentX( Container.CENTER_ALIGNMENT );
+        header.setFont( new Font( "Arial", Font.BOLD, 14 ) );
 
         errorPanel.setVisible( false );
 
