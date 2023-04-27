@@ -102,10 +102,10 @@ public class App {
         emailPattern = Pattern.compile( emailRegex );
 
         // Remove
-        User user = new User();
-        user.setEmail( "J@GMAIL.COM" );
-        user.setPasswordString( "password" );
-        login( user );
+        // User user = new User();
+        // user.setEmail( "J@GMAIL.COM" );
+        // user.setPasswordString( "password" );
+        // login( user );
     }
 
     // Constructor for tests only

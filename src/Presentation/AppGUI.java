@@ -29,11 +29,13 @@ public class AppGUI {
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         frame.setContentPane( panel );
 
-        // StartMenuView startView = new StartMenuView( frame, app );
+        StartMenuView startView = new StartMenuView( frame, app );
         // RegisterView registerView = new RegisterView( frame, app );
         // LoginView loginView = new LoginView( frame, app );
         // UserMenuView umv = new UserMenuView( frame, app );
-        GenerateView gv = new GenerateView( frame, app );
+        // GenerateView gv = new GenerateView( frame, app );
         // ApproveView av = new ApproveView( frame, app );
+        // PhonesView pv = new PhonesVie/w( frame, app );
+        // ApprovedPhrasesView apv = new ApprovedPhrasesView( frame, app );
     }
 }
