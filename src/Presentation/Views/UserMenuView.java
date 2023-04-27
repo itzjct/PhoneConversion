@@ -10,7 +10,7 @@ import Presentation.*;
 public class UserMenuView {
 
     private final int WIDTH = 600;
-    private final int HEIGHT = 200;
+    private final int HEIGHT = 300;
 
     App app;
     JFrame frame;
@@ -29,12 +29,12 @@ public class UserMenuView {
         frame = passedFrame;
 
         btnPanel.setMaximumSize( new Dimension( 200, AppGUI.LINE_HEIGHT ) );
-        btnPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
+        // btnPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
         btnPanel.add( logoutBtn );
         btnPanel.add( accountBtn );
 
         JPanel optionsPanel = new JPanel( new GridLayout( 2, 2, 5, 5 ) );
-        optionsPanel.setMaximumSize( new Dimension( 500, AppGUI.LINE_HEIGHT * 2 ) );
+        optionsPanel.setMinimumSize( new Dimension( 500, AppGUI.LINE_HEIGHT * 4 ) );
         optionsPanel.add( generatePhrasesBtn );
         optionsPanel.add( viewPhoneNumbersBtn );
         optionsPanel.add( viewPhrasesBtn );
@@ -47,13 +47,21 @@ public class UserMenuView {
 
         header.setText( "Welcome " + app.getCurrentUser().getFirstName() + "!" );
         header.setAlignmentX( Container.CENTER_ALIGNMENT );
+        header.setFont( new Font( "Arial", Font.BOLD, 14 ) );
+
+        JSeparator separator = new JSeparator();
+        separator.setMaximumSize( new Dimension( WIDTH, 1 ) );
 
         Container mainPanel = frame.getContentPane();
         mainPanel.add( header );
         mainPanel.add( contentPanel );
+        mainPanel.add( Box.createRigidArea( new Dimension( WIDTH, 20 ) ) );
+        mainPanel.add( separator );
+        mainPanel.add( Box.createRigidArea( new Dimension( WIDTH, 10 ) ) );
         mainPanel.add( btnPanel );
 
         addActionListeners();
+        onInit();
 
         frame.setSize( WIDTH, HEIGHT );
         frame.setVisible( true );
@@ -66,6 +74,11 @@ public class UserMenuView {
         viewPhoneNumbersBtn.addActionListener( x -> onViewPhoneNumbersClick() );
         viewPhrasesBtn.addActionListener( x -> onViewApprovedPhrasesClick() );
         approvePhrasesBtn.addActionListener( x -> onApprovePhrasesClick() );
+    }
+
+    private void onInit() {
+        app.updateState();
+        approvePhrasesBtn.setEnabled( app.getCurrentUser().getIsAdmin() );
     }
 
     private void onLogoutClick() {
