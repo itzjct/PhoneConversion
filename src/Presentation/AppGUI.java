@@ -19,15 +19,19 @@ public class AppGUI {
         App app = new App();
 
         UIManager.put( "OptionPane.minimumSize", new Dimension( 250, 100 ) );
+        UIManager.put( "Panel.background", Color.WHITE );
+        UIManager.put( "Button.background", Color.LIGHT_GRAY );
 
         JPanel panel = new JPanel();
         panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
         panel.setAlignmentX( Container.CENTER_ALIGNMENT );
         panel.setBorder( new EmptyBorder( 10, 20, 10, 20 ) );
+        // panel.setBackground( Color.WHITE );
 
         JFrame frame = new JFrame( "Phone Conversion" );
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         frame.setContentPane( panel );
+        frame.setResizable( false );
 
         StartMenuView startView = new StartMenuView( frame, app );
         // RegisterView registerView = new RegisterView( frame, app );

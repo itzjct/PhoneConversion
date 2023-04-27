@@ -10,16 +10,16 @@ import javax.swing.border.EmptyBorder;
 public class StartMenuView {
 
     private final int WIDTH = 400;
-    private final int HEIGHT = 150;
+    private final int HEIGHT = 170;
 
     App app;
     JFrame frame;
     JPanel contentPanel = new JPanel();
     JPanel btnPanel = new JPanel( new GridLayout( 1, 2, 5, 0 ) );
-    JLabel header = new JLabel( "Start Menu" );
+    JLabel header = new JLabel( "Phone Conversion" );
     JButton loginBtn = new JButton( "Login" );
     JButton registerBtn = new JButton( "Register" );
-    JLabel messageLb = new JLabel( "Select an option to begin" );
+    JLabel messageLb = new JLabel( "Select an option to begin:" );
 
     public StartMenuView( JFrame passedFrame, App passedApp ) {
         app = passedApp;
@@ -38,10 +38,19 @@ public class StartMenuView {
         contentPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
         contentPanel.add( messageLb );
 
+        header.setFont( new Font( "Arial", Font.BOLD, 20 ) );
         header.setAlignmentX( Container.CENTER_ALIGNMENT );
+        header.setBorder( new EmptyBorder( 0, 0, 5, 0 ) );
+
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout( new BoxLayout( headerPanel, BoxLayout.Y_AXIS ) );
+        headerPanel.setMaximumSize( new Dimension( WIDTH, 50 ) );
+        headerPanel.add( new JSeparator() );
+        headerPanel.add( header );
+        headerPanel.add( new JSeparator() );
 
         Container mainPanel = frame.getContentPane();
-        mainPanel.add( header );
+        mainPanel.add( headerPanel );
         mainPanel.add( contentPanel );
         mainPanel.add( btnPanel );
 
