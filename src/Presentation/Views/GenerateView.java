@@ -144,7 +144,8 @@ public class GenerateView {
 
         phoneNumber.setIsApproved( false );
 
-        app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany() );
+        int id = app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany() );
+        phoneNumber.setId( id );
         app.storePhrases( selectedPhrases, phoneNumber );
 
         clearView();
@@ -152,6 +153,8 @@ public class GenerateView {
     }
 
     private void onDeleteClick() {
+        clearErrorMessages();
+
         List<String> tempPhrases = selectedPhrasesList.getSelectedValuesList();
         if ( tempPhrases.isEmpty() ) {
             displayErrorMessages( Arrays.asList( "No phrase to delete" ) );
@@ -164,6 +167,7 @@ public class GenerateView {
     }
 
     private void onClearClick() {
+        clearErrorMessages();
         selectedPhrases.clear();
         populateSelectedPhrasesScroll();
     }
@@ -215,17 +219,11 @@ public class GenerateView {
             return false;
         }
 
-        // Set the current user's company as owner of given phone number
+        // Check if phone number already belongs to this company.
+        // If not, create new instance
         phoneNumber = app.getCurrentUser().getCompany().getPhoneNumber( phoneNumberStr );
         if ( phoneNumber == null ) {
             phoneNumber = new PhoneNumber( phoneNumberStr );
-            int id = app.storePhoneNumber( phoneNumber, app.getCurrentUser().getCompany() );
-            if ( id == 0 ) {
-                displayErrorMessages( Arrays.asList( "Failure to create link between entered phone number and "
-                        + app.getCurrentUser().getCompany().getName() ) );
-                return false;
-            }
-            phoneNumber.setId( id );
         }
 
         return true;
