@@ -84,7 +84,7 @@ public class ApprovedPhrasesView {
         phrasesModel.addColumn( "Phone Number" );
         phrasesModel.addColumn( "Approved Phrase" );
         for ( PhoneNumber phoneNumber : phoneNumbers ) {
-            phrasesModel.addRow( new Object[] { phoneNumber.getPhoneNumber(), phoneNumber.getPhrases().get( 0 ) } );
+            phrasesModel.addRow( new Object[] { phoneNumber.toFormattedString(), phoneNumber.getPhrases().get( 0 ) } );
         }
     }
 }

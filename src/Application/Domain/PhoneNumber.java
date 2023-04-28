@@ -115,6 +115,27 @@ public class PhoneNumber {
     }
 
     /**
+     * This method returns a formatted phone number string.
+     * The pattern return is as follows: (XXX) XXX-XXXX
+     * 
+     * @return A String. If phoneNumber field is null, it
+     *         returns null.
+     */
+    public String toFormattedString() {
+        if ( phoneNumber == null || phoneNumber.length() != 10 ) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append( '(' );
+        sb.append( phoneNumber.substring( 0, 3 ) );
+        sb.append( ") " );
+        sb.append( phoneNumber.substring( 3, 6 ) );
+        sb.append( '-' );
+        sb.append( phoneNumber.substring( 6, 10 ) );
+        return sb.toString();
+    }
+
+    /**
      * Overriden method. Checks equality based on phoneNumber
      * field.
      * 

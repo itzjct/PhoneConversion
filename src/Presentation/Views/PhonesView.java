@@ -76,7 +76,7 @@ public class PhonesView {
     }
 
     private void populatePhonesTable() {
-        String[] phoneNumbersArr = phoneNumbers.stream().map( x -> x.getPhoneNumber() )
+        String[] phoneNumbersArr = phoneNumbers.stream().map( x -> x.toFormattedString() )
                 .toArray( String[]::new );
         Arrays.sort( phoneNumbersArr );
         phonesModel.addColumn( "Phone Numbers" );

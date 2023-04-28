@@ -130,7 +130,7 @@ public class ApproveView {
     }
 
     private void populatePhonesScroll() {
-        String[] phoneNumbersArr = phoneNumbers.stream().map( x -> x.getPhoneNumber() )
+        String[] phoneNumbersArr = phoneNumbers.stream().map( x -> x.toFormattedString() )
                 .toArray( String[]::new );
         Arrays.sort( phoneNumbersArr );
         phonesModel.setColumnCount( 0 );
@@ -143,7 +143,7 @@ public class ApproveView {
 
     private void getPhrases() {
         selectedPhoneNumber = phoneNumbers.stream()
-                .filter( x -> x.getPhoneNumber().equals( phonesTable.getValueAt( phonesTable.getSelectedRow(), 0 ) ) )
+                .filter( x -> x.toFormattedString().equals( phonesTable.getValueAt( phonesTable.getSelectedRow(), 0 ) ) )
                 .findFirst().get();
         phrases = selectedPhoneNumber.getPhrases();
     }
