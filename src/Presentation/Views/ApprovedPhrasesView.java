@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.*;
 import javax.swing.*;
@@ -43,6 +44,7 @@ public class ApprovedPhrasesView {
         contentPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
         contentPanel.add( tableScroll );
 
+        header.setFont( new Font( "Arial", Font.BOLD, 14 ) );
         header.setAlignmentX( Container.CENTER_ALIGNMENT );
 
         errorPanel.setVisible( false );
@@ -84,24 +86,5 @@ public class ApprovedPhrasesView {
         for ( PhoneNumber phoneNumber : phoneNumbers ) {
             phrasesModel.addRow( new Object[] { phoneNumber.getPhoneNumber(), phoneNumber.getPhrases().get( 0 ) } );
         }
-    }
-
-    private void displayErrorMessages( List<String> errors ) {
-        for ( String error : errors ) {
-            JLabel label = new JLabel( error );
-            label.setForeground( Color.RED );
-            label.setHorizontalAlignment( JLabel.CENTER );
-            errorPanel.add( label );
-        }
-
-        errorPanel.setMaximumSize( new Dimension( WIDTH, errors.size() * 25 ) );
-        frame.setSize( WIDTH, HEIGHT + errors.size() * 25 );
-        errorPanel.setVisible( true );
-    }
-
-    private void clearErrorMessages() {
-        errorPanel.removeAll();
-        errorPanel.setVisible( false );
-        frame.setSize( WIDTH, HEIGHT );
     }
 }
