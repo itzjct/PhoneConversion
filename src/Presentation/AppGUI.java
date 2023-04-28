@@ -27,7 +27,6 @@ public class AppGUI {
         panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
         panel.setAlignmentX( Container.CENTER_ALIGNMENT );
         panel.setBorder( new EmptyBorder( 20, 20, 20, 20 ) );
-        // panel.setBackground( Color.WHITE );
 
         JFrame frame = new JFrame( "Phone Conversion" );
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
@@ -35,12 +34,5 @@ public class AppGUI {
         frame.setResizable( false );
 
         StartMenuView startView = new StartMenuView( frame, app );
-        // RegisterView registerView = new RegisterView( frame, app );
-        // LoginView loginView = new LoginView( frame, app );
-        // UserMenuView umv = new UserMenuView( frame, app );
-        // GenerateView gv = new GenerateView( frame, app );
-        // ApproveView av = new ApproveView( frame, app );
-        // PhonesView pv = new PhonesVie/w( frame, app );
-        // ApprovedPhrasesView apv = new ApprovedPhrasesView( frame, app );
     }
 }

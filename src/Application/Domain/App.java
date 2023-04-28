@@ -100,12 +100,6 @@ public class App {
                 "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
                 "A-Z]{2,7}$";
         emailPattern = Pattern.compile( emailRegex );
-
-        // Remove
-        // User user = new User();
-        // user.setEmail( "J@GMAIL.COM" );
-        // user.setPasswordString( "password" );
-        // login( user );
     }
 
     // Constructor for tests only
