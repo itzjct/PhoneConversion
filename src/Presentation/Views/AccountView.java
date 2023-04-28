@@ -97,6 +97,9 @@ public class AccountView {
         mainPanel.add( contentPanel );
         mainPanel.add( btnPanel );
 
+        // Add needed listeners
+        addListeners();
+
         // Perform initialization logic
         onInit();
 
@@ -117,7 +120,6 @@ public class AccountView {
      * initialization logic.
      */
     private void onInit() {
-        addListeners();
         populateTextFields();
     }
 

@@ -85,6 +85,9 @@ public class ApprovedPhrasesView {
         mainPanel.add( contentPanel );
         mainPanel.add( btnPanel );
 
+        // Add needed listeners
+        addListeners();
+
         // Perform initialization logic
         onInit();
 
@@ -105,7 +108,6 @@ public class ApprovedPhrasesView {
      * initialization logic.
      */
     private void onInit() {
-        addListeners();
         getApprovedPhoneNumbers();
         populatePhrasesTable();
     }
