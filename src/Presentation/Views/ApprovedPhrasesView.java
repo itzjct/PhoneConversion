@@ -14,7 +14,7 @@ import Application.Domain.*;
 import Presentation.*;
 
 /**
- * AccountView is the class responsible for displaying
+ * ApprovedPhrasesView is the class responsible for displaying
  * the user account view.
  * 
  * @author Julian Ceja
