@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 import Application.Domain.*;
 import Presentation.*;
@@ -26,21 +28,24 @@ public class ApproveView {
     JPanel errorPanel = new JPanel( new GridLayout( 0, 1 ) );
     JPanel btnPanel = new JPanel( new GridLayout( 1, 2, 5, 0 ) );
     JLabel header = new JLabel( "Validate Phrases" );
-    JScrollPane phonesScroll = new JScrollPane();
-    JScrollPane phrasesScroll = new JScrollPane();
+    DefaultTableModel phonesModel = new DefaultTableModel();
+    DefaultTableModel phrasesModel = new DefaultTableModel();
+    JTable phonesTable = new JTable( phonesModel );
+    JTable phrasesTable = new JTable( phrasesModel );
+    JScrollPane phonesScroll = new JScrollPane( phonesTable );
+    JScrollPane phrasesScroll = new JScrollPane( phrasesTable );
     JButton approveBtn = new JButton( "Approve" );
-    JList<String> phonesList = new JList<>();
-    JList<String> phrasesList = new JList<>();
     JButton backBtn = new JButton( "Back" );
     JButton saveBtn = new JButton( "Save" );
     List<String> phrases = new LinkedList<>();
     Set<PhoneNumber> phoneNumbers;
     PhoneNumber selectedPhoneNumber;
+    boolean isResetting;
 
     ListSelectionListener phonesListListener = new ListSelectionListener() {
         @Override
         public void valueChanged( ListSelectionEvent e ) {
-            if ( !e.getValueIsAdjusting() ) {
+            if ( !e.getValueIsAdjusting() && !isResetting ) {
                 getPhrases();
                 populatePhrasesScroll();
             }
@@ -50,9 +55,6 @@ public class ApproveView {
     public ApproveView( JFrame passedFrame, App passedApp ) {
         app = passedApp;
         frame = passedFrame;
-
-        phonesList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
-        phrasesList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
 
         JPanel scrollsPanel = new JPanel( new GridLayout( 1, 2, 5, 0 ) );
         scrollsPanel.add( phonesScroll );
@@ -68,6 +70,7 @@ public class ApproveView {
         contentPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
         contentPanel.add( scrollsPanel );
 
+        header.setFont( new Font( "Arial", Font.BOLD, 14 ) );
         header.setAlignmentX( Container.CENTER_ALIGNMENT );
 
         errorPanel.setVisible( false );
@@ -93,11 +96,12 @@ public class ApproveView {
     private void onApproveClick() {
         clearErrorMessages();
 
-        String approvedPhrase = phrasesList.getSelectedValue();
-        if ( approvedPhrase == null ) {
+        int selectedPhrasesIndex = phrasesTable.getSelectedRow();
+        if ( selectedPhrasesIndex == -1 ) {
             displayErrorMessages( Arrays.asList( "No phrase to approve" ) );
             return;
         }
+        String approvedPhrase = phrasesTable.getValueAt( selectedPhrasesIndex, 0 ).toString();
 
         // Approve phrase
         selectedPhoneNumber.setIsApproved( true );
@@ -121,19 +125,25 @@ public class ApproveView {
         phoneNumbers = app.getCurrentUser().getCompany().getPhoneNumbers().stream().filter( x -> !x.getIsApproved() )
                 .collect( Collectors.toSet() );
         populatePhonesScroll();
-        phonesList.addListSelectionListener( phonesListListener );
+        populatePhrasesScroll();
+        phonesTable.getSelectionModel().addListSelectionListener( phonesListListener );
     }
 
     private void populatePhonesScroll() {
         String[] phoneNumbersArr = phoneNumbers.stream().map( x -> x.getPhoneNumber() )
                 .toArray( String[]::new );
         Arrays.sort( phoneNumbersArr );
-        phonesList = new JList<>( phoneNumbersArr );
-        phonesScroll.setViewportView( phonesList );
+        phonesModel.setColumnCount( 0 );
+        phonesModel.setRowCount( 0 );
+        phonesModel.addColumn( "Unapproved Phone Numbers" );
+        for ( String phoneNumber : phoneNumbersArr ) {
+            phonesModel.addRow( new Object[] { phoneNumber } );
+        }
     }
 
     private void getPhrases() {
-        selectedPhoneNumber = phoneNumbers.stream().filter( x -> x.getPhoneNumber().equals( phonesList.getSelectedValue() ) )
+        selectedPhoneNumber = phoneNumbers.stream()
+                .filter( x -> x.getPhoneNumber().equals( phonesTable.getValueAt( phonesTable.getSelectedRow(), 0 ) ) )
                 .findFirst().get();
         phrases = selectedPhoneNumber.getPhrases();
     }
@@ -141,15 +151,21 @@ public class ApproveView {
     private void populatePhrasesScroll() {
         String[] phrasesArr = phrases.toArray( String[]::new );
         Arrays.sort( phrasesArr );
-        phrasesList = new JList<>( phrasesArr );
-        phrasesScroll.setViewportView( phrasesList );
+        phrasesModel.setColumnCount( 0 );
+        phrasesModel.setRowCount( 0 );
+        phrasesModel.addColumn( "Candidate Phrases" );
+        for ( String phrase : phrasesArr ) {
+            phrasesModel.addRow( new Object[] { phrase } );
+        }
     }
 
     public void resetView() {
-        phonesList.removeListSelectionListener( phonesListListener );
+        isResetting = true;
+        phonesTable.getSelectionModel().removeListSelectionListener( phonesListListener );
         phrases.clear();
-        populatePhrasesScroll();
+        phoneNumbers.clear();
         onInit();
+        isResetting = true;
     }
 
     private void displayErrorMessages( List<String> errors ) {
