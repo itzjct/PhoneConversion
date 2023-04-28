@@ -5,12 +5,14 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 
 import Application.Domain.*;
 import Presentation.*;
@@ -34,12 +36,15 @@ public class GenerateView {
     JButton addBtn = new JButton( ">" );
     JButton backBtn = new JButton( "Back" );
     JButton saveBtn = new JButton( "Save" );
-    JScrollPane wordScroll = new JScrollPane();
-    JScrollPane phraseScroll = new JScrollPane();
-    JScrollPane selectedScroll = new JScrollPane();
-    JList<String> wordList = new JList<>();
-    JList<String> phrasesList = new JList<>();
-    JList<String> selectedPhrasesList = new JList<>();
+    DefaultTableModel wordsModel = new DefaultTableModel();
+    DefaultTableModel phrasesModel = new DefaultTableModel();
+    DefaultTableModel selectedPhrasesModel = new DefaultTableModel();
+    JTable wordsTable = new JTable( wordsModel );
+    JTable phrasesTable = new JTable( phrasesModel );
+    JTable selectedPhrasesTable = new JTable( selectedPhrasesModel );
+    JScrollPane wordsScroll = new JScrollPane( wordsTable );
+    JScrollPane phraseScroll = new JScrollPane( phrasesTable );
+    JScrollPane selectedScroll = new JScrollPane( selectedPhrasesTable );
     PhoneNumber phoneNumber;
     Word selecteWord = new Word();
     Set<Word> words = new HashSet<>();
@@ -60,13 +65,6 @@ public class GenerateView {
         app = passedApp;
         frame = passedFrame;
 
-        wordList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
-        wordList.setLayoutOrientation( JList.HORIZONTAL_WRAP );
-        phrasesList.setSelectionMode( ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
-        phrasesList.setLayoutOrientation( JList.VERTICAL_WRAP );
-        selectedPhrasesList.setSelectionMode( ListSelectionModel.MULTIPLE_INTERVAL_SELECTION );
-        selectedPhrasesList.setLayoutOrientation( JList.VERTICAL_WRAP );
-
         JPanel phonePanel = new JPanel();
         phonePanel.setLayout( new BoxLayout( phonePanel, BoxLayout.X_AXIS ) );
         phonePanel.setMaximumSize( new Dimension( WIDTH / 2, AppGUI.LINE_HEIGHT ) );
@@ -84,11 +82,11 @@ public class GenerateView {
         JPanel selectedPanel = new JPanel();
         selectedPanel.setLayout( new BoxLayout( selectedPanel, BoxLayout.X_AXIS ) );
         selectedPanel.add( addBtn );
-        selectedPanel.add( Box.createRigidArea( new Dimension( 5, 0 ) ) );
+        selectedPanel.add( Box.createRigidArea( new Dimension( 6, 0 ) ) );
         selectedPanel.add( selectedScroll );
 
         JPanel scrollsPanel = new JPanel( new GridLayout( 1, 3, 5, 0 ) );
-        scrollsPanel.add( wordScroll );
+        scrollsPanel.add( wordsScroll );
         scrollsPanel.add( phraseScroll );
         scrollsPanel.add( selectedPanel );
 
@@ -105,6 +103,7 @@ public class GenerateView {
         contentPanel.add( scrollsPanel );
 
         header.setAlignmentX( Container.CENTER_ALIGNMENT );
+        header.setFont( new Font( "Arial", Font.BOLD, 14 ) );
 
         errorPanel.setVisible( false );
 
@@ -115,6 +114,7 @@ public class GenerateView {
         mainPanel.add( btnPanel );
 
         addActionListeners();
+        onInit();
 
         frame.setSize( WIDTH, HEIGHT );
         frame.setVisible( true );
@@ -127,6 +127,12 @@ public class GenerateView {
         deleteBtn.addActionListener( x -> onDeleteClick() );
         saveBtn.addActionListener( x -> onSaveClick() );
         backBtn.addActionListener( x -> onBackClick() );
+    }
+
+    private void onInit() {
+        populateWordsScroll();
+        populatePhrasesScroll();
+        populateSelectedPhrasesScroll();
     }
 
     private void onBackClick() {
@@ -155,7 +161,11 @@ public class GenerateView {
     private void onDeleteClick() {
         clearErrorMessages();
 
-        List<String> tempPhrases = selectedPhrasesList.getSelectedValuesList();
+        int[] selectedPhrasesIndices = selectedPhrasesTable.getSelectedRows();
+        List<String> tempPhrases = new LinkedList<>();
+        for ( int i : selectedPhrasesIndices ) {
+            tempPhrases.add( phrasesTable.getValueAt( i, 0 ).toString() );
+        }
         if ( tempPhrases.isEmpty() ) {
             displayErrorMessages( Arrays.asList( "No phrase to delete" ) );
             return;
@@ -175,7 +185,11 @@ public class GenerateView {
     private void onAddClick() {
         clearErrorMessages();
 
-        List<String> tempPhrases = phrasesList.getSelectedValuesList();
+        int[] selectedPhrasesIndices = phrasesTable.getSelectedRows();
+        List<String> tempPhrases = new LinkedList<>();
+        for ( int i : selectedPhrasesIndices ) {
+            tempPhrases.add( phrasesTable.getValueAt( i, 0 ).toString() );
+        }
         if ( tempPhrases.isEmpty() ) {
             displayErrorMessages( Arrays.asList( "No phrase to add" ) );
             return;
@@ -190,7 +204,7 @@ public class GenerateView {
 
     private void onGenerateClick() {
         clearErrorMessages();
-        wordList.removeListSelectionListener( wordsListListener );
+        wordsTable.getSelectionModel().removeListSelectionListener( wordsListListener );
 
         boolean success = getPhoneNumber();
         if ( !success ) {
@@ -200,7 +214,7 @@ public class GenerateView {
         words = app.generateWords( phoneNumber );
 
         populateWordsScroll();
-        wordList.addListSelectionListener( wordsListListener );
+        wordsTable.getSelectionModel().addListSelectionListener( wordsListListener );
     }
 
     private boolean getPhoneNumber() {
@@ -230,7 +244,9 @@ public class GenerateView {
     }
 
     private void generatePhrases() {
-        selecteWord = words.stream().filter( x -> x.getWord().equals( wordList.getSelectedValue() ) ).findFirst().get();
+        selecteWord = words.stream()
+                .filter( x -> x.getWord().equals( wordsTable.getValueAt( wordsTable.getSelectedRow(), 0 ).toString() ) )
+                .findFirst().get();
         List<List<Word>> tempPhrases = app.generatePhrases( selecteWord, words );
         phrases = app.generateNumericPhrases( tempPhrases, phoneNumber.getPhoneNumber() );
     }
@@ -238,22 +254,34 @@ public class GenerateView {
     private void populateWordsScroll() {
         String[] wordsArr = words.stream().map( x -> x.getWord() ).toArray( String[]::new );
         Arrays.sort( wordsArr );
-        wordList = new JList<>( wordsArr );
-        wordScroll.setViewportView( wordList );
+        wordsModel.setColumnCount( 0 );
+        wordsModel.setRowCount( 0 );
+        wordsModel.addColumn( "Generated Words" );
+        for ( String word : wordsArr ) {
+            wordsModel.addRow( new Object[] { word } );
+        }
     }
 
     private void populatePhrasesScroll() {
         String[] phrasesArr = phrases.toArray( String[]::new );
         Arrays.sort( phrasesArr );
-        phrasesList = new JList<>( phrasesArr );
-        phraseScroll.setViewportView( phrasesList );
+        phrasesModel.setColumnCount( 0 );
+        phrasesModel.setRowCount( 0 );
+        phrasesModel.addColumn( "Phrases" + ( selecteWord.getWord() != null ? " containing " + selecteWord.getWord() : "" ) );
+        for ( String phrase : phrasesArr ) {
+            phrasesModel.addRow( new Object[] { phrase } );
+        }
     }
 
     private void populateSelectedPhrasesScroll() {
         String[] selectedPhrasesArr = selectedPhrases.toArray( String[]::new );
         Arrays.sort( selectedPhrasesArr );
-        selectedPhrasesList = new JList<>( selectedPhrasesArr );
-        selectedScroll.setViewportView( selectedPhrasesList );
+        selectedPhrasesModel.setColumnCount( 0 );
+        selectedPhrasesModel.setRowCount( 0 );
+        selectedPhrasesModel.addColumn( "Selected Phrases" );
+        for ( String phrase : selectedPhrasesArr ) {
+            selectedPhrasesModel.addRow( new Object[] { phrase } );
+        }
     }
 
     private void clearView() {
