@@ -62,6 +62,7 @@ public class AppGUI {
         frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
         frame.setContentPane( panel );
         frame.setResizable( false );
+        frame.setVisible( true );
 
         // Load start view
         StartMenuView startView = new StartMenuView( frame, app );
