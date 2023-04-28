@@ -50,11 +50,12 @@ public class GenerateView {
     Set<Word> words = new HashSet<>();
     List<String> phrases = new LinkedList<>();
     Set<String> selectedPhrases = new TreeSet<>();
+    boolean isResetting;
 
     ListSelectionListener wordsListListener = new ListSelectionListener() {
         @Override
         public void valueChanged( ListSelectionEvent e ) {
-            if ( !e.getValueIsAdjusting() ) {
+            if ( !e.getValueIsAdjusting() && !isResetting ) {
                 generatePhrases();
                 populatePhrasesScroll();
             }
@@ -127,6 +128,7 @@ public class GenerateView {
         deleteBtn.addActionListener( x -> onDeleteClick() );
         saveBtn.addActionListener( x -> onSaveClick() );
         backBtn.addActionListener( x -> onBackClick() );
+        wordsTable.getSelectionModel().addListSelectionListener( wordsListListener );
     }
 
     private void onInit() {
@@ -154,7 +156,7 @@ public class GenerateView {
         phoneNumber.setId( id );
         app.storePhrases( selectedPhrases, phoneNumber );
 
-        clearView();
+        resetView();
         JOptionPane.showMessageDialog( frame, "Success", "Information", JOptionPane.INFORMATION_MESSAGE );
     }
 
@@ -204,7 +206,6 @@ public class GenerateView {
 
     private void onGenerateClick() {
         clearErrorMessages();
-        wordsTable.getSelectionModel().removeListSelectionListener( wordsListListener );
 
         boolean success = getPhoneNumber();
         if ( !success ) {
@@ -214,7 +215,6 @@ public class GenerateView {
         words = app.generateWords( phoneNumber );
 
         populateWordsScroll();
-        wordsTable.getSelectionModel().addListSelectionListener( wordsListListener );
     }
 
     private boolean getPhoneNumber() {
@@ -284,7 +284,8 @@ public class GenerateView {
         }
     }
 
-    private void clearView() {
+    private void resetView() {
+        isResetting = true;
         phoneTxt.setText( "" );
         words.clear();
         phrases.clear();
@@ -292,6 +293,7 @@ public class GenerateView {
         populateWordsScroll();
         populatePhrasesScroll();
         populateSelectedPhrasesScroll();
+        isResetting = false;
     }
 
     private void displayErrorMessages( List<String> errors ) {
