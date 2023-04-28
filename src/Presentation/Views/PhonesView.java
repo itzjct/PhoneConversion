@@ -3,6 +3,7 @@ package Presentation.Views;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.*;
 import javax.swing.*;
@@ -42,6 +43,7 @@ public class PhonesView {
         contentPanel.setBorder( new EmptyBorder( 10, 0, 0, 0 ) );
         contentPanel.add( phonesScroll );
 
+        header.setFont( new Font( "Arial", Font.BOLD, 14 ) );
         header.setAlignmentX( Container.CENTER_ALIGNMENT );
 
         errorPanel.setVisible( false );
